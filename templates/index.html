@@ -1,789 +1,1352 @@
-<!DOCTYPE html>
 
+<!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
-
-```
-<meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
->
-
-<title>{{ config.site_name }}</title>
-
-<style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    :root {
-        --red: {{ config.primary_color or "#e00000" }};
-        --bg: #030303;
-        --panel: rgba(12, 12, 12, .78);
-        --border: rgba(255, 255, 255, .08);
-        --text: #f5f5f5;
-        --muted: #777;
-    }
-
-    html {
-        scroll-behavior: smooth;
-    }
-
-    body {
-        min-height: 100vh;
-        color: var(--text);
-        background:
-            radial-gradient(
-                circle at 15% 5%,
-                rgba(224, 0, 0, .16),
-                transparent 30%
-            ),
-            radial-gradient(
-                circle at 85% 75%,
-                rgba(120, 0, 0, .09),
-                transparent 30%
-            ),
-            #030303;
-        font-family: Arial, Helvetica, sans-serif;
-        overflow-x: hidden;
-    }
-
-    body::before {
-        content: "";
-        position: fixed;
-        inset: 0;
-        pointer-events: none;
-        opacity: .22;
-        background-image:
-            linear-gradient(
-                rgba(255, 255, 255, .025) 1px,
-                transparent 1px
-            ),
-            linear-gradient(
-                90deg,
-                rgba(255, 255, 255, .025) 1px,
-                transparent 1px
-            );
-        background-size: 45px 45px;
-    }
-
-    a {
-        color: inherit;
-        text-decoration: none;
-    }
-
-    button,
-    input,
-    textarea {
-        font-family: inherit;
-    }
-
-    /* =========================
-       TOPBAR
-    ========================= */
-
-    .topbar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 1000;
-        height: 72px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 30px;
-        background: rgba(3, 3, 3, .72);
-        border-bottom: 1px solid rgba(255, 255, 255, .06);
-        backdrop-filter: blur(18px);
-    }
-
-    .logo {
-        display: flex;
-        align-items: center;
-        gap: 11px;
-        font-size: 17px;
-        font-weight: 900;
-        letter-spacing: 3px;
-    }
-
-    .logo-icon {
-        width: 38px;
-        height: 38px;
-        display: grid;
-        place-items: center;
-        border-radius: 11px;
-        background:
-            linear-gradient(
-                145deg,
-                #280000,
-                #650000
-            );
-        border: 1px solid rgba(255, 0, 0, .28);
-        box-shadow:
-            0 0 25px rgba(224, 0, 0, .18);
-    }
-
-    .logo span {
-        color: var(--red);
-    }
-
-    /* =========================
-       SETTINGS
-    ========================= */
-
-    .settings {
-        position: relative;
-    }
-
-    .gear {
-        width: 43px;
-        height: 43px;
-        display: grid;
-        place-items: center;
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, .08);
-        background: rgba(255, 255, 255, .035);
-        color: #aaa;
-        font-size: 21px;
-        cursor: pointer;
-        transition:
-            transform .5s ease,
-            color .25s ease,
-            background .25s ease,
-            border-color .25s ease;
-    }
-
-    .gear:hover {
-        transform: rotate(180deg);
-        color: white;
-        background: rgba(224, 0, 0, .10);
-        border-color: rgba(224, 0, 0, .28);
-    }
-
-    .settings-menu {
-        position: absolute;
-        top: 54px;
-        right: 0;
-        width: 225px;
-        padding: 8px;
-        border-radius: 14px;
-        background: rgba(9, 9, 9, .97);
-        border: 1px solid rgba(255, 255, 255, .09);
-        box-shadow: 0 25px 70px rgba(0, 0, 0, .55);
-        backdrop-filter: blur(20px);
-        opacity: 0;
-        visibility: hidden;
-        transform: translateY(-8px) scale(.97);
-        transition: .22s ease;
-    }
-
-    .settings:hover .settings-menu {
-        opacity: 1;
-        visibility: visible;
-        transform: translateY(0) scale(1);
-    }
-
-    .menu-title {
-        padding: 9px 11px 7px;
-        color: #444;
-        font-size: 8px;
-        letter-spacing: 1.7px;
-        text-transform: uppercase;
-    }
-
-    .settings-menu a {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 11px;
-        border-radius: 9px;
-        color: #999;
-        font-size: 11px;
-        transition: .2s;
-    }
-
-    .settings-menu a:hover {
-        color: white;
-        background: rgba(255, 255, 255, .05);
-    }
-
-    .settings-menu .admin-link {
-        color: #ff6666;
-        background: rgba(224, 0, 0, .035);
-        border: 1px solid rgba(224, 0, 0, .08);
-    }
-
-    .settings-menu .admin-link:hover {
-        color: white;
-        background: rgba(224, 0, 0, .12);
-        border-color: rgba(224, 0, 0, .25);
-    }
-
-    .admin-badge {
-        margin-left: auto;
-        padding: 3px 6px;
-        border-radius: 5px;
-        color: #ff7777;
-        background: rgba(224, 0, 0, .10);
-        font-size: 7px;
-        font-weight: 900;
-        letter-spacing: .7px;
-    }
-
-    .menu-separator {
-        height: 1px;
-        margin: 6px 5px;
-        background: rgba(255, 255, 255, .06);
-    }
-
-    /* =========================
-       HERO
-    ========================= */
-
-    .hero {
-        position: relative;
-        min-height: 650px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 120px 20px 70px;
-        text-align: center;
-    }
-
-    .hero-content {
-        position: relative;
-        z-index: 2;
-        width: min(900px, 100%);
-    }
-
-    .hero-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 7px 12px;
-        margin-bottom: 22px;
-        border-radius: 100px;
-        color: #ff7777;
-        background: rgba(224, 0, 0, .08);
-        border: 1px solid rgba(224, 0, 0, .18);
-        font-size: 9px;
-        font-weight: bold;
-        letter-spacing: 1.8px;
-        text-transform: uppercase;
-    }
-
-    .hero-badge-dot {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: var(--red);
-        box-shadow: 0 0 12px var(--red);
-    }
-
-    .hero h1 {
-        font-size: clamp(45px, 9vw, 105px);
-        line-height: .92;
-        font-weight: 900;
-        letter-spacing: -5px;
-        text-transform: uppercase;
-        text-shadow: 0 0 50px rgba(224, 0, 0, .12);
-    }
-
-    .hero h1 span {
-        color: var(--red);
-    }
-
-    .hero-text {
-        max-width: 650px;
-        margin: 25px auto 0;
-        color: #707070;
-        font-size: 13px;
-        line-height: 1.8;
-    }
-
-    .hero-buttons {
-        display: flex;
-        justify-content: center;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-top: 28px;
-    }
-
-    .hero-button {
-        min-width: 140px;
-        padding: 12px 18px;
-        border-radius: 9px;
-        border: 1px solid rgba(255, 255, 255, .08);
-        background: rgba(255, 255, 255, .035);
-        color: #bbb;
-        font-size: 11px;
-        transition: .25s;
-    }
-
-    .hero-button:hover {
-        color: white;
-        background: rgba(255, 255, 255, .07);
-        transform: translateY(-2px);
-    }
-
-    .hero-button.primary {
-        color: white;
-        border-color: rgba(224, 0, 0, .35);
-        background:
-            linear-gradient(
-                135deg,
-                #250000,
-                #700000
-            );
-        box-shadow: 0 10px 35px rgba(224, 0, 0, .13);
-    }
-
-    .glow {
-        position: absolute;
-        width: 420px;
-        height: 420px;
-        border-radius: 50%;
-        background: var(--red);
-        filter: blur(150px);
-        opacity: .07;
-        pointer-events: none;
-    }
-
-    .glow.one {
-        top: 100px;
-        left: -180px;
-    }
-
-    .glow.two {
-        right: -180px;
-        bottom: 20px;
-        opacity: .05;
-    }
-
-    /* =========================
-       MEMBER PANEL
-    ========================= */
-
-    .member-panel {
-        width: min(1050px, calc(100% - 30px));
-        margin: -25px auto 30px;
-        position: relative;
-        z-index: 5;
-        padding: 20px;
-        border-radius: 16px;
-        background:
-            linear-gradient(
-                145deg,
-                rgba(18, 18, 18, .92),
-                rgba(7, 7, 7, .92)
-            );
-        border: 1px solid rgba(224, 0, 0, .15);
-        box-shadow: 0 20px 70px rgba(0, 0, 0, .35);
-    }
-
-    .member-panel-inner {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 20px;
-    }
-
-    .member-info {
-        display: flex;
-        align-items: center;
-        gap: 13px;
-    }
-
-    .member-avatar {
-        width: 47px;
-        height: 47px;
-        display: grid;
-        place-items: center;
-        border-radius: 13px;
-        background:
-            linear-gradient(
-                145deg,
-                var(--red),
-                #4d0000
-            );
-        font-weight: 900;
-    }
-
-    .member-info strong {
-        display: block;
-        font-size: 13px;
-    }
-
-    .member-info small {
-        display: block;
-        margin-top: 4px;
-        color: #666;
-        font-size: 9px;
-    }
-
-    .member-actions {
-        display: flex;
-        gap: 8px;
-    }
-
-    .member-button {
-        padding: 10px 13px;
-        border-radius: 8px;
-        border: 1px solid rgba(255, 255, 255, .07);
-        background: rgba(255, 255, 255, .03);
-        color: #aaa;
-        font-size: 10px;
-        transition: .2s;
-    }
-
-    .member-button:hover {
-        color: white;
-        background: rgba(255, 255, 255, .06);
-    }
-
-    /* =========================
-       BANNER
-    ========================= */
-
-    .banner-section {
-        width: min(1100px, calc(100% - 30px));
-        margin: 25px auto 55px;
-        position: relative;
-        z-index: 4;
-    }
-
-    .banner {
-        position: relative;
-        min-height: 240px;
-        overflow: hidden;
-        display: flex;
-        align-items: flex-end;
-        border-radius: 18px;
-        border: 1px solid rgba(255, 255, 255, .08);
-        background:
-            linear-gradient(
-                135deg,
-                #090909,
-                #151515
-            );
-        box-shadow: 0 25px 80px rgba(0, 0, 0, .35);
-    }
-
-    .banner-image {
-        position: absolute;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        opacity: .48;
-    }
-
-    .banner-overlay {
-        position: absolute;
-        inset: 0;
-        background:
-            linear-gradient(
-                90deg,
-                rgba(0, 0, 0, .95),
-                rgba(0, 0, 0, .55),
-                rgba(0, 0, 0, .35)
-            );
-    }
-
-    .banner-content {
-        position: relative;
-        z-index: 2;
-        max-width: 700px;
-        padding: 35px;
-    }
-
-    .banner-label {
-        color: #ff6868;
-        font-size: 9px;
-        font-weight: bold;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        margin-bottom: 10px;
-    }
-
-    .banner h2 {
-        font-size: clamp(24px, 4vw, 40px);
-        line-height: 1.05;
-        margin-bottom: 10px;
-    }
-
-    .banner p {
-        color: #aaa;
-        font-size: 12px;
-        line-height: 1.7;
-    }
-
-    .banner-button {
-        display: inline-flex;
-        margin-top: 18px;
-        padding: 10px 15px;
-        border-radius: 8px;
-        background: var(--red);
-        color: white;
-        font-size: 10px;
-        font-weight: bold;
-    }
-
-    /* =========================
-       SECTIONS
-    ========================= */
-
-    .section {
-        width: min(1100px, calc(100% - 30px));
-        margin: 0 auto 65px;
-    }
-
-    .section-header {
-        margin-bottom: 18px;
-    }
-
-    .section-label {
-        color: var(--red);
-        font-size: 9px;
-        font-weight: bold;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-    }
-
-    .section-title {
-        margin-top: 7px;
-        font-size: 25px;
-    }
-
-    .section-description {
-        margin-top: 5px;
-        color: #555;
-        font-size: 11px;
-    }
-
-    /* =========================
-       ANNOUNCEMENTS
-    ========================= */
-
-    .announcements {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 14px;
-    }
-
-    .announcement {
-        overflow: hidden;
-        border-radius: 14px;
-        background: rgba(10, 10, 10, .82);
-        border: 1px solid var(--border);
-        transition: .25s;
-    }
-
-    .announcement:hover {
-        transform: translateY(-4px);
-        border-color: rgba(224, 0, 0, .23);
-        box-shadow: 0 20px 45px rgba(0, 0, 0, .3);
-    }
-
-    .announcement-image {
-        width: 100%;
-        height: 145px;
-        object-fit: cover;
-        background: #080808;
-    }
-
-    .announcement-content {
-        padding: 17px;
-    }
-
-    .announcement h3 {
-        font-size: 14px;
-    }
-
-    .announcement p {
-        margin-top: 8px;
-        color: #666;
-        font-size: 10px;
-        line-height: 1.7;
-    }
-
-    .announcement-link {
-        display: inline-block;
-        margin-top: 14px;
-        color: #ff6666;
-        font-size: 9px;
-        font-weight: bold;
-    }
-
-    .empty {
-        padding: 35px;
-        text-align: center;
-        border-radius: 13px;
-        border: 1px solid var(--border);
-        background: rgba(255, 255, 255, .015);
-        color: #444;
-        font-size: 11px;
-    }
-
-    /* =========================
-       FEATURES
-    ========================= */
-
-    .features {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 14px;
-    }
-
-    .feature {
-        padding: 22px;
-        border-radius: 14px;
-        border: 1px solid var(--border);
-        background: rgba(10, 10, 10, .65);
-        transition: .25s;
-    }
-
-    .feature:hover {
-        transform: translateY(-3px);
-        border-color: rgba(224, 0, 0, .18);
-    }
-
-    .feature-icon {
-        width: 38px;
-        height: 38px;
-        display: grid;
-        place-items: center;
-        margin-bottom: 15px;
-        border-radius: 10px;
-        background: rgba(224, 0, 0, .08);
-        border: 1px solid rgba(224, 0, 0, .14);
-    }
-
-    .feature h3 {
-        font-size: 13px;
-    }
-
-    .feature p {
-        margin-top: 7px;
-        color: #5e5e5e;
-        font-size: 10px;
-        line-height: 1.7;
-    }
-
-    /* =========================
-       FOOTER
-    ========================= */
-
-    footer {
-        padding: 35px 20px 45px;
-        text-align: center;
-        border-top: 1px solid rgba(255, 255, 255, .05);
-        color: #333;
-        font-size: 9px;
-        letter-spacing: 1px;
-    }
-
-    footer span {
-        color: var(--red);
-    }
-
-    /* =========================
-       RESPONSIVE
-    ========================= */
-
-    @media (max-width: 850px) {
-        .announcements,
-        .features {
-            grid-template-columns: 1fr 1fr;
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% if session.get("usuario") %}
+            {{ config.site_name }} • Área da comunidade
+        {% else %}
+            {{ config.site_name }}
+        {% endif %}
+    </title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        .hero {
-            min-height: 570px;
+        :root {
+            --red: {{ config.primary_color or "#e00000" }};
+            --bg: #030303;
+            --panel: rgba(12, 12, 12, .82);
+            --panel-2: rgba(18, 18, 18, .68);
+            --border: rgba(255, 255, 255, .075);
+            --text: #f5f5f5;
+            --muted: #707070;
         }
 
-        .hero h1 {
-            letter-spacing: -3px;
+        html {
+            scroll-behavior: smooth;
         }
-    }
 
-    @media (max-width: 600px) {
+        body {
+            min-height: 100vh;
+            color: var(--text);
+            background:
+                radial-gradient(
+                    circle at 12% 8%,
+                    rgba(224, 0, 0, .13),
+                    transparent 27%
+                ),
+                radial-gradient(
+                    circle at 88% 78%,
+                    rgba(120, 0, 0, .08),
+                    transparent 28%
+                ),
+                #030303;
+            font-family: Arial, Helvetica, sans-serif;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            opacity: .17;
+            background-image:
+                linear-gradient(
+                    rgba(255,255,255,.025) 1px,
+                    transparent 1px
+                ),
+                linear-gradient(
+                    90deg,
+                    rgba(255,255,255,.025) 1px,
+                    transparent 1px
+                );
+            background-size: 45px 45px;
+            z-index: 0;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button,
+        input,
+        textarea {
+            font-family: inherit;
+        }
+
+        /* =====================================
+           TOPBAR
+        ===================================== */
+
         .topbar {
-            padding: 0 15px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 72px;
+            z-index: 1000;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 30px;
+
+            background: rgba(3,3,3,.74);
+            border-bottom: 1px solid rgba(255,255,255,.06);
+
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
         }
 
         .logo {
-            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+
+            font-size: 17px;
+            font-weight: 900;
+            letter-spacing: 3px;
         }
 
         .logo-icon {
-            width: 35px;
-            height: 35px;
+            width: 38px;
+            height: 38px;
+
+            display: grid;
+            place-items: center;
+
+            border-radius: 11px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #280000,
+                    #650000
+                );
+
+            border: 1px solid rgba(255,0,0,.28);
+
+            box-shadow:
+                0 0 25px rgba(224,0,0,.18);
         }
 
-        .hero {
-            min-height: 540px;
-            padding-top: 110px;
+        .logo span {
+            color: var(--red);
         }
 
-        .hero h1 {
-            font-size: 48px;
-            letter-spacing: -3px;
+        /* =====================================
+           SETTINGS
+        ===================================== */
+
+        .settings {
+            position: relative;
         }
 
-        .hero-text {
-            font-size: 11px;
+        .gear {
+            width: 43px;
+            height: 43px;
+
+            display: grid;
+            place-items: center;
+
+            border-radius: 12px;
+
+            border: 1px solid rgba(255,255,255,.08);
+            background: rgba(255,255,255,.035);
+
+            color: #aaa;
+            font-size: 21px;
+
+            cursor: pointer;
+
+            transition:
+                transform .5s ease,
+                color .25s ease,
+                background .25s ease,
+                border-color .25s ease;
         }
 
-        .member-panel-inner {
-            align-items: flex-start;
-            flex-direction: column;
-        }
-
-        .member-actions {
-            width: 100%;
-        }
-
-        .member-button {
-            flex: 1;
-            text-align: center;
-        }
-
-        .banner-content {
-            padding: 25px;
-        }
-
-        .announcements,
-        .features {
-            grid-template-columns: 1fr;
+        .gear:hover {
+            transform: rotate(180deg);
+            color: white;
+            background: rgba(224,0,0,.10);
+            border-color: rgba(224,0,0,.28);
         }
 
         .settings-menu {
-            right: -5px;
-        }
-    }
-</style>
-```
+            position: absolute;
+            top: 54px;
+            right: 0;
 
+            width: 230px;
+            padding: 8px;
+
+            border-radius: 14px;
+
+            background: rgba(9,9,9,.97);
+            border: 1px solid rgba(255,255,255,.09);
+
+            box-shadow:
+                0 25px 70px rgba(0,0,0,.55);
+
+            backdrop-filter: blur(20px);
+
+            opacity: 0;
+            visibility: hidden;
+
+            transform:
+                translateY(-8px)
+                scale(.97);
+
+            transition: .22s ease;
+        }
+
+        .settings:hover .settings-menu {
+            opacity: 1;
+            visibility: visible;
+
+            transform:
+                translateY(0)
+                scale(1);
+        }
+
+        .menu-title {
+            padding: 9px 11px 7px;
+
+            color: #444;
+
+            font-size: 8px;
+            letter-spacing: 1.7px;
+            text-transform: uppercase;
+        }
+
+        .settings-menu a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            padding: 11px;
+
+            border-radius: 9px;
+
+            color: #999;
+            font-size: 11px;
+
+            transition: .2s;
+        }
+
+        .settings-menu a:hover {
+            color: white;
+            background: rgba(255,255,255,.05);
+        }
+
+        .settings-menu .admin-link {
+            color: #ff6666;
+            background: rgba(224,0,0,.035);
+            border: 1px solid rgba(224,0,0,.08);
+        }
+
+        .settings-menu .admin-link:hover {
+            color: white;
+            background: rgba(224,0,0,.12);
+            border-color: rgba(224,0,0,.25);
+        }
+
+        .admin-badge {
+            margin-left: auto;
+
+            padding: 3px 6px;
+
+            border-radius: 5px;
+
+            color: #ff7777;
+            background: rgba(224,0,0,.10);
+
+            font-size: 7px;
+            font-weight: 900;
+            letter-spacing: .7px;
+        }
+
+        .menu-separator {
+            height: 1px;
+            margin: 6px 5px;
+
+            background: rgba(255,255,255,.06);
+        }
+
+        /* =====================================
+           LOGGED HERO
+        ===================================== */
+
+        .logged-hero {
+            position: relative;
+
+            min-height: 610px;
+
+            display: flex;
+            align-items: center;
+
+            padding:
+                130px 30px
+                80px;
+
+            overflow: hidden;
+
+            z-index: 1;
+        }
+
+        .hero-grid {
+            width: min(1120px, 100%);
+            margin: auto;
+
+            display: grid;
+            grid-template-columns:
+                minmax(0, 1.3fr)
+                minmax(300px, .7fr);
+
+            gap: 55px;
+
+            align-items: center;
+        }
+
+        .hero-copy {
+            position: relative;
+            z-index: 2;
+        }
+
+        .welcome-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+
+            padding: 8px 13px;
+
+            border-radius: 100px;
+
+            color: #ff6b6b;
+
+            background: rgba(224,0,0,.075);
+            border: 1px solid rgba(224,0,0,.18);
+
+            font-size: 9px;
+            font-weight: bold;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+
+            border-radius: 50%;
+
+            background: #e00000;
+
+            box-shadow:
+                0 0 13px #e00000;
+
+            animation:
+                pulse 1.8s infinite;
+        }
+
+        @keyframes pulse {
+            0%,100% {
+                opacity: .45;
+                transform: scale(.8);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .welcome-title {
+            margin-top: 24px;
+
+            font-size:
+                clamp(42px, 6vw, 76px);
+
+            line-height: .95;
+
+            font-weight: 900;
+
+            letter-spacing: -4px;
+
+            text-transform: uppercase;
+        }
+
+        .welcome-title .line-muted {
+            display: block;
+
+            color: #666;
+            font-size: .45em;
+
+            letter-spacing: 1px;
+
+            margin-bottom: 10px;
+        }
+
+        .welcome-title .username {
+            display: block;
+
+            color: white;
+
+            overflow-wrap: anywhere;
+        }
+
+        .welcome-title .username span {
+            color: var(--red);
+
+            text-shadow:
+                0 0 35px rgba(224,0,0,.20);
+        }
+
+        .welcome-description {
+            max-width: 620px;
+
+            margin-top: 25px;
+
+            color: #777;
+
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .welcome-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+
+            margin-top: 28px;
+        }
+
+        .action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            min-width: 135px;
+
+            padding: 12px 17px;
+
+            border-radius: 9px;
+
+            border: 1px solid rgba(255,255,255,.08);
+
+            background: rgba(255,255,255,.035);
+
+            color: #aaa;
+
+            font-size: 10px;
+
+            transition:
+                transform .25s,
+                background .25s,
+                border-color .25s,
+                color .25s;
+        }
+
+        .action:hover {
+            transform: translateY(-2px);
+
+            color: white;
+
+            background: rgba(255,255,255,.07);
+
+            border-color: rgba(255,255,255,.13);
+        }
+
+        .action.primary {
+            color: white;
+
+            border-color: rgba(224,0,0,.35);
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #280000,
+                    #760000
+                );
+
+            box-shadow:
+                0 12px 35px rgba(224,0,0,.15);
+        }
+
+        .action.primary:hover {
+            box-shadow:
+                0 15px 45px rgba(224,0,0,.25);
+        }
+
+        /* =====================================
+           PROFILE CARD
+        ===================================== */
+
+        .profile-card {
+            position: relative;
+
+            padding: 25px;
+
+            border-radius: 19px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(20,20,20,.88),
+                    rgba(7,7,7,.9)
+                );
+
+            border: 1px solid rgba(255,255,255,.075);
+
+            box-shadow:
+                0 30px 90px rgba(0,0,0,.42);
+
+            overflow: hidden;
+        }
+
+        .profile-card::before {
+            content: "";
+
+            position: absolute;
+
+            width: 220px;
+            height: 220px;
+
+            right: -90px;
+            top: -100px;
+
+            border-radius: 50%;
+
+            background: var(--red);
+
+            filter: blur(90px);
+
+            opacity: .08;
+        }
+
+        .profile-card-label {
+            color: #555;
+
+            font-size: 8px;
+            font-weight: bold;
+            letter-spacing: 1.8px;
+
+            text-transform: uppercase;
+        }
+
+        .profile-avatar {
+            width: 72px;
+            height: 72px;
+
+            display: grid;
+            place-items: center;
+
+            margin-top: 20px;
+
+            border-radius: 19px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    var(--red),
+                    #430000
+                );
+
+            border: 1px solid rgba(255,0,0,.22);
+
+            font-size: 27px;
+            font-weight: 900;
+
+            box-shadow:
+                0 15px 45px rgba(224,0,0,.16);
+        }
+
+        .profile-name {
+            margin-top: 17px;
+
+            font-size: 20px;
+            font-weight: 900;
+        }
+
+        .profile-role {
+            margin-top: 5px;
+
+            color: #666;
+
+            font-size: 10px;
+        }
+
+        .profile-line {
+            height: 1px;
+
+            margin: 22px 0;
+
+            background:
+                rgba(255,255,255,.06);
+        }
+
+        .profile-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            color: #777;
+
+            font-size: 9px;
+        }
+
+        .online-dot {
+            width: 6px;
+            height: 6px;
+
+            border-radius: 50%;
+
+            background: #43d17a;
+
+            box-shadow:
+                0 0 12px rgba(67,209,122,.5);
+        }
+
+        .profile-link {
+            display: block;
+
+            margin-top: 17px;
+
+            color: #aaa;
+
+            font-size: 10px;
+
+            transition: .2s;
+        }
+
+        .profile-link:hover {
+            color: white;
+        }
+
+        /* =====================================
+           DECORATION
+        ===================================== */
+
+        .orb {
+            position: absolute;
+
+            border-radius: 50%;
+
+            pointer-events: none;
+
+            filter: blur(120px);
+        }
+
+        .orb-one {
+            width: 400px;
+            height: 400px;
+
+            left: -230px;
+            top: 80px;
+
+            background: var(--red);
+
+            opacity: .06;
+        }
+
+        .orb-two {
+            width: 350px;
+            height: 350px;
+
+            right: -180px;
+            bottom: -100px;
+
+            background: #8c0000;
+
+            opacity: .05;
+        }
+
+        /* =====================================
+           BANNER
+        ===================================== */
+
+        .banner-section {
+            width: min(1100px, calc(100% - 30px));
+
+            margin: -5px auto 60px;
+
+            position: relative;
+
+            z-index: 5;
+        }
+
+        .banner {
+            position: relative;
+
+            width: 100%;
+            min-height: 280px;
+
+            overflow: hidden;
+
+            display: flex;
+            align-items: flex-end;
+
+            border-radius: 18px;
+
+            border: 1px solid rgba(255,255,255,.09);
+
+            background:
+                radial-gradient(
+                    circle at 80% 20%,
+                    rgba(224,0,0,.15),
+                    transparent 35%
+                ),
+                linear-gradient(
+                    135deg,
+                    #080808,
+                    #151515
+                );
+
+            box-shadow:
+                0 25px 80px rgba(0,0,0,.35);
+
+            transition:
+                border-color .3s,
+                box-shadow .3s;
+        }
+
+        .banner:hover {
+            border-color:
+                rgba(224,0,0,.20);
+
+            box-shadow:
+                0 30px 90px rgba(0,0,0,.48);
+        }
+
+        .banner-image {
+            position: absolute;
+            inset: 0;
+
+            width: 100%;
+            height: 100%;
+
+            object-fit: cover;
+
+            opacity: .58;
+
+            z-index: 0;
+
+            transition:
+                transform .8s ease,
+                opacity .3s ease;
+        }
+
+        .banner:hover .banner-image {
+            transform: scale(1.025);
+            opacity: .63;
+        }
+
+        .banner-overlay {
+            position: absolute;
+            inset: 0;
+
+            z-index: 1;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(0,0,0,.94),
+                    rgba(0,0,0,.72) 42%,
+                    rgba(0,0,0,.38) 72%,
+                    rgba(0,0,0,.28)
+                );
+
+            pointer-events: none;
+        }
+
+        .banner-content {
+            position: relative;
+
+            z-index: 2;
+
+            width: 100%;
+
+            padding: 38px;
+
+            max-width: 760px;
+        }
+
+        .banner-label {
+            color: #ff6868;
+
+            font-size: 9px;
+            font-weight: bold;
+            letter-spacing: 2px;
+
+            text-transform: uppercase;
+
+            margin-bottom: 10px;
+        }
+
+        .banner h2 {
+            font-size:
+                clamp(27px, 4vw, 45px);
+
+            line-height: 1.05;
+
+            margin-bottom: 10px;
+        }
+
+        .banner p {
+            max-width: 650px;
+
+            color: #b5b5b5;
+
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .banner-button {
+            display: inline-flex;
+
+            margin-top: 18px;
+
+            padding: 10px 15px;
+
+            border-radius: 8px;
+
+            background: var(--red);
+
+            color: white;
+
+            font-size: 10px;
+            font-weight: bold;
+
+            box-shadow:
+                0 8px 25px rgba(224,0,0,.20);
+        }
+
+        /* =====================================
+           SECTIONS
+        ===================================== */
+
+        .section {
+            width: min(1100px, calc(100% - 30px));
+
+            margin:
+                0 auto
+                65px;
+
+            position: relative;
+
+            z-index: 1;
+        }
+
+        .section-header {
+            margin-bottom: 18px;
+        }
+
+        .section-label {
+            color: var(--red);
+
+            font-size: 9px;
+            font-weight: bold;
+            letter-spacing: 2px;
+
+            text-transform: uppercase;
+        }
+
+        .section-title {
+            margin-top: 7px;
+
+            font-size: 25px;
+        }
+
+        .section-description {
+            margin-top: 5px;
+
+            color: #555;
+
+            font-size: 11px;
+        }
+
+        /* =====================================
+           ANNOUNCEMENTS
+        ===================================== */
+
+        .announcements {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, minmax(0,1fr));
+
+            gap: 14px;
+        }
+
+        .announcement {
+            overflow: hidden;
+
+            border-radius: 14px;
+
+            background:
+                rgba(10,10,10,.82);
+
+            border: 1px solid var(--border);
+
+            transition: .25s;
+        }
+
+        .announcement:hover {
+            transform: translateY(-4px);
+
+            border-color:
+                rgba(224,0,0,.23);
+
+            box-shadow:
+                0 20px 45px rgba(0,0,0,.3);
+        }
+
+        .announcement-image {
+            width: 100%;
+            height: 145px;
+
+            object-fit: cover;
+
+            display: block;
+
+            opacity: .85;
+        }
+
+        .announcement-content {
+            padding: 17px;
+        }
+
+        .announcement h3 {
+            font-size: 14px;
+        }
+
+        .announcement p {
+            margin-top: 8px;
+
+            color: #666;
+
+            font-size: 10px;
+            line-height: 1.7;
+        }
+
+        .announcement-link {
+            display: inline-block;
+
+            margin-top: 14px;
+
+            color: #ff6666;
+
+            font-size: 9px;
+            font-weight: bold;
+        }
+
+        .empty {
+            padding: 35px;
+
+            text-align: center;
+
+            border-radius: 13px;
+
+            border: 1px solid var(--border);
+
+            background:
+                rgba(255,255,255,.015);
+
+            color: #444;
+
+            font-size: 11px;
+        }
+
+        /* =====================================
+           QUICK ACCESS
+        ===================================== */
+
+        .quick-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, minmax(0,1fr));
+
+            gap: 14px;
+        }
+
+        .quick-card {
+            position: relative;
+
+            padding: 22px;
+
+            min-height: 150px;
+
+            overflow: hidden;
+
+            border-radius: 14px;
+
+            border:
+                1px solid var(--border);
+
+            background:
+                rgba(10,10,10,.68);
+
+            transition:
+                transform .25s,
+                border-color .25s,
+                background .25s;
+        }
+
+        .quick-card:hover {
+            transform: translateY(-4px);
+
+            border-color:
+                rgba(224,0,0,.20);
+
+            background:
+                rgba(15,15,15,.82);
+        }
+
+        .quick-icon {
+            width: 40px;
+            height: 40px;
+
+            display: grid;
+            place-items: center;
+
+            margin-bottom: 17px;
+
+            border-radius: 11px;
+
+            background:
+                rgba(224,0,0,.08);
+
+            border:
+                1px solid rgba(224,0,0,.14);
+
+            font-size: 17px;
+        }
+
+        .quick-card h3 {
+            font-size: 13px;
+        }
+
+        .quick-card p {
+            margin-top: 7px;
+
+            color: #5e5e5e;
+
+            font-size: 10px;
+            line-height: 1.7;
+        }
+
+        .quick-arrow {
+            position: absolute;
+
+            right: 18px;
+            bottom: 18px;
+
+            color: #555;
+
+            font-size: 13px;
+
+            transition: .2s;
+        }
+
+        .quick-card:hover .quick-arrow {
+            color: var(--red);
+            transform: translateX(3px);
+        }
+
+        /* =====================================
+           PUBLIC HERO
+        ===================================== */
+
+        .public-hero {
+            position: relative;
+
+            min-height: 650px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding:
+                120px 20px
+                70px;
+
+            text-align: center;
+
+            z-index: 1;
+        }
+
+        .public-content {
+            width: min(900px,100%);
+        }
+
+        .public-badge {
+            display: inline-flex;
+
+            align-items: center;
+            gap: 8px;
+
+            padding: 7px 12px;
+
+            margin-bottom: 22px;
+
+            border-radius: 100px;
+
+            color: #ff7777;
+
+            background:
+                rgba(224,0,0,.08);
+
+            border:
+                1px solid rgba(224,0,0,.18);
+
+            font-size: 9px;
+            font-weight: bold;
+            letter-spacing: 1.8px;
+
+            text-transform: uppercase;
+        }
+
+        .public-dot {
+            width: 6px;
+            height: 6px;
+
+            border-radius: 50%;
+
+            background: var(--red);
+
+            box-shadow:
+                0 0 12px var(--red);
+        }
+
+        .public-title {
+            font-size:
+                clamp(45px,9vw,105px);
+
+            line-height: .92;
+
+            font-weight: 900;
+
+            letter-spacing: -5px;
+
+            text-transform: uppercase;
+        }
+
+        .public-title span {
+            color: var(--red);
+        }
+
+        .public-text {
+            max-width: 650px;
+
+            margin: 25px auto 0;
+
+            color: #707070;
+
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .public-buttons {
+            display: flex;
+
+            justify-content: center;
+            flex-wrap: wrap;
+
+            gap: 10px;
+
+            margin-top: 28px;
+        }
+
+        /* =====================================
+           FOOTER
+        ===================================== */
+
+        footer {
+            padding:
+                35px 20px
+                45px;
+
+            text-align: center;
+
+            border-top:
+                1px solid rgba(255,255,255,.05);
+
+            color: #333;
+
+            font-size: 9px;
+            letter-spacing: 1px;
+        }
+
+        footer span {
+            color: var(--red);
+        }
+
+        /* =====================================
+           ANIMATION
+        ===================================== */
+
+        .appear {
+            opacity: 0;
+            transform: translateY(15px);
+
+            animation:
+                appear .65s
+                cubic-bezier(.2,.8,.2,1)
+                forwards;
+        }
+
+        .delay-1 {
+            animation-delay: .08s;
+        }
+
+        .delay-2 {
+            animation-delay: .16s;
+        }
+
+        .delay-3 {
+            animation-delay: .24s;
+        }
+
+        @keyframes appear {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* =====================================
+           RESPONSIVE
+        ===================================== */
+
+        @media (max-width: 850px) {
+
+            .hero-grid {
+                grid-template-columns: 1fr;
+                gap: 35px;
+            }
+
+            .profile-card {
+                max-width: 550px;
+            }
+
+            .announcements,
+            .quick-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .topbar {
+                padding: 0 15px;
+            }
+
+            .logo {
+                font-size: 14px;
+            }
+
+            .logo-icon {
+                width: 35px;
+                height: 35px;
+            }
+
+            .logged-hero {
+                padding:
+                    115px 20px
+                    55px;
+            }
+
+            .welcome-title {
+                font-size: 47px;
+                letter-spacing: -3px;
+            }
+
+            .welcome-description {
+                font-size: 11px;
+            }
+
+            .welcome-actions {
+                flex-direction: column;
+            }
+
+            .action {
+                width: 100%;
+            }
+
+            .profile-card {
+                padding: 21px;
+            }
+
+            .banner-section {
+                width: calc(100% - 20px);
+                margin-top: 5px;
+                margin-bottom: 45px;
+            }
+
+            .banner {
+                min-height: 300px;
+            }
+
+            .banner-overlay {
+                background:
+                    linear-gradient(
+                        0deg,
+                        rgba(0,0,0,.95),
+                        rgba(0,0,0,.70) 50%,
+                        rgba(0,0,0,.35)
+                    );
+            }
+
+            .banner-content {
+                padding: 25px;
+            }
+
+            .announcements,
+            .quick-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .public-hero {
+                min-height: 540px;
+            }
+
+            .public-title {
+                font-size: 48px;
+                letter-spacing: -3px;
+            }
+
+            .public-text {
+                font-size: 11px;
+            }
+
+            .settings-menu {
+                right: -5px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-```
-<!-- =========================================================
-     SESSÃO
-========================================================== -->
-
 {% set logado = session.get("usuario") %}
 {% set sou_admin = session.get("admin", false) %}
 
-<!-- =========================================================
+<!-- =====================================
      TOPO
-========================================================== -->
+====================================== -->
 
 <header class="topbar">
 
@@ -814,6 +1377,12 @@
                 <a href="/perfil">
                     👤 Perfil
                 </a>
+
+                {% if config.chat_enabled %}
+                    <a href="/chat">
+                        💬 Chat
+                    </a>
+                {% endif %}
 
                 <a href="/configuracoes">
                     ⚙ Configurações
@@ -885,88 +1454,128 @@
 
 </header>
 
-<!-- =========================================================
-     HERO
-========================================================== -->
 
-<section class="hero">
+{% if logado %}
 
-    <div class="glow one"></div>
-    <div class="glow two"></div>
+<!-- =====================================
+     ÁREA LOGADA
+====================================== -->
 
-    <div class="hero-content">
+<section class="logged-hero">
 
-        <div class="hero-badge">
+    <div class="orb orb-one"></div>
+    <div class="orb orb-two"></div>
 
-            <span class="hero-badge-dot"></span>
+    <div class="hero-grid">
 
-            Comunidade online
+        <div class="hero-copy">
 
-        </div>
+            <div class="welcome-label appear">
 
-        <h1>
-            {{ config.home_text or "THE WORLD IS YOURS" }}
-        </h1>
+                <span class="status-dot"></span>
 
-        <p class="hero-text">
+                Sessão ativa
 
-            Bem-vindo ao {{ config.site_name }}.
+            </div>
 
-            Um espaço criado para reunir pessoas,
-            conteúdo e uma comunidade em um só lugar.
+            <h1 class="welcome-title appear delay-1">
 
-        </p>
+                <span class="line-muted">
+                    Bem-vindo de volta,
+                </span>
 
-        <div class="hero-buttons">
+                <span class="username">
+                    {{ logado }}
+                    <span>.</span>
+                </span>
 
-            {% if logado %}
+            </h1>
+
+            <p class="welcome-description appear delay-2">
+
+                Seu espaço no
+                <strong>{{ config.site_name }}</strong>
+                está pronto.
+
+                Entre no chat, veja as novidades da comunidade
+                ou simplesmente explore o que está acontecendo.
+
+            </p>
+
+            <div class="welcome-actions appear delay-3">
 
                 {% if config.chat_enabled %}
 
                     <a
                         href="/chat"
-                        class="hero-button primary"
+                        class="action primary"
                     >
-                        💬 Abrir chat
+                        💬 Entrar no chat
                     </a>
 
                 {% endif %}
 
                 <a
                     href="#anuncios"
-                    class="hero-button"
+                    class="action"
                 >
-                    Ver novidades
+                    ✦ Ver novidades
                 </a>
+
+                <a
+                    href="/perfil"
+                    class="action"
+                >
+                    👤 Meu perfil
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- PERFIL RESUMIDO -->
+
+        <div class="profile-card appear delay-2">
+
+            <div class="profile-card-label">
+                Sua conta
+            </div>
+
+            <div class="profile-avatar">
+                {{ logado[0]|upper }}
+            </div>
+
+            <div class="profile-name">
+                {{ logado }}
+            </div>
+
+            <div class="profile-role">
 
                 {% if sou_admin %}
-
-                    <a
-                        href="/admin"
-                        class="hero-button"
-                    >
-                        🛡 Painel Admin
-                    </a>
-
+                    Administrador
+                {% else %}
+                    Membro da comunidade
                 {% endif %}
 
-            {% else %}
+            </div>
 
-                <a
-                    href="/login"
-                    class="hero-button primary"
-                >
-                    🔐 Entrar
-                </a>
+            <div class="profile-line"></div>
 
-                <a
-                    href="/cadastro"
-                    class="hero-button"
-                >
-                    Criar conta
-                </a>
+            <div class="profile-status">
 
-            {% endif %}
+                <span class="online-dot"></span>
+
+                Online agora
+
+            </div>
+
+            <a
+                href="/perfil"
+                class="profile-link"
+            >
+                Ver meu perfil →
+            </a>
 
         </div>
 
@@ -974,324 +1583,378 @@
 
 </section>
 
-<!-- =========================================================
-     MEMBER PANEL
-========================================================== -->
 
-{% if logado %}
+<!-- =====================================
+     BANNER
+====================================== -->
 
-    <section class="member-panel">
+{% if config.banner_enabled %}
 
-        <div class="member-panel-inner">
+<section class="banner-section">
 
-            <div class="member-info">
+    {% if config.banner_link %}
 
-                <div class="member-avatar">
+        <a
+            href="{{ config.banner_link }}"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="banner"
+        >
 
-                    {{ logado[0]|upper }}
+    {% else %}
 
-                </div>
+        <div class="banner">
 
-                <div>
+    {% endif %}
 
-                    <strong>
-                        Bem-vindo,
-                        {{ logado }}
-                    </strong>
+        {% if config.banner_image %}
 
-                    {% if sou_admin %}
+            <img
+                src="{{ config.banner_image }}"
+                class="banner-image"
+                alt="{{ config.banner_title or 'Banner' }}"
+                loading="eager"
+                onerror="this.style.display='none';"
+            >
 
-                        <small>
-                            Administrador • Acesso total
-                        </small>
+        {% endif %}
 
-                    {% else %}
+        <div class="banner-overlay"></div>
 
-                        <small>
-                            Membro da comunidade
-                        </small>
+        <div class="banner-content">
 
-                    {% endif %}
-
-                </div>
-
+            <div class="banner-label">
+                Destaque
             </div>
 
-            <div class="member-actions">
+            <h2>
+                {{ config.banner_title or "THE WORLD IS YOURS" }}
+            </h2>
 
-                <a
-                    href="/perfil"
-                    class="member-button"
-                >
-                    👤 Meu perfil
-                </a>
+            {% if config.banner_text %}
 
-                {% if config.chat_enabled %}
+                <p>
+                    {{ config.banner_text }}
+                </p>
 
-                    <a
-                        href="/chat"
-                        class="member-button"
-                    >
-                        💬 Chat
-                    </a>
+            {% endif %}
 
-                {% endif %}
+            {% if config.banner_link %}
 
-                {% if sou_admin %}
+                <span class="banner-button">
+                    Acessar →
+                </span>
 
-                    <a
-                        href="/admin"
-                        class="member-button"
-                    >
-                        🛡 Admin
-                    </a>
-
-                {% endif %}
-
-            </div>
+            {% endif %}
 
         </div>
 
-    </section>
+    {% if config.banner_link %}
+
+        </a>
+
+    {% else %}
+
+        </div>
+
+    {% endif %}
+
+</section>
 
 {% endif %}
 
-<!-- =========================================================
-     BANNER
-========================================================== -->
 
-{% if logado and config.banner_enabled %}
-
-    <section class="banner-section">
-
-        {% if config.banner_link %}
-
-            <a
-                href="{{ config.banner_link }}"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="banner"
-            >
-
-        {% else %}
-
-            <div class="banner">
-
-        {% endif %}
-
-                {% if config.banner_image %}
-
-                    <img
-                        src="{{ config.banner_image }}"
-                        class="banner-image"
-                        alt="Banner"
-                    >
-
-                {% endif %}
-
-                <div class="banner-overlay"></div>
-
-                <div class="banner-content">
-
-                    <div class="banner-label">
-                        Destaque
-                    </div>
-
-                    <h2>
-                        {{
-                            config.banner_title
-                            or
-                            "THE WORLD IS YOURS"
-                        }}
-                    </h2>
-
-                    {% if config.banner_text %}
-
-                        <p>
-                            {{ config.banner_text }}
-                        </p>
-
-                    {% endif %}
-
-                    {% if config.banner_link %}
-
-                        <span class="banner-button">
-                            Acessar →
-                        </span>
-
-                    {% endif %}
-
-                </div>
-
-        {% if config.banner_link %}
-
-            </a>
-
-        {% else %}
-
-            </div>
-
-        {% endif %}
-
-    </section>
-
-{% endif %}
-
-<!-- =========================================================
+<!-- =====================================
      ANÚNCIOS
-========================================================== -->
+====================================== -->
 
 {% if config.announcements_enabled %}
 
-    <section
-        class="section"
-        id="anuncios"
-    >
+<section
+    class="section"
+    id="anuncios"
+>
 
-        <div class="section-header">
+    <div class="section-header">
 
-            <div class="section-label">
-                Atualizações
-            </div>
+        <div class="section-label">
+            Atualizações
+        </div>
 
-            <h2 class="section-title">
-                Novidades
-            </h2>
+        <h2 class="section-title">
+            O que está acontecendo
+        </h2>
 
-            <p class="section-description">
-                Últimas publicações da comunidade.
-            </p>
+        <p class="section-description">
+            As últimas novidades publicadas pela comunidade.
+        </p>
+
+    </div>
+
+    {% if anuncios %}
+
+        <div class="announcements">
+
+            {% for anuncio in anuncios %}
+
+                <article class="announcement">
+
+                    {% if anuncio.image %}
+
+                        <img
+                            src="{{ anuncio.image }}"
+                            class="announcement-image"
+                            alt="{{ anuncio.title }}"
+                            loading="lazy"
+                            onerror="this.style.display='none';"
+                        >
+
+                    {% endif %}
+
+                    <div class="announcement-content">
+
+                        <h3>
+                            {{ anuncio.title }}
+                        </h3>
+
+                        {% if anuncio.content %}
+
+                            <p>
+                                {{ anuncio.content }}
+                            </p>
+
+                        {% endif %}
+
+                        {% if anuncio.link %}
+
+                            <a
+                                href="{{ anuncio.link }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="announcement-link"
+                            >
+                                Acessar →
+                            </a>
+
+                        {% endif %}
+
+                    </div>
+
+                </article>
+
+            {% endfor %}
 
         </div>
 
-        {% if anuncios %}
+    {% else %}
 
-            <div class="announcements">
+        <div class="empty">
+            Nenhuma novidade publicada no momento.
+        </div>
 
-                {% for anuncio in anuncios %}
+    {% endif %}
 
-                    <article class="announcement">
-
-                        <div class="announcement-content">
-
-                            <h3>
-                                {{ anuncio.title }}
-                            </h3>
-
-                            {% if anuncio.content %}
-
-                                <p>
-                                    {{ anuncio.content }}
-                                </p>
-
-                            {% endif %}
-
-                            {% if anuncio.link %}
-
-                                <a
-                                    href="{{ anuncio.link }}"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    class="announcement-link"
-                                >
-                                    Acessar →
-                                </a>
-
-                            {% endif %}
-
-                        </div>
-
-                    </article>
-
-                {% endfor %}
-
-            </div>
-
-        {% else %}
-
-            <div class="empty">
-                Nenhuma novidade publicada no momento.
-            </div>
-
-        {% endif %}
-
-    </section>
+</section>
 
 {% endif %}
 
-<!-- =========================================================
-     RECURSOS
-========================================================== -->
+
+<!-- =====================================
+     ACESSO RÁPIDO
+====================================== -->
 
 <section class="section">
 
     <div class="section-header">
 
         <div class="section-label">
-            {{ config.site_name }}
+            Navegação
         </div>
 
         <h2 class="section-title">
-            Tudo em um só lugar
+            Explore a comunidade
         </h2>
 
         <p class="section-description">
-            Recursos disponíveis para a comunidade.
+            Tudo o que você precisa está a poucos cliques.
         </p>
 
     </div>
 
-    <div class="features">
 
-        <div class="feature">
+    <div class="quick-grid">
 
-            <div class="feature-icon">
-                👥
+        <!-- PERFIL -->
+
+        <a
+            href="/perfil"
+            class="quick-card"
+        >
+
+            <div class="quick-icon">
+                👤
             </div>
 
             <h3>
-                Comunidade
+                Meu perfil
             </h3>
 
             <p>
-                Crie sua conta e faça parte
-                da comunidade do
-                {{ config.site_name }}.
+                Veja e gerencie as informações
+                da sua conta.
             </p>
 
-        </div>
+            <span class="quick-arrow">
+                →
+            </span>
 
-        <div class="feature">
+        </a>
 
-            <div class="feature-icon">
+
+        <!-- CHAT -->
+
+        {% if config.chat_enabled %}
+
+        <a
+            href="/chat"
+            class="quick-card"
+        >
+
+            <div class="quick-icon">
                 💬
             </div>
 
             <h3>
-                Chat
+                Chat da comunidade
             </h3>
 
             <p>
                 Converse com outros membros
-                através do chat da comunidade.
+                em tempo real.
             </p>
 
-        </div>
+            <span class="quick-arrow">
+                →
+            </span>
 
-        <div class="feature">
+        </a>
 
-            <div class="feature-icon">
-                🔒
+        {% endif %}
+
+
+        <!-- CONFIGURAÇÕES -->
+
+        <a
+            href="/configuracoes"
+            class="quick-card"
+        >
+
+            <div class="quick-icon">
+                ⚙
             </div>
 
             <h3>
-                Área privada
+                Configurações
             </h3>
 
             <p>
-                Recursos exclusivos ficam disponíveis
-                depois que você entra na sua conta.
+                Personalize sua experiência
+                dentro do {{ config.site_name }}.
             </p>
+
+            <span class="quick-arrow">
+                →
+            </span>
+
+        </a>
+
+
+        {% if sou_admin %}
+
+        <!-- ADMIN -->
+
+        <a
+            href="/admin"
+            class="quick-card"
+        >
+
+            <div class="quick-icon">
+                🛡
+            </div>
+
+            <h3>
+                Painel administrativo
+            </h3>
+
+            <p>
+                Gerencie usuários, acessos,
+                anúncios e configurações.
+            </p>
+
+            <span class="quick-arrow">
+                →
+            </span>
+
+        </a>
+
+        {% endif %}
+
+    </div>
+
+</section>
+
+
+{% else %}
+
+<!-- =====================================
+     ÁREA PÚBLICA
+====================================== -->
+
+<section class="public-hero">
+
+    <div class="public-content">
+
+        <div class="public-badge">
+
+            <span class="public-dot"></span>
+
+            Seja bem-vindo
+
+        </div>
+
+        <h1 class="public-title">
+
+            SEJA
+            <span>BEM VINDO</span>
+            !
+
+        </h1>
+
+        <p class="public-text">
+
+            Seja bem-vindo ao
+            {{ config.site_name }}.
+
+            Crie sua conta, entre na comunidade
+            e descubra tudo o que preparamos para você.
+
+        </p>
+
+        <div class="public-buttons">
+
+            <a
+                href="/login"
+                class="action primary"
+            >
+                🔐 Entrar
+            </a>
+
+            <a
+                href="/cadastro"
+                class="action"
+            >
+                Criar conta
+            </a>
 
         </div>
 
@@ -1299,9 +1962,12 @@
 
 </section>
 
-<!-- =========================================================
+{% endif %}
+
+
+<!-- =====================================
      FOOTER
-========================================================== -->
+====================================== -->
 
 <footer>
 
@@ -1319,15 +1985,12 @@
 
 </footer>
 
-<!-- =========================================================
-     JAVASCRIPT
-========================================================== -->
+
+<!-- =====================================
+     MOUSE GLOW
+====================================== -->
 
 <script>
-
-    /* =========================
-       BRILHO DO MOUSE
-    ========================= */
 
     const glow = document.createElement("div");
 
@@ -1337,6 +2000,7 @@
     glow.style.borderRadius = "50%";
     glow.style.pointerEvents = "none";
     glow.style.zIndex = "999";
+
     glow.style.background =
         "radial-gradient(circle, rgba(224,0,0,.10), transparent 70%)";
 
@@ -1349,6 +2013,7 @@
         "opacity .3s";
 
     document.body.appendChild(glow);
+
 
     document.addEventListener(
         "mousemove",
@@ -1365,6 +2030,7 @@
         }
     );
 
+
     document.addEventListener(
         "mouseleave",
         function() {
@@ -1374,45 +2040,7 @@
         }
     );
 
-
-    /* =========================
-       ANIMAÇÕES DOS CARDS
-    ========================= */
-
-    document
-        .querySelectorAll(
-            ".announcement, .feature, .member-panel, .banner"
-        )
-        .forEach(
-            function(elemento) {
-
-                elemento.animate(
-                    [
-                        {
-                            opacity: 0,
-                            transform:
-                                "translateY(12px)"
-                        },
-                        {
-                            opacity: 1,
-                            transform:
-                                "translateY(0)"
-                        }
-                    ],
-                    {
-                        duration: 550,
-                        easing:
-                            "cubic-bezier(.2,.8,.2,1)",
-                        fill: "forwards"
-                    }
-                );
-
-            }
-        );
-
 </script>
-```
 
 </body>
-
 </html>

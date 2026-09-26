@@ -1,841 +1,739 @@
 <!DOCTYPE html>
-
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-```
-<title>Painel Admin | {{ config.site_name }}</title>
-
-<style>
-    :root {
-        --red: {{ config.primary_color or '#e00000' }};
-        --red-soft: rgba(224, 0, 0, .12);
-        --bg: #030303;
-        --panel: #0b0b0b;
-        --panel-2: #101010;
-        --border: rgba(255,255,255,.07);
-        --text: #f4f4f4;
-        --muted: #777;
-        --green: #36d98b;
-        --yellow: #f4c542;
-    }
-
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
-
-    html {
-        scroll-behavior: smooth;
-    }
-
-    body {
-        min-height: 100vh;
-        background:
-            radial-gradient(
-                circle at 85% 0%,
-                rgba(224,0,0,.13),
-                transparent 30%
-            ),
-            radial-gradient(
-                circle at 0% 100%,
-                rgba(224,0,0,.06),
-                transparent 28%
-            ),
-            var(--bg);
-        color: var(--text);
-        font-family: Arial, Helvetica, sans-serif;
-    }
-
-    a {
-        color: inherit;
-        text-decoration: none;
-    }
-
-    button,
-    input {
-        font-family: inherit;
-    }
-
-    .layout {
-        min-height: 100vh;
-    }
-
-    /* SIDEBAR */
-
-    .sidebar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 245px;
-        height: 100vh;
-        padding: 22px 16px;
-        background: rgba(7,7,7,.96);
-        border-right: 1px solid var(--border);
-        z-index: 100;
-    }
-
-    .brand {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 8px 10px 25px;
-    }
-
-    .brand-icon {
-        width: 42px;
-        height: 42px;
-        display: grid;
-        place-items: center;
-        border-radius: 12px;
-        background:
-            linear-gradient(
-                145deg,
-                var(--red),
-                #4f0000
-            );
-        box-shadow:
-            0 0 30px rgba(224,0,0,.22);
-        font-weight: 900;
-        font-size: 18px;
-    }
-
-    .brand-name {
-        font-size: 18px;
-        font-weight: 900;
-        letter-spacing: 1px;
-    }
-
-    .brand-sub {
-        margin-top: 3px;
-        color: #555;
-        font-size: 9px;
-        letter-spacing: 1.5px;
-    }
-
-    .nav-title {
-        margin: 16px 10px 8px;
-        color: #4d4d4d;
-        font-size: 9px;
-        font-weight: 900;
-        letter-spacing: 1.5px;
-    }
-
-    .nav {
-        display: flex;
-        flex-direction: column;
-        gap: 5px;
-    }
-
-    .nav a {
-        display: flex;
-        align-items: center;
-        gap: 11px;
-        padding: 12px 13px;
-        border-radius: 10px;
-        color: #999;
-        font-size: 12px;
-        font-weight: 700;
-        transition: .2s ease;
-    }
-
-    .nav a:hover {
-        color: white;
-        background: rgba(255,255,255,.045);
-        transform: translateX(3px);
-    }
-
-    .nav a.active {
-        color: white;
-        background:
-            linear-gradient(
-                90deg,
-                rgba(224,0,0,.20),
-                rgba(224,0,0,.035)
-            );
-        border-left: 2px solid var(--red);
-    }
-
-    .nav-icon {
-        width: 22px;
-        text-align: center;
-        font-size: 15px;
-    }
-
-    .sidebar-bottom {
-        position: absolute;
-        left: 16px;
-        right: 16px;
-        bottom: 18px;
-    }
-
-    .site-link {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 11px;
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        color: #888;
-        font-size: 11px;
-        font-weight: 700;
-        transition: .2s;
-    }
-
-    .site-link:hover {
-        color: white;
-        background: var(--red-soft);
-        border-color: rgba(224,0,0,.3);
-    }
-
-    /* CONTENT */
-
-    .content {
-        width: calc(100% - 245px);
-        margin-left: 245px;
-        padding: 32px;
-    }
-
-    .topbar {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 20px;
-        margin-bottom: 28px;
-    }
-
-    .eyebrow {
-        color: var(--red);
-        font-size: 9px;
-        font-weight: 900;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        margin-bottom: 8px;
-    }
-
-    h1 {
-        font-size: clamp(30px, 4vw, 46px);
-        line-height: 1;
-        letter-spacing: -2px;
-    }
-
-    .description {
-        margin-top: 9px;
-        color: #666;
-        font-size: 12px;
-    }
-
-    .admin-profile {
-        display: flex;
-        align-items: center;
-        gap: 11px;
-        padding: 8px 12px;
-        border: 1px solid var(--border);
-        border-radius: 13px;
-        background: rgba(255,255,255,.025);
-    }
-
-    .admin-avatar {
-        width: 40px;
-        height: 40px;
-        display: grid;
-        place-items: center;
-        border-radius: 11px;
-        background:
-            linear-gradient(
-                145deg,
-                var(--red),
-                #4c0000
-            );
-        font-weight: 900;
-    }
-
-    .admin-name {
-        font-size: 11px;
-        font-weight: 900;
-    }
-
-    .admin-role {
-        margin-top: 3px;
-        color: var(--red);
-        font-size: 8px;
-        font-weight: 900;
-        letter-spacing: 1px;
-    }
-
-    /* STATS */
-
-    .stats {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0,1fr));
-        gap: 13px;
-        margin-bottom: 20px;
-    }
-
-    .stat {
-        position: relative;
-        overflow: hidden;
-        min-height: 118px;
-        padding: 19px;
-        border: 1px solid var(--border);
-        border-radius: 15px;
-        background:
-            linear-gradient(
-                145deg,
-                #151515,
-                #090909
-            );
-        transition: .2s;
-    }
-
-    .stat:hover {
-        transform: translateY(-3px);
-        border-color: rgba(224,0,0,.25);
-    }
-
-    .stat::after {
-        content: "";
-        position: absolute;
-        right: -35px;
-        bottom: -35px;
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        background: var(--red);
-        opacity: .07;
-        filter: blur(25px);
-    }
-
-    .stat-label {
-        color: #666;
-        font-size: 9px;
-        font-weight: 900;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-    }
-
-    .stat-value {
-        margin-top: 13px;
-        font-size: 30px;
-        font-weight: 900;
-    }
-
-    .stat-icon {
-        position: absolute;
-        top: 17px;
-        right: 17px;
-        width: 35px;
-        height: 35px;
-        display: grid;
-        place-items: center;
-        border-radius: 10px;
-        color: var(--red);
-        background: var(--red-soft);
-        font-size: 15px;
-    }
-
-    /* MAIN GRID */
-
-    .grid {
-        display: grid;
-        grid-template-columns: minmax(0,1.55fr) minmax(280px,.75fr);
-        gap: 18px;
-    }
-
-    .panel {
-        overflow: hidden;
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        background: rgba(10,10,10,.9);
-        box-shadow: 0 20px 60px rgba(0,0,0,.2);
-    }
-
-    .panel-head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 15px;
-        padding: 19px 20px;
-        border-bottom: 1px solid var(--border);
-    }
-
-    .panel-title {
-        font-size: 13px;
-        font-weight: 900;
-    }
-
-    .panel-sub {
-        margin-top: 4px;
-        color: #555;
-        font-size: 9px;
-    }
-
-    .badge {
-        flex-shrink: 0;
-        padding: 6px 9px;
-        border-radius: 7px;
-        color: #ff6666;
-        background: var(--red-soft);
-        font-size: 8px;
-        font-weight: 900;
-        letter-spacing: .5px;
-    }
-
-    /* TABLE */
-
-    .table-wrap {
-        width: 100%;
-        overflow-x: auto;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    th {
-        padding: 13px 16px;
-        text-align: left;
-        color: #555;
-        background: rgba(255,255,255,.012);
-        font-size: 8px;
-        font-weight: 900;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        white-space: nowrap;
-    }
-
-    td {
-        padding: 13px 16px;
-        border-top: 1px solid rgba(255,255,255,.045);
-        color: #999;
-        font-size: 10px;
-        white-space: nowrap;
-    }
-
-    tr:hover td {
-        background: rgba(255,255,255,.018);
-    }
-
-    .user-cell {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-        color: white;
-        font-weight: 800;
-    }
-
-    .user-avatar {
-        width: 31px;
-        height: 31px;
-        display: grid;
-        place-items: center;
-        flex-shrink: 0;
-        border-radius: 9px;
-        background: linear-gradient(145deg,#242424,#101010);
-        border: 1px solid var(--border);
-        font-size: 10px;
-        font-weight: 900;
-    }
-
-    .status {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 9px;
-        font-weight: 800;
-    }
-
-    .status::before {
-        content: "";
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: #777;
-    }
-
-    .status.active {
-        color: var(--green);
-    }
-
-    .status.active::before {
-        background: var(--green);
-        box-shadow: 0 0 7px var(--green);
-    }
-
-    .status.blocked {
-        color: #ff5555;
-    }
-
-    .status.blocked::before {
-        background: #ff5555;
-    }
-
-    .action {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 7px 9px;
-        border: 1px solid var(--border);
-        border-radius: 7px;
-        color: #999;
-        background: transparent;
-        font-size: 9px;
-        font-weight: 800;
-        cursor: pointer;
-        transition: .2s;
-    }
-
-    .action:hover {
-        color: white;
-        border-color: rgba(224,0,0,.35);
-        background: var(--red-soft);
-    }
-
-    .action.danger:hover {
-        color: #ff6666;
-    }
-
-    /* SIDE */
-
-    .side-stack {
-        display: flex;
-        flex-direction: column;
-        gap: 18px;
-    }
-
-    .quick-grid {
-        display: grid;
-        grid-template-columns: repeat(2,minmax(0,1fr));
-        gap: 9px;
-        padding: 17px;
-    }
-
-    .quick {
-        padding: 15px;
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        background: rgba(255,255,255,.018);
-        transition: .2s;
-    }
-
-    .quick:hover {
-        transform: translateY(-2px);
-        border-color: rgba(224,0,0,.22);
-        background: rgba(224,0,0,.045);
-    }
-
-    .quick-icon {
-        margin-bottom: 9px;
-        font-size: 18px;
-    }
-
-    .quick-title {
-        color: white;
-        font-size: 10px;
-        font-weight: 900;
-    }
-
-    .quick-text {
-        margin-top: 4px;
-        color: #555;
-        font-size: 8px;
-    }
-
-    /* ACCESS */
-
-    .access {
-        padding: 17px 19px;
-    }
-
-    .access-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 15px;
-        padding: 12px 0;
-        border-bottom: 1px solid rgba(255,255,255,.045);
-    }
-
-    .access-row:last-child {
-        border-bottom: 0;
-    }
-
-    .access-label {
-        color: #555;
-        font-size: 9px;
-    }
-
-    .access-value {
-        max-width: 220px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        color: #ddd;
-        font-size: 9px;
-        font-weight: 700;
-        text-align: right;
-    }
-
-    /* IP */
-
-    .ip-panel {
-        margin-top: 18px;
-    }
-
-    .ip-content {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 20px;
-        padding: 20px;
-    }
-
-    .ip-number {
-        font-size: 34px;
-        font-weight: 900;
-    }
-
-    .ip-description {
-        margin-top: 5px;
-        color: #555;
-        font-size: 9px;
-    }
-
-    .private {
-        padding: 7px 10px;
-        border-radius: 8px;
-        color: #ff6666;
-        background: var(--red-soft);
-        font-size: 8px;
-        font-weight: 900;
-    }
-
-    /* LOGS */
-
-    .logs-panel {
-        margin-top: 18px;
-    }
-
-    .clear-form {
-        margin-left: auto;
-    }
-
-    .clear-button {
-        padding: 8px 11px;
-        border: 1px solid rgba(224,0,0,.15);
-        border-radius: 8px;
-        background: rgba(224,0,0,.05);
-        color: #aa5555;
-        font-size: 8px;
-        font-weight: 900;
-        cursor: pointer;
-        transition: .2s;
-    }
-
-    .clear-button:hover {
-        color: white;
-        background: rgba(224,0,0,.15);
-        border-color: rgba(224,0,0,.3);
-    }
-
-    .log-ip {
-        color: #ddd;
-        font-family: monospace;
-    }
-
-    .empty {
-        padding: 32px 20px;
-        text-align: center;
-        color: #444;
-        font-size: 10px;
-    }
-
-    /* FOOTER */
-
-    .footer {
-        display: flex;
-        justify-content: space-between;
-        gap: 15px;
-        margin-top: 24px;
-        padding: 15px 3px;
-        color: #3d3d3d;
-        font-size: 9px;
-    }
-
-    .footer strong {
-        color: #666;
-    }
-
-    /* RESPONSIVE */
-
-    @media (max-width: 1100px) {
-        .stats {
-            grid-template-columns: repeat(2,minmax(0,1fr));
+    <title>Dashboard | {{ config.site_name }}</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
-        .grid {
-            grid-template-columns: 1fr;
+        :root {
+            --red: {{ config.primary_color or '#e00000' }};
+            --red-dark: #850000;
+            --bg: #050505;
+            --card: rgba(15, 15, 15, .88);
+            --border: rgba(255,255,255,.08);
+            --text: #f5f5f5;
+            --muted: #777;
         }
-    }
 
-    @media (max-width: 760px) {
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 15% 10%, rgba(224,0,0,.12), transparent 30%),
+                radial-gradient(circle at 85% 80%, rgba(224,0,0,.07), transparent 30%),
+                var(--bg);
+            color: var(--text);
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background:
+                linear-gradient(rgba(255,255,255,.012) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.012) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* SIDEBAR */
+
         .sidebar {
-            width: 68px;
-            padding: 18px 9px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 260px;
+            padding: 24px 15px;
+            background: linear-gradient(180deg, rgba(10,10,11,.98), rgba(5,5,6,.98));
+            border-right: 1px solid var(--border);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 20px 0 70px rgba(0,0,0,.25);
         }
 
         .brand {
-            justify-content: center;
-            padding: 5px 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 10px 25px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
         }
 
-        .brand-text,
-        .nav-title,
-        .nav span,
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: linear-gradient(145deg, var(--red), var(--red-dark));
+            color: white;
+            font-size: 18px;
+            font-weight: 900;
+            box-shadow: 0 0 30px rgba(224,0,0,.22);
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-text strong {
+            color: white;
+            font-size: 17px;
+            font-weight: 900;
+            letter-spacing: 2px;
+        }
+
+        .brand-text span {
+            margin-top: 3px;
+            color: #555;
+            font-size: 8px;
+            font-weight: 800;
+            letter-spacing: 1.7px;
+        }
+
+        .side-label {
+            padding: 0 11px 9px;
+            color: #444;
+            font-size: 9px;
+            font-weight: 900;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+        }
+
+        .side-link {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 11px;
+            margin-bottom: 4px;
+            border-radius: 10px;
+            color: #888;
+            font-size: 13px;
+            border: 1px solid transparent;
+            transition: .2s;
+        }
+
+        .side-link:hover {
+            color: #fff;
+            background: rgba(255,255,255,.035);
+        }
+
+        .side-link.active {
+            color: #fff;
+            background: linear-gradient(
+                90deg,
+                rgba(224,0,0,.16),
+                rgba(224,0,0,.035)
+            );
+            border-color: rgba(224,0,0,.14);
+        }
+
+        .side-icon {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: rgba(255,255,255,.04);
+            font-size: 13px;
+        }
+
+        .active .side-icon {
+            color: var(--red);
+            background: rgba(224,0,0,.14);
+        }
+
         .sidebar-bottom {
-            display: none;
+            margin-top: auto;
+            padding-top: 18px;
+            border-top: 1px solid var(--border);
         }
 
-        .nav a {
-            justify-content: center;
-            padding: 13px 5px;
+        .logout {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 11px;
+            margin-bottom: 4px;
+            border-radius: 10px;
+            color: #777;
+            font-size: 13px;
+            transition: .2s;
         }
 
-        .content {
-            width: calc(100% - 68px);
-            margin-left: 68px;
-            padding: 22px 14px;
+        .logout:hover {
+            color: #fff;
+            background: rgba(255,255,255,.035);
         }
 
-        .admin-profile {
-            display: none;
+        /* MAIN */
+
+        .main {
+            min-height: 100vh;
+            margin-left: 260px;
         }
 
         .topbar {
-            margin-bottom: 22px;
+            height: 78px;
+            padding: 0 35px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(5,5,5,.82);
+            backdrop-filter: blur(18px);
+            border-bottom: 1px solid var(--border);
         }
 
-        .stats {
-            grid-template-columns: 1fr;
+        .topbar h1 {
+            font-size: 18px;
+            font-weight: 800;
         }
 
-        h1 {
-            font-size: 32px;
+        .topbar p {
+            margin-top: 4px;
+            color: #666;
+            font-size: 11px;
         }
-    }
 
-    @media (max-width: 500px) {
-        .quick-grid {
-            grid-template-columns: 1fr;
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .top-button {
+            padding: 10px 14px;
+            border-radius: 9px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,.035);
+            color: #aaa;
+            font-size: 11px;
+            font-weight: 700;
+            transition: .2s;
+        }
+
+        .top-button:hover {
+            color: white;
+            border-color: rgba(255,255,255,.15);
+        }
+
+        .top-button.red {
+            color: white;
+            border-color: rgba(224,0,0,.2);
+            background: rgba(224,0,0,.09);
+        }
+
+        .content {
+            width: min(1250px, calc(100% - 70px));
+            margin: 0 auto;
+            padding: 35px 0 60px;
+        }
+
+        /* FLASH */
+
+        .flash {
+            padding: 13px 16px;
+            margin-bottom: 18px;
+            border-radius: 11px;
+            border: 1px solid rgba(255,255,255,.08);
+            font-size: 13px;
+        }
+
+        .flash.success {
+            color: #9bffc7;
+            background: rgba(39,209,127,.07);
+            border-color: rgba(39,209,127,.2);
+        }
+
+        .flash.error {
+            color: #ff9999;
+            background: rgba(224,0,0,.07);
+            border-color: rgba(224,0,0,.2);
+        }
+
+        /* HERO */
+
+        .hero {
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 24px;
+            padding: 31px;
+            border-radius: 17px;
+            border: 1px solid rgba(224,0,0,.14);
+            background:
+                radial-gradient(circle at 85% 20%, rgba(224,0,0,.18), transparent 35%),
+                linear-gradient(135deg, rgba(22,10,10,.95), rgba(9,9,10,.96));
+            box-shadow: 0 25px 70px rgba(0,0,0,.24);
+        }
+
+        .hero-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin-bottom: 10px;
+            color: var(--red);
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+        }
+
+        .hero h2 {
+            font-size: clamp(25px, 3vw, 36px);
+            letter-spacing: -1px;
+        }
+
+        .hero p {
+            max-width: 700px;
+            margin-top: 10px;
+            color: #777;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        /* METRICS */
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .metric {
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid var(--border);
+            background: linear-gradient(145deg, rgba(17,17,19,.97), rgba(8,8,9,.97));
+            box-shadow: 0 15px 40px rgba(0,0,0,.2);
+        }
+
+        .metric-label {
+            color: #666;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metric-value {
+            margin-top: 10px;
+            color: white;
+            font-size: 26px;
+            font-weight: 900;
+        }
+
+        .metric-red {
+            color: var(--red);
+        }
+
+        /* CARD */
+
+        .card {
+            overflow: hidden;
+            margin-bottom: 20px;
+            background: linear-gradient(145deg, rgba(17,17,19,.97), rgba(8,8,9,.97));
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.25);
+        }
+
+        .card-header {
+            padding: 20px 21px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-icon {
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            color: var(--red);
+            background: rgba(224,0,0,.09);
+            border: 1px solid rgba(224,0,0,.15);
+        }
+
+        .card-header h3 {
+            font-size: 14px;
+        }
+
+        .card-header p {
+            margin-top: 4px;
+            color: #666;
+            font-size: 10px;
+        }
+
+        .card-body {
+            padding: 0;
+        }
+
+        /* TABLE */
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 720px;
+        }
+
+        th {
+            padding: 13px 18px;
+            color: #555;
+            font-size: 9px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: left;
+            background: rgba(255,255,255,.018);
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 14px 18px;
+            color: #aaa;
+            font-size: 11px;
+            border-bottom: 1px solid rgba(255,255,255,.045);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(255,255,255,.018);
+        }
+
+        .user-name {
+            color: #eee;
+            font-weight: 700;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 8px;
+            border-radius: 7px;
+            font-size: 9px;
+            font-weight: 800;
+        }
+
+        .badge-admin {
+            color: #ff7777;
+            background: rgba(224,0,0,.1);
+        }
+
+        .badge-user {
+            color: #aaa;
+            background: rgba(255,255,255,.06);
+        }
+
+        .badge-active {
+            color: #8dffc0;
+            background: rgba(39,209,127,.08);
+        }
+
+        .badge-blocked {
+            color: #ff9999;
+            background: rgba(224,0,0,.08);
+        }
+
+        .actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .action {
+            padding: 6px 8px;
+            border-radius: 7px;
+            color: #aaa;
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(255,255,255,.06);
+            font-size: 9px;
+            transition: .2s;
+        }
+
+        .action:hover {
+            color: white;
+            border-color: rgba(255,255,255,.15);
+        }
+
+        .action.red {
+            color: #ff7777;
+            border-color: rgba(224,0,0,.12);
+            background: rgba(224,0,0,.05);
+        }
+
+        .empty {
+            padding: 35px 20px;
+            color: #555;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        /* CLEAR LOGS */
+
+        .logs-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .clear-button {
+            border: 1px solid rgba(224,0,0,.16);
+            border-radius: 8px;
+            padding: 8px 11px;
+            cursor: pointer;
+            color: #ff7777;
+            background: rgba(224,0,0,.06);
+            font-size: 9px;
+            font-weight: 800;
+        }
+
+        .clear-button:hover {
+            background: rgba(224,0,0,.12);
         }
 
         .footer {
-            flex-direction: column;
+            padding: 5px 0 0;
+            color: #444;
+            text-align: center;
+            font-size: 10px;
         }
 
-        .ip-content {
-            align-items: flex-start;
-            flex-direction: column;
-        }
-    }
-</style>
-```
+        /* RESPONSIVE */
 
+        @media (max-width: 1050px) {
+            .metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 800px) {
+            .sidebar {
+                width: 72px;
+                padding: 20px 9px;
+            }
+
+            .brand {
+                justify-content: center;
+                padding: 0 0 20px;
+            }
+
+            .brand-text,
+            .side-label {
+                display: none;
+            }
+
+            .side-link {
+                justify-content: center;
+                padding: 12px 8px;
+            }
+
+            .side-link span {
+                display: none;
+            }
+
+            .side-icon {
+                width: 34px;
+                height: 34px;
+            }
+
+            .logout {
+                justify-content: center;
+            }
+
+            .logout span:last-child {
+                display: none;
+            }
+
+            .main {
+                margin-left: 72px;
+            }
+
+            .topbar {
+                padding: 0 20px;
+            }
+
+            .content {
+                width: calc(100% - 40px);
+            }
+        }
+
+        @media (max-width: 650px) {
+            .metrics {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+
+            .metric {
+                padding: 16px;
+            }
+
+            .metric-value {
+                font-size: 21px;
+            }
+
+            .topbar {
+                height: auto;
+                min-height: 72px;
+                padding: 12px 15px;
+            }
+
+            .topbar h1 {
+                font-size: 15px;
+            }
+
+            .topbar p {
+                font-size: 9px;
+            }
+
+            .top-actions {
+                gap: 5px;
+            }
+
+            .top-button {
+                padding: 8px 9px;
+                font-size: 9px;
+            }
+
+            .content {
+                width: calc(100% - 24px);
+                padding-top: 24px;
+            }
+
+            .hero {
+                padding: 24px 20px;
+            }
+
+            .hero h2 {
+                font-size: 25px;
+            }
+        }
+
+        @media (max-width: 430px) {
+            .sidebar {
+                width: 60px;
+            }
+
+            .main {
+                margin-left: 60px;
+            }
+
+            .metrics {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .top-actions {
+                flex-direction: column;
+            }
+
+            .top-button {
+                width: 100%;
+            }
+
+            .content {
+                width: calc(100% - 16px);
+            }
+
+            .hero {
+                padding: 20px 16px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-<div class="layout">
-
-```
-<!-- SIDEBAR -->
-
 <aside class="sidebar">
 
     <div class="brand">
-
-        <div class="brand-icon">
-            E
-        </div>
+        <div class="brand-icon">▣</div>
 
         <div class="brand-text">
-
-            <div class="brand-name">
-                {{ config.site_name }}
-            </div>
-
-            <div class="brand-sub">
-                ADMIN SYSTEM
-            </div>
-
+            <strong>EXPURG</strong>
+            <span>ADMIN CONTROL</span>
         </div>
-
     </div>
 
-    <div class="nav-title">
-        ADMINISTRAÇÃO
+    <div class="side-label">
+        Administração
     </div>
 
-    <nav class="nav">
+    <a href="/admin" class="side-link active">
+        <div class="side-icon">▦</div>
+        <span>Dashboard</span>
+    </a>
 
-        <a href="/admin" class="active">
-            <span class="nav-icon">⌂</span>
-            <span>Dashboard</span>
-        </a>
+    <a href="/admin/config" class="side-link">
+        <div class="side-icon">⚙</div>
+        <span>Configurações</span>
+    </a>
 
-        <a href="/admin/config">
-            <span class="nav-icon">⚙</span>
-            <span>Configurações</span>
-        </a>
+    <a href="/admin/anuncios" class="side-link">
+        <div class="side-icon">◈</div>
+        <span>Anúncios</span>
+    </a>
 
-        <a href="/admin/anuncios">
-            <span class="nav-icon">◈</span>
-            <span>Anúncios</span>
-        </a>
+    <a href="/admin/banner" class="side-link">
+        <div class="side-icon">▣</div>
+        <span>Banner</span>
+    </a>
 
-        <a href="/admin/banner">
-            <span class="nav-icon">▣</span>
-            <span>Banner</span>
-        </a>
-
-        {% if config.chat_enabled %}
-
-        <a href="/chat">
-            <span class="nav-icon">◉</span>
-            <span>Chat</span>
-        </a>
-
-        {% endif %}
-
-    </nav>
-
-    <div class="nav-title">
-        SISTEMA
-    </div>
-
-    <nav class="nav">
-
-        <a href="/">
-            <span class="nav-icon">↗</span>
-            <span>Ver site</span>
-        </a>
-
-        <a href="/logout">
-            <span class="nav-icon">⇥</span>
-            <span>Sair</span>
-        </a>
-
-    </nav>
+    <a href="/chat" class="side-link">
+        <div class="side-icon">◌</div>
+        <span>Chat</span>
+    </a>
 
     <div class="sidebar-bottom">
 
-        <a href="/" class="site-link">
-            ← Voltar ao site
+        <a href="/" class="logout">
+            <span>↩</span>
+            <span>Voltar ao site</span>
+        </a>
+
+        <a href="/logout" class="logout">
+            <span>⏻</span>
+            <span>Sair da conta</span>
         </a>
 
     </div>
@@ -843,680 +741,368 @@
 </aside>
 
 
-<!-- CONTEÚDO -->
-
-<main class="content">
+<main class="main">
 
     <header class="topbar">
 
         <div>
-
-            <div class="eyebrow">
-                Controle administrativo
-            </div>
-
-            <h1>
-                Dashboard
-            </h1>
-
-            <p class="description">
-                Gerencie os membros e acompanhe a atividade do {{ config.site_name }}.
-            </p>
-
+            <h1>Painel administrativo</h1>
+            <p>Controle e monitore o EXPURG</p>
         </div>
 
-        <div class="admin-profile">
-
-            <div class="admin-avatar">
-                {{ config.admin_name[:1]|upper }}
-            </div>
-
-            <div>
-
-                <div class="admin-name">
-                    {{ config.admin_name }}
-                </div>
-
-                <div class="admin-role">
-                    ADMINISTRADOR
-                </div>
-
-            </div>
-
+        <div class="top-actions">
+            <a href="/" class="top-button">Ver site</a>
+            <a href="/admin/config" class="top-button red">Configurações</a>
         </div>
 
     </header>
 
 
-    <!-- ESTATÍSTICAS -->
+    <div class="content">
 
-    <section class="stats">
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% if mensagens %}
+                {% for categoria, mensagem in mensagens %}
+                    <div class="flash {{ categoria }}">
+                        {{ mensagem }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
 
-        <div class="stat">
 
-            <div class="stat-label">
-                Usuários
+        <section class="hero">
+
+            <div class="hero-label">
+                ● Central administrativa
             </div>
 
-            <div class="stat-value">
-                {{ total_usuarios }}
+            <h2>
+                Dashboard
+            </h2>
+
+            <p>
+                Acompanhe os membros, acessos e registros do
+                sistema através de uma única central.
+            </p>
+
+        </section>
+
+
+        <section class="metrics">
+
+            <div class="metric">
+                <div class="metric-label">Usuários</div>
+                <div class="metric-value">
+                    {{ total_usuarios }}
+                </div>
             </div>
 
-            <div class="stat-icon">
-                👥
+            <div class="metric">
+                <div class="metric-label">Acessos</div>
+                <div class="metric-value">
+                    {{ total_acessos }}
+                </div>
             </div>
 
-        </div>
-
-
-        <div class="stat">
-
-            <div class="stat-label">
-                Acessos
+            <div class="metric">
+                <div class="metric-label">IPs únicos</div>
+                <div class="metric-value metric-red">
+                    {{ ips_unicos }}
+                </div>
             </div>
 
-            <div class="stat-value">
-                {{ total_acessos }}
+            <div class="metric">
+                <div class="metric-label">Último acesso</div>
+                <div class="metric-value" style="font-size:16px;">
+                    {% if ultimo_acesso %}
+                        {{ ultimo_acesso["ip"] }}
+                    {% else %}
+                        Nenhum
+                    {% endif %}
+                </div>
             </div>
 
-            <div class="stat-icon">
-                ↗
-            </div>
-
-        </div>
+        </section>
 
 
-        <div class="stat">
+        <!-- USUÁRIOS -->
 
-            <div class="stat-label">
-                IPs únicos
-            </div>
+        <section class="card">
 
-            <div class="stat-value">
-                {{ ips_unicos }}
-            </div>
+            <div class="card-header">
 
-            <div class="stat-icon">
-                #
-            </div>
-
-        </div>
-
-
-        <div class="stat">
-
-            <div class="stat-label">
-                Último acesso
-            </div>
-
-            <div class="stat-value" style="font-size:15px;margin-top:18px;">
-                {% if ultimo_acesso %}
-                    {{ ultimo_acesso.created_at }}
-                {% else %}
-                    Nenhum
-                {% endif %}
-            </div>
-
-            <div class="stat-icon">
-                🕒
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- PRINCIPAL -->
-
-    <section class="grid">
-
-
-        <!-- MEMBROS -->
-
-        <div class="panel">
-
-            <div class="panel-head">
+                <div class="card-icon">
+                    ◉
+                </div>
 
                 <div>
-
-                    <div class="panel-title">
-                        Membros
-                    </div>
-
-                    <div class="panel-sub">
-                        Contas registradas no sistema
-                    </div>
-
-                </div>
-
-                <div class="badge">
-                    {{ total_usuarios }} CONTAS
+                    <h3>Membros</h3>
+                    <p>Usuários registrados no EXPURG.</p>
                 </div>
 
             </div>
 
+            <div class="card-body">
 
-            <div class="table-wrap">
+                {% if usuarios %}
 
-                <table>
+                <div class="table-wrapper">
 
-                    <thead>
+                    <table>
 
-                        <tr>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Usuário</th>
+                                <th>Email</th>
+                                <th>Nível</th>
+                                <th>XP</th>
+                                <th>Status</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
 
-                            <th>
-                                Usuário
-                            </th>
-
-                            <th>
-                                E-mail
-                            </th>
-
-                            <th>
-                                Nível
-                            </th>
-
-                            <th>
-                                XP
-                            </th>
-
-                            <th>
-                                Status
-                            </th>
-
-                            <th>
-                                Ação
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
+                        <tbody>
 
                         {% for usuario in usuarios %}
 
-                        <tr>
+                            <tr>
 
-                            <td>
+                                <td>
+                                    #{{ usuario["id"] }}
+                                </td>
 
-                                <div class="user-cell">
+                                <td>
+                                    <span class="user-name">
+                                        {{ usuario["username"] }}
+                                    </span>
+                                </td>
 
-                                    <div class="user-avatar">
-                                        {{ usuario.username[:1]|upper }}
+                                <td>
+                                    {{ usuario["email"] or "-" }}
+                                </td>
+
+                                <td>
+
+                                    {% if usuario["level"] == "admin" %}
+
+                                        <span class="badge badge-admin">
+                                            ADMIN
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge badge-user">
+                                            {{ usuario["level"] or "user" }}
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td>
+                                    {{ usuario["xp"] or 0 }}
+                                </td>
+
+                                <td>
+
+                                    {% if usuario["status"] == "ativo" %}
+
+                                        <span class="badge badge-active">
+                                            ATIVO
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="badge badge-blocked">
+                                            {{ usuario["status"] or "BLOQUEADO" }}
+                                        </span>
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td>
+
+                                    <div class="actions">
+
+                                        <a
+                                            href="{{ url_for('editar_membro', user_id=usuario['id']) }}"
+                                            class="action"
+                                        >
+                                            Editar
+                                        </a>
+
+                                        {% if usuario["level"] != "admin" %}
+
+                                            {% if usuario["status"] == "ativo" %}
+
+                                                <a
+                                                    href="{{ url_for('bloquear_membro', user_id=usuario['id']) }}"
+                                                    class="action red"
+                                                    onclick="return confirm('Bloquear este membro?')"
+                                                >
+                                                    Bloquear
+                                                </a>
+
+                                            {% else %}
+
+                                                <a
+                                                    href="{{ url_for('desbloquear_membro', user_id=usuario['id']) }}"
+                                                    class="action"
+                                                >
+                                                    Desbloquear
+                                                </a>
+
+                                            {% endif %}
+
+                                            <a
+                                                href="{{ url_for('excluir_membro', user_id=usuario['id']) }}"
+                                                class="action red"
+                                                onclick="return confirm('Excluir este membro permanentemente?')"
+                                            >
+                                                Excluir
+                                            </a>
+
+                                        {% endif %}
+
                                     </div>
 
-                                    {{ usuario.username }}
+                                </td>
 
-                                </div>
-
-                            </td>
-
-                            <td>
-                                {{ usuario.email }}
-                            </td>
-
-                            <td>
-                                {{ usuario.level }}
-                            </td>
-
-                            <td>
-                                {{ usuario.xp }}
-                            </td>
-
-                            <td>
-
-                                {% if usuario.status == "blocked" %}
-
-                                <span class="status blocked">
-                                    Bloqueado
-                                </span>
-
-                                {% else %}
-
-                                <span class="status active">
-                                    Ativo
-                                </span>
-
-                                {% endif %}
-
-                            </td>
-
-                            <td>
-
-                                <a
-                                    href="/admin/membro/{{ usuario.id }}/editar"
-                                    class="action"
-                                >
-                                    Editar
-                                </a>
-
-                            </td>
-
-                        </tr>
-
-                        {% else %}
-
-                        <tr>
-
-                            <td
-                                colspan="6"
-                                class="empty"
-                            >
-                                Nenhum membro cadastrado.
-                            </td>
-
-                        </tr>
+                            </tr>
 
                         {% endfor %}
 
-                    </tbody>
+                        </tbody>
 
-                </table>
-
-            </div>
-
-        </div>
-
-
-        <!-- DIREITA -->
-
-        <div class="side-stack">
-
-
-            <!-- ATALHOS -->
-
-            <div class="panel">
-
-                <div class="panel-head">
-
-                    <div>
-
-                        <div class="panel-title">
-                            Acesso rápido
-                        </div>
-
-                        <div class="panel-sub">
-                            Ferramentas administrativas
-                        </div>
-
-                    </div>
+                    </table>
 
                 </div>
 
+                {% else %}
 
-                <div class="quick-grid">
+                    <div class="empty">
+                        Nenhum usuário registrado.
+                    </div>
 
-                    <a
-                        href="/admin/config"
-                        class="quick"
+                {% endif %}
+
+            </div>
+
+        </section>
+
+
+        <!-- LOGS -->
+
+        <section class="card">
+
+            <div class="card-header">
+
+                <div class="card-icon">
+                    ◌
+                </div>
+
+                <div class="logs-head">
+
+                    <div>
+                        <h3>Registros de acesso</h3>
+                        <p>Últimos acessos registrados pelo sistema.</p>
+                    </div>
+
+                    <form
+                        method="POST"
+                        action="{{ url_for('limpar_logs') }}"
+                        onsubmit="return confirm('Tem certeza que deseja apagar todos os logs?')"
                     >
-
-                        <div class="quick-icon">
-                            ⚙
-                        </div>
-
-                        <div class="quick-title">
-                            Configurações
-                        </div>
-
-                        <div class="quick-text">
-                            Configuração geral
-                        </div>
-
-                    </a>
-
-
-                    <a
-                        href="/admin/anuncios"
-                        class="quick"
-                    >
-
-                        <div class="quick-icon">
-                            ◈
-                        </div>
-
-                        <div class="quick-title">
-                            Anúncios
-                        </div>
-
-                        <div class="quick-text">
-                            Gerenciar publicações
-                        </div>
-
-                    </a>
-
-
-                    <a
-                        href="/admin/banner"
-                        class="quick"
-                    >
-
-                        <div class="quick-icon">
-                            ▣
-                        </div>
-
-                        <div class="quick-title">
-                            Banner
-                        </div>
-
-                        <div class="quick-text">
-                            Alterar banner do site
-                        </div>
-
-                    </a>
-
-
-                    {% if config.chat_enabled %}
-
-                    <a
-                        href="/chat"
-                        class="quick"
-                    >
-
-                        <div class="quick-icon">
-                            ◉
-                        </div>
-
-                        <div class="quick-title">
-                            Chat
-                        </div>
-
-                        <div class="quick-text">
-                            Abrir chat
-                        </div>
-
-                    </a>
-
-                    {% endif %}
+                        <button
+                            type="submit"
+                            class="clear-button"
+                        >
+                            Limpar logs
+                        </button>
+                    </form>
 
                 </div>
 
             </div>
 
 
-            <!-- ÚLTIMO ACESSO -->
+            <div class="card-body">
 
-            <div class="panel">
+                {% if logs %}
 
-                <div class="panel-head">
+                    <div class="table-wrapper">
 
-                    <div>
+                        <table>
 
-                        <div class="panel-title">
-                            Último acesso
-                        </div>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>IP</th>
+                                    <th>Rota</th>
+                                    <th>Navegador</th>
+                                    <th>Data</th>
+                                </tr>
+                            </thead>
 
-                        <div class="panel-sub">
-                            Atividade mais recente
-                        </div>
+                            <tbody>
 
-                    </div>
+                            {% for log in logs %}
 
-                </div>
+                                <tr>
 
+                                    <td>
+                                        #{{ log["id"] }}
+                                    </td>
 
-                <div class="access">
+                                    <td>
+                                        {{ log["ip"] }}
+                                    </td>
 
-                    {% if ultimo_acesso %}
+                                    <td>
+                                        {{ log["route"] }}
+                                    </td>
 
-                    <div class="access-row">
+                                    <td>
+                                        {{ log["browser"] or "-" }}
+                                    </td>
 
-                        <span class="access-label">
-                            IP
-                        </span>
+                                    <td>
+                                        {{ log["created_at"] }}
+                                    </td>
 
-                        <span class="access-value">
-                            {{ ultimo_acesso.ip or "Não registrado" }}
-                        </span>
+                                </tr>
 
-                    </div>
+                            {% endfor %}
 
+                            </tbody>
 
-                    <div class="access-row">
-
-                        <span class="access-label">
-                            Rota
-                        </span>
-
-                        <span class="access-value">
-                            {{ ultimo_acesso.route or "/" }}
-                        </span>
-
-                    </div>
-
-
-                    <div class="access-row">
-
-                        <span class="access-label">
-                            Navegador
-                        </span>
-
-                        <span class="access-value">
-                            {{ ultimo_acesso.browser or "Desconhecido" }}
-                        </span>
+                        </table>
 
                     </div>
 
-
-                    <div class="access-row">
-
-                        <span class="access-label">
-                            Data
-                        </span>
-
-                        <span class="access-value">
-                            {{ ultimo_acesso.created_at }}
-                        </span>
-
-                    </div>
-
-                    {% else %}
+                {% else %}
 
                     <div class="empty">
                         Nenhum acesso registrado.
                     </div>
 
-                    {% endif %}
-
-                </div>
+                {% endif %}
 
             </div>
 
+        </section>
+
+
+        <div class="footer">
+            EXPURG • Painel administrativo
         </div>
 
-    </section>
-
-
-    <!-- IPs -->
-
-    {% if config.show_ip %}
-
-    <section class="panel ip-panel">
-
-        <div class="panel-head">
-
-            <div>
-
-                <div class="panel-title">
-                    Endereços IP registrados
-                </div>
-
-                <div class="panel-sub">
-                    Informações privadas disponíveis somente para administradores
-                </div>
-
-            </div>
-
-            <div class="private">
-                PRIVADO
-            </div>
-
-        </div>
-
-
-        <div class="ip-content">
-
-            <div>
-
-                <div class="ip-number">
-                    {{ ips_unicos }}
-                </div>
-
-                <div class="ip-description">
-                    endereços IP únicos registrados
-                </div>
-
-            </div>
-
-            <div class="private">
-                SOMENTE ADMIN
-            </div>
-
-        </div>
-
-    </section>
-
-    {% endif %}
-
-
-    <!-- LOGS -->
-
-    {% if config.show_logs %}
-
-    <section class="panel logs-panel">
-
-        <div class="panel-head">
-
-            <div>
-
-                <div class="panel-title">
-                    Registros de acesso
-                </div>
-
-                <div class="panel-sub">
-                    Histórico recente de acessos
-                </div>
-
-            </div>
-
-
-            <form
-                class="clear-form"
-                method="POST"
-                action="/admin/logs/limpar"
-                onsubmit="return confirm('Tem certeza que deseja apagar todos os logs?')"
-            >
-
-                <button
-                    type="submit"
-                    class="clear-button"
-                >
-                    Limpar logs
-                </button>
-
-            </form>
-
-        </div>
-
-
-        <div class="table-wrap">
-
-            <table>
-
-                <thead>
-
-                    <tr>
-
-                        <th>
-                            IP
-                        </th>
-
-                        <th>
-                            Rota
-                        </th>
-
-                        <th>
-                            Navegador
-                        </th>
-
-                        <th>
-                            Data
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody>
-
-                    {% for log in logs %}
-
-                    <tr>
-
-                        <td class="log-ip">
-                            {{ log.ip or "Não registrado" }}
-                        </td>
-
-                        <td>
-                            {{ log.route or "/" }}
-                        </td>
-
-                        <td>
-                            {{ log.browser or "Desconhecido" }}
-                        </td>
-
-                        <td>
-                            {{ log.created_at }}
-                        </td>
-
-                    </tr>
-
-                    {% else %}
-
-                    <tr>
-
-                        <td
-                            colspan="4"
-                            class="empty"
-                        >
-                            Nenhum registro encontrado.
-                        </td>
-
-                    </tr>
-
-                    {% endfor %}
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-    </section>
-
-    {% endif %}
-
-
-    <footer class="footer">
-
-        <span>
-            {{ config.site_name }}
-            <strong>ADMIN SYSTEM</strong>
-        </span>
-
-        <span>
-            Painel protegido
-        </span>
-
-    </footer>
+    </div>
 
 </main>
-```
-
-</div>
 
 </body>
-
 </html>

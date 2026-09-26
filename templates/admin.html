@@ -1,1209 +1,2241 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
-
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>
-        Admin | {{ config.site_name }}
-    </title>
+    <title>Painel Administrativo</title>
 
     <style>
-
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
 
+        :root {
+            --bg: #070707;
+            --sidebar: #0b0b0b;
+            --card: #101010;
+            --card-hover: #151515;
+            --border: #202020;
+
+            --red: #8b0000;
+            --red-dark: #570000;
+            --red-soft: rgba(139, 0, 0, 0.12);
+
+            --text: #eeeeee;
+            --muted: #858585;
+            --green: #39a96b;
+        }
+
         body {
-
             min-height: 100vh;
-
-            font-family: Arial, sans-serif;
-
-            color: #eee;
 
             background:
                 radial-gradient(
-                    circle at top right,
-                    rgba(120, 0, 0, .14),
-                    transparent 35%
+                    circle at 80% 10%,
+                    rgba(100, 0, 0, 0.08),
+                    transparent 30%
                 ),
-                #050505;
-        }
-
-        a {
-            color: inherit;
-        }
-
-        .topbar {
-
-            position: sticky;
-
-            top: 0;
-
-            z-index: 1000;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-
-            gap: 20px;
-
-            padding: 16px 25px;
-
-            background: rgba(5, 5, 5, .96);
-
-            border-bottom: 1px solid #241010;
-
-            backdrop-filter: blur(10px);
-        }
-
-        .brand {
-
-            color: #fff;
-
-            text-decoration: none;
-
-            font-size: 21px;
-
-            font-weight: 800;
-
-            letter-spacing: 2px;
-        }
-
-        .brand span {
-            color: #8b0000;
-        }
-
-        .nav {
-
-            display: flex;
-
-            align-items: center;
-
-            gap: 10px;
-
-            flex-wrap: wrap;
-        }
-
-        .nav a {
-
-            padding: 10px 15px;
-
-            border-radius: 8px;
-
-            border: 1px solid #2a1515;
-
-            background: #0b0b0b;
-
-            color: #aaa;
-
-            text-decoration: none;
-
-            font-size: 13px;
-
-            transition: .2s;
-        }
-
-        .nav a:hover {
-
-            color: white;
-
-            border-color: #8b0000;
-
-            background: #160000;
-
-            transform: translateY(-1px);
-        }
-
-        .nav .home {
-
-            border-color: #550000;
-
-            color: #ddd;
-        }
-
-        .container {
-
-            width: min(
-                1250px,
-                calc(100% - 30px)
-            );
-
-            margin: 0 auto;
-
-            padding: 35px 0 60px;
-        }
-
-        .title {
-
-            margin-bottom: 8px;
-
-            font-size: 32px;
-
-            letter-spacing: 2px;
-        }
-
-        .subtitle {
-
-            color: #666;
-
-            margin-bottom: 30px;
-
-            font-size: 14px;
-        }
-
-        .cards {
-
-            display: grid;
-
-            grid-template-columns:
-                repeat(
-                    4,
-                    minmax(0, 1fr)
-                );
-
-            gap: 15px;
-
-            margin-bottom: 25px;
-        }
-
-        .card {
-
-            padding: 22px;
-
-            border: 1px solid #241010;
-
-            border-radius: 12px;
-
-            background: #0a0a0a;
-
-            box-shadow:
-                0 15px 40px rgba(
-                    0,
-                    0,
-                    0,
-                    .2
-                );
-        }
-
-        .card-label {
-
-            color: #666;
-
-            font-size: 11px;
-
-            text-transform: uppercase;
-
-            letter-spacing: 1px;
-
-            margin-bottom: 9px;
-        }
-
-        .card-value {
-
-            color: #fff;
-
-            font-size: 27px;
-
-            font-weight: bold;
-        }
-
-        .section {
-
-            margin-top: 20px;
-
-            padding: 24px;
-
-            border: 1px solid #241010;
-
-            border-radius: 12px;
-
-            background: #090909;
-        }
-
-        .section h2 {
-
-            margin-bottom: 18px;
-
-            font-size: 18px;
-
-            letter-spacing: 1px;
-        }
-
-        .actions {
-
-            display: flex;
-
-            gap: 10px;
-
-            flex-wrap: wrap;
+                var(--bg);
+
+            color: var(--text);
+
+            font-family:
+                Inter,
+                Arial,
+                Helvetica,
+                sans-serif;
         }
 
         button,
-        .button {
+        input,
+        select {
+            font: inherit;
+        }
 
-            border: 1px solid #600000;
-
-            border-radius: 8px;
-
-            padding: 11px 16px;
-
-            color: white;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #260000,
-                    #650000
-                );
-
+        button {
             cursor: pointer;
+        }
 
-            text-decoration: none;
+        /* =====================================================
+           LAYOUT
+           ===================================================== */
+
+        .layout {
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* =====================================================
+           SIDEBAR
+           ===================================================== */
+
+        .sidebar {
+            width: 235px;
+            min-height: 100vh;
+
+            position: fixed;
+            left: 0;
+            top: 0;
+
+            padding: 25px 15px;
+
+            background: var(--sidebar);
+
+            border-right: 1px solid var(--border);
+        }
+
+        .brand {
+            padding: 5px 12px 28px;
+        }
+
+        .brand-line {
+            width: 32px;
+            height: 3px;
+
+            margin-bottom: 14px;
+
+            border-radius: 20px;
+
+            background: var(--red);
+        }
+
+        .brand h1 {
+            font-size: 17px;
+            letter-spacing: 1.5px;
+        }
+
+        .brand p {
+            margin-top: 5px;
+
+            color: var(--muted);
+
+            font-size: 11px;
+        }
+
+        .menu-title {
+            margin: 15px 12px 9px;
+
+            color: #4f4f4f;
+
+            font-size: 10px;
+            font-weight: 700;
+
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .menu button {
+            width: 100%;
+
+            display: flex;
+            align-items: center;
+            gap: 11px;
+
+            padding: 11px 12px;
+
+            color: #888;
+
+            background: transparent;
+
+            border: 1px solid transparent;
+            border-radius: 7px;
+
+            text-align: left;
 
             font-size: 13px;
+
+            transition:
+                color .2s ease,
+                background .2s ease,
+                border-color .2s ease;
+        }
+
+        .menu button:hover {
+            color: #ddd;
+            background: #111;
+        }
+
+        .menu button.active {
+            color: #fff;
+
+            background: var(--red-soft);
+
+            border-color: rgba(139, 0, 0, .25);
+        }
+
+        .menu-icon {
+            width: 19px;
+
+            color: inherit;
+
+            text-align: center;
+
+            font-size: 13px;
+        }
+
+        .sidebar-bottom {
+            position: absolute;
+
+            left: 15px;
+            right: 15px;
+            bottom: 22px;
+        }
+
+        .logout {
+            width: 100%;
+
+            padding: 10px 12px;
+
+            color: #777;
+
+            background: transparent;
+
+            border: 1px solid var(--border);
+            border-radius: 7px;
+
+            font-size: 12px;
 
             transition: .2s;
         }
 
-        button:hover,
-        .button:hover {
-
-            border-color: #a00000;
-
-            transform: translateY(-1px);
+        .logout:hover {
+            color: #ddd;
+            border-color: #3a2020;
+            background: #111;
         }
 
-        .button.secondary {
+        /* =====================================================
+           CONTEÚDO
+           ===================================================== */
 
-            border-color: #292929;
+        .main {
+            width: calc(100% - 235px);
 
-            background: #101010;
+            margin-left: 235px;
 
-            color: #aaa;
+            padding: 32px 38px;
         }
 
-        .table-wrap {
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
 
-            overflow-x: auto;
-
-            border: 1px solid #1d1d1d;
-
-            border-radius: 9px;
+            margin-bottom: 30px;
         }
 
-        table {
-
-            width: 100%;
-
-            border-collapse: collapse;
-
-            min-width: 800px;
+        .page-title h2 {
+            font-size: 24px;
+            font-weight: 700;
         }
 
-        th,
-        td {
+        .page-title p {
+            margin-top: 5px;
 
-            padding: 13px;
-
-            text-align: left;
-
-            border-bottom: 1px solid #191919;
+            color: var(--muted);
 
             font-size: 12px;
         }
 
-        th {
-
-            color: #777;
-
-            background: #0d0d0d;
-
-            text-transform: uppercase;
-
-            letter-spacing: 1px;
-        }
-
-        td {
-
-            color: #bbb;
-        }
-
-        tr:last-child td {
-
-            border-bottom: none;
-        }
-
         .status {
-
-            display: inline-block;
-
-            padding: 5px 8px;
-
-            border-radius: 5px;
-
-            font-size: 10px;
-
-            text-transform: uppercase;
-        }
-
-        .online {
-
-            color: #9ad59a;
-
-            background: rgba(
-                0,
-                100,
-                20,
-                .15
-            );
-        }
-
-        .offline {
-
-            color: #777;
-
-            background: #151515;
-        }
-
-        .blocked {
-
-            color: #ff8d8d;
-
-            background: rgba(
-                100,
-                0,
-                0,
-                .15
-            );
-        }
-
-        .small-actions {
-
             display: flex;
+            align-items: center;
+            gap: 8px;
 
-            gap: 6px;
+            padding: 8px 11px;
 
-            flex-wrap: wrap;
+            color: #999;
+
+            border: 1px solid var(--border);
+            border-radius: 20px;
+
+            font-size: 11px;
         }
 
-        .small-actions button {
+        .status-dot {
+            width: 7px;
+            height: 7px;
 
-            padding: 7px 9px;
+            border-radius: 50%;
 
-            font-size: 10px;
+            background: var(--green);
+
+            box-shadow:
+                0 0 8px rgba(57, 169, 107, .35);
         }
 
-        .danger {
+        /* =====================================================
+           SEÇÕES
+           ===================================================== */
 
-            border-color: #650000;
+        .section {
+            display: none;
 
-            background: #300000;
+            animation: sectionIn .25s ease;
         }
 
-        .form-grid {
+        .section.active {
+            display: block;
+        }
 
+        @keyframes sectionIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            margin-bottom: 18px;
+        }
+
+        .section-head h3 {
+            font-size: 16px;
+        }
+
+        .section-head p {
+            margin-top: 4px;
+
+            color: var(--muted);
+
+            font-size: 11px;
+        }
+
+        /* =====================================================
+           CARDS
+           ===================================================== */
+
+        .cards {
             display: grid;
 
             grid-template-columns:
-                repeat(
-                    2,
-                    minmax(0, 1fr)
-                );
+                repeat(4, minmax(0, 1fr));
 
-            gap: 16px;
+            gap: 13px;
+
+            margin-bottom: 28px;
         }
 
-        .field {
+        .card {
+            padding: 18px;
 
-            display: flex;
+            background: var(--card);
 
-            flex-direction: column;
+            border: 1px solid var(--border);
+            border-radius: 10px;
 
-            gap: 7px;
+            transition:
+                transform .2s ease,
+                border-color .2s ease,
+                background .2s ease;
         }
 
-        .field.full {
+        .card:hover {
+            transform: translateY(-2px);
 
-            grid-column: 1 / -1;
+            background: var(--card-hover);
+
+            border-color: #292929;
         }
 
-        label {
-
-            color: #777;
+        .card-label {
+            color: var(--muted);
 
             font-size: 11px;
-
-            text-transform: uppercase;
-
-            letter-spacing: 1px;
         }
 
-        input,
-        textarea {
+        .card-value {
+            margin-top: 8px;
 
-            width: 100%;
-
-            padding: 12px;
-
-            border: 1px solid #252525;
-
-            border-radius: 8px;
-
-            outline: none;
-
-            background: #060606;
-
-            color: white;
-
-            font-family: Arial, sans-serif;
+            font-size: 25px;
+            font-weight: 700;
         }
 
-        textarea {
+        .card-detail {
+            margin-top: 5px;
 
-            min-height: 100px;
+            color: #555;
 
-            resize: vertical;
+            font-size: 10px;
         }
 
-        input:focus,
-        textarea:focus {
+        /* =====================================================
+           PAINEL
+           ===================================================== */
 
-            border-color: #700000;
+        .panel {
+            background: var(--card);
+
+            border: 1px solid var(--border);
+            border-radius: 10px;
+
+            overflow: hidden;
         }
 
-        .log-ip {
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
 
-            color: #d16b6b;
+            padding: 16px 18px;
 
-            font-family: monospace;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .panel-header h4 {
+            font-size: 13px;
+        }
+
+        .panel-header span {
+            color: #555;
+            font-size: 10px;
         }
 
         .empty {
-
-            padding: 30px;
-
-            text-align: center;
+            padding: 45px 20px;
 
             color: #555;
-        }
-
-        .footer {
-
-            padding: 30px;
 
             text-align: center;
 
-            color: #444;
+            font-size: 12px;
+        }
+
+        /* =====================================================
+           BOTÕES
+           ===================================================== */
+
+        .btn {
+            padding: 9px 13px;
+
+            border-radius: 7px;
+
+            border: 1px solid var(--border);
+
+            color: #aaa;
+
+            background: #0d0d0d;
+
+            font-size: 11px;
+
+            transition: .2s;
+        }
+
+        .btn:hover {
+            color: white;
+            background: #151515;
+            border-color: #333;
+        }
+
+        .btn-danger {
+            color: #c88;
+
+            border-color: rgba(139, 0, 0, .35);
+
+            background: rgba(90, 0, 0, .12);
+        }
+
+        .btn-danger:hover {
+            color: #fff;
+
+            background: rgba(110, 0, 0, .25);
+
+            border-color: #720000;
+        }
+
+        .btn-primary {
+            color: white;
+
+            background: #650000;
+
+            border-color: #780000;
+        }
+
+        .btn-primary:hover {
+            background: #800000;
+            border-color: #900000;
+        }
+
+        /* =====================================================
+           TABELA
+           ===================================================== */
+
+        .table-wrap {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+
+            border-collapse: collapse;
+
+            min-width: 650px;
+        }
+
+        th {
+            padding: 12px 15px;
+
+            color: #666;
+
+            background: #0c0c0c;
+
+            border-bottom: 1px solid var(--border);
+
+            font-size: 10px;
+
+            font-weight: 700;
+
+            text-align: left;
+
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 13px 15px;
+
+            color: #aaa;
+
+            border-bottom: 1px solid #171717;
 
             font-size: 11px;
         }
 
-        @media (max-width: 900px) {
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, .012);
+        }
+
+        .ip {
+            color: #ddd;
+
+            font-family:
+                Consolas,
+                monospace;
+        }
+
+        /* =====================================================
+           CONFIG
+           ===================================================== */
+
+        .config-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(2, minmax(0, 1fr));
+
+            gap: 13px;
+        }
+
+        .config-box {
+            background: var(--card);
+
+            border: 1px solid var(--border);
+            border-radius: 10px;
+
+            overflow: hidden;
+        }
+
+        .config-title {
+            padding: 15px 17px;
+
+            border-bottom: 1px solid var(--border);
+
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .config-content {
+            padding: 16px;
+        }
+
+        .form-row {
+            margin-bottom: 15px;
+        }
+
+        .form-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-row label {
+            display: block;
+
+            margin-bottom: 7px;
+
+            color: #777;
+
+            font-size: 10px;
+
+            text-transform: uppercase;
+            letter-spacing: .7px;
+        }
+
+        .form-row input,
+        .form-row select {
+            width: 100%;
+
+            height: 39px;
+
+            padding: 0 11px;
+
+            color: #ddd;
+
+            background: #0b0b0b;
+
+            border: 1px solid #252525;
+            border-radius: 6px;
+
+            outline: none;
+
+            font-size: 12px;
+        }
+
+        .form-row input:focus,
+        .form-row select:focus {
+            border-color: #5c0000;
+
+            box-shadow:
+                0 0 0 2px rgba(100, 0, 0, .08);
+        }
+
+        .switch-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 10px 0;
+
+            border-bottom: 1px solid #181818;
+        }
+
+        .switch-row:last-child {
+            border-bottom: none;
+        }
+
+        .switch-info strong {
+            display: block;
+
+            color: #ccc;
+
+            font-size: 11px;
+        }
+
+        .switch-info span {
+            display: block;
+
+            margin-top: 3px;
+
+            color: #555;
+
+            font-size: 9px;
+        }
+
+        .switch {
+            position: relative;
+
+            width: 34px;
+            height: 18px;
+
+            flex-shrink: 0;
+        }
+
+        .switch input {
+            display: none;
+        }
+
+        .slider {
+            position: absolute;
+            inset: 0;
+
+            background: #292929;
+
+            border-radius: 20px;
+
+            cursor: pointer;
+
+            transition: .2s;
+        }
+
+        .slider::before {
+            content: "";
+
+            position: absolute;
+
+            width: 12px;
+            height: 12px;
+
+            left: 3px;
+            top: 3px;
+
+            background: #888;
+
+            border-radius: 50%;
+
+            transition: .2s;
+        }
+
+        .switch input:checked + .slider {
+            background: #650000;
+        }
+
+        .switch input:checked + .slider::before {
+            transform: translateX(16px);
+
+            background: #fff;
+        }
+
+        .config-actions {
+            display: flex;
+            justify-content: flex-end;
+
+            gap: 8px;
+
+            margin-top: 18px;
+        }
+
+        /* =====================================================
+           NOTIFICAÇÃO
+           ===================================================== */
+
+        .toast {
+            position: fixed;
+
+            right: 25px;
+            bottom: 25px;
+
+            min-width: 220px;
+
+            padding: 13px 16px;
+
+            color: #ddd;
+
+            background: #111;
+
+            border: 1px solid #292929;
+            border-left: 3px solid var(--red);
+
+            border-radius: 7px;
+
+            box-shadow:
+                0 10px 35px rgba(0, 0, 0, .45);
+
+            font-size: 11px;
+
+            opacity: 0;
+            transform: translateY(15px);
+
+            pointer-events: none;
+
+            transition: .25s;
+
+            z-index: 100;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* =====================================================
+           RESPONSIVO
+           ===================================================== */
+
+        @media (max-width: 1050px) {
 
             .cards {
-
                 grid-template-columns:
-                    repeat(
-                        2,
-                        minmax(0, 1fr)
-                    );
+                    repeat(2, minmax(0, 1fr));
             }
 
-            .form-grid {
-
+            .config-grid {
                 grid-template-columns: 1fr;
-            }
-
-            .field.full {
-
-                grid-column: auto;
             }
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 750px) {
+
+            .sidebar {
+                width: 65px;
+
+                padding: 18px 8px;
+            }
+
+            .brand {
+                padding-left: 8px;
+            }
+
+            .brand h1,
+            .brand p,
+            .menu-title,
+            .menu button span:not(.menu-icon),
+            .logout {
+                display: none;
+            }
+
+            .brand-line {
+                margin-left: 8px;
+            }
+
+            .menu button {
+                justify-content: center;
+            }
+
+            .sidebar-bottom {
+                display: none;
+            }
+
+            .main {
+                width: calc(100% - 65px);
+
+                margin-left: 65px;
+
+                padding: 22px 16px;
+            }
+        }
+
+        @media (max-width: 500px) {
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
 
             .topbar {
-
                 align-items: flex-start;
-
-                flex-direction: column;
             }
 
-            .cards {
-
-                grid-template-columns: 1fr;
-            }
-
-            .container {
-
-                width: min(
-                    100% - 20px,
-                    1250px
-                );
-            }
-
-            .section {
-
-                padding: 17px;
+            .status {
+                display: none;
             }
         }
-
     </style>
-
 </head>
 
 <body>
 
+<div class="layout">
 
-    <!-- ===================================================
-         TOPO
-    ==================================================== -->
+    <!-- =====================================================
+         SIDEBAR
+         ===================================================== -->
 
-    <header class="topbar">
+    <aside class="sidebar">
 
-        <a
-            href="/admin"
-            class="brand"
-        >
-            {{ config.site_name }}
-            <span>ADMIN</span>
-        </a>
+        <div class="brand">
 
+            <div class="brand-line"></div>
 
-        <nav class="nav">
+            <h1>{{ config.site_name }}</h1>
 
-            <!-- VOLTAR PARA ÁREA CENTRAL -->
+            <p>Painel administrativo</p>
 
-            <a
-                href="/"
-                class="home"
+        </div>
+
+        <div class="menu-title">
+            Principal
+        </div>
+
+        <nav class="menu">
+
+            <button
+                class="active"
+                data-section="dashboard"
             >
-                ← Voltar para o site
-            </a>
+                <span class="menu-icon">⌂</span>
+                <span>Dashboard</span>
+            </button>
 
+            <button
+                data-section="usuarios"
+            >
+                <span class="menu-icon">♙</span>
+                <span>Usuários</span>
+            </button>
 
-            <!-- PERFIL -->
+            <button
+                data-section="acessos"
+            >
+                <span class="menu-icon">◉</span>
+                <span>Acessos</span>
+            </button>
 
-            <a href="/perfil">
-                Perfil
-            </a>
+            <button
+                data-section="arquivos"
+            >
+                <span class="menu-icon">□</span>
+                <span>Arquivos</span>
+            </button>
 
-
-            <!-- SAIR -->
-
-            <a href="/logout">
-                Sair
-            </a>
+            <button
+                data-section="logs"
+            >
+                <span class="menu-icon">≡</span>
+                <span>Logs</span>
+            </button>
 
         </nav>
 
-    </header>
+        <div class="menu-title">
+            Sistema
+        </div>
+
+        <nav class="menu">
+
+            <button
+                data-section="config"
+            >
+                <span class="menu-icon">⚙</span>
+                <span>Configurações</span>
+            </button>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <button
+                class="logout"
+                onclick="window.location.href='/logout'"
+            >
+                Sair da conta
+            </button>
+
+        </div>
+
+    </aside>
 
 
-    <!-- ===================================================
-         CONTEÚDO
-    ==================================================== -->
+    <!-- =====================================================
+         MAIN
+         ===================================================== -->
 
-    <main class="container">
+    <main class="main">
 
+        <header class="topbar">
 
-        <h1 class="title">
-            Painel Administrativo
-        </h1>
+            <div class="page-title">
 
-        <p class="subtitle">
-            Controle do site e gerenciamento dos membros.
-        </p>
+                <h2 id="pageTitle">
+                    Dashboard
+                </h2>
+
+                <p id="pageDescription">
+                    Visão geral do sistema
+                </p>
+
+            </div>
+
+            <div class="status">
+
+                <span class="status-dot"></span>
+
+                Servidor online
+
+            </div>
+
+        </header>
 
 
         <!-- =================================================
-             CARDS
-        ================================================== -->
+             DASHBOARD
+             ================================================= -->
 
-        {% if config.show_cards %}
+        <section
+            id="dashboard"
+            class="section active"
+        >
 
-        <section class="cards">
+            <div class="cards">
 
+                <div class="card">
 
-            <div class="card">
+                    <div class="card-label">
+                        Total de acessos
+                    </div>
 
-                <div class="card-label">
-                    Usuários
+                    <div
+                        class="card-value"
+                        id="totalAcessos"
+                    >
+                        {{ total_acessos }}
+                    </div>
+
+                    <div class="card-detail">
+                        Registros armazenados
+                    </div>
+
                 </div>
 
-                <div class="card-value">
-                    {{ total_usuarios }}
+
+                <div class="card">
+
+                    <div class="card-label">
+                        IPs únicos
+                    </div>
+
+                    <div
+                        class="card-value"
+                        id="totalIps"
+                    >
+                        {{ ips_unicos|length }}
+                    </div>
+
+                    <div class="card-detail">
+                        Endereços diferentes
+                    </div>
+
+                </div>
+
+
+                <div class="card">
+
+                    <div class="card-label">
+                        Último acesso
+                    </div>
+
+                    <div class="card-value">
+                        {% if ultimo_acesso %}
+                            {{ ultimo_acesso.hora }}
+                        {% else %}
+                            --
+                        {% endif %}
+                    </div>
+
+                    <div class="card-detail">
+                        Horário registrado
+                    </div>
+
+                </div>
+
+
+                <div class="card">
+
+                    <div class="card-label">
+                        Logs máximos
+                    </div>
+
+                    <div
+                        class="card-value"
+                        id="maxLogsCard"
+                    >
+                        {{ config.max_logs }}
+                    </div>
+
+                    <div class="card-detail">
+                        Limite configurado
+                    </div>
+
                 </div>
 
             </div>
 
 
-            <div class="card">
+            <div class="panel">
 
-                <div class="card-label">
-                    Acessos
-                </div>
+                <div class="panel-header">
 
-                <div class="card-value">
-                    {{ total_acessos }}
-                </div>
-
-            </div>
-
-
-            <div class="card">
-
-                <div class="card-label">
-                    IPs únicos
-                </div>
-
-                <div class="card-value">
-                    {{ total_ips }}
-                </div>
-
-            </div>
-
-
-            <div class="card">
-
-                <div class="card-label">
-                    Último acesso
-                </div>
-
-                <div class="card-value">
-
-                    {% if ultimo_acesso %}
-
-                        {{ ultimo_acesso.get(
-                            "time",
-                            ultimo_acesso.get(
-                                "data",
-                                "-"
-                            )
-                        ) }}
-
-                    {% else %}
-
-                        -
-
-                    {% endif %}
-
-                </div>
-
-            </div>
-
-
-        </section>
-
-        {% endif %}
-
-
-        <!-- =================================================
-             LOGS
-        ================================================== -->
-
-        {% if config.show_logs %}
-
-        <section class="section">
-
-            <h2>
-                Logs de acesso
-            </h2>
-
-
-            <div class="actions">
-
-                <form
-                    action="/admin/limpar-logs"
-                    method="POST"
-                    onsubmit="return confirm('Tem certeza que deseja apagar todos os logs?');"
-                >
+                    <div>
+                        <h4>Acessos recentes</h4>
+                        <span>Últimos registros</span>
+                    </div>
 
                     <button
-                        type="submit"
-                        class="danger"
+                        class="btn"
+                        onclick="abrirSecao('acessos')"
                     >
-                        🗑 Limpar todos os logs
+                        Ver todos
                     </button>
-
-                </form>
-
-            </div>
-
-
-            <br>
-
-
-            <div class="table-wrap">
-
-                {% if logs %}
-
-                <table>
-
-                    <thead>
-
-                        <tr>
-
-                            <th>
-                                IP
-                            </th>
-
-                            <th>
-                                Navegador
-                            </th>
-
-                            <th>
-                                Rota
-                            </th>
-
-                            <th>
-                                Data
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        {% for log in logs|reverse %}
-
-                        <tr>
-
-                            <td class="log-ip">
-
-                                {{ log.get(
-                                    "ip",
-                                    "-"
-                                ) }}
-
-                            </td>
-
-                            <td>
-
-                                {{ log.get(
-                                    "browser",
-                                    log.get(
-                                        "navegador",
-                                        "-"
-                                    )
-                                ) }}
-
-                            </td>
-
-                            <td>
-
-                                {{ log.get(
-                                    "route",
-                                    log.get(
-                                        "rota",
-                                        "-"
-                                    )
-                                ) }}
-
-                            </td>
-
-                            <td>
-
-                                {{ log.get(
-                                    "time",
-                                    log.get(
-                                        "data",
-                                        "-"
-                                    )
-                                ) }}
-
-                            </td>
-
-                        </tr>
-
-                        {% endfor %}
-
-                    </tbody>
-
-                </table>
-
-                {% else %}
-
-                <div class="empty">
-
-                    Nenhum log registrado.
 
                 </div>
 
-                {% endif %}
+                <div class="table-wrap">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>IP</th>
+                                <th>Data</th>
+                                <th>Hora</th>
+                                <th>Rota</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="recentTable">
+
+                            {% for log in logs[:config.recent_accesses] %}
+
+                            <tr>
+
+                                <td class="ip">
+                                    {{ log.ip }}
+                                </td>
+
+                                <td>
+                                    {{ log.data }}
+                                </td>
+
+                                <td>
+                                    {{ log.hora }}
+                                </td>
+
+                                <td>
+                                    {{ log.rota }}
+                                </td>
+
+                            </tr>
+
+                            {% else %}
+
+                            <tr>
+                                <td
+                                    colspan="4"
+                                    class="empty"
+                                >
+                                    Nenhum acesso registrado.
+                                </td>
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
 
             </div>
 
         </section>
-
-        {% endif %}
 
 
         <!-- =================================================
              USUÁRIOS
-        ================================================== -->
+             ================================================= -->
 
-        {% if config.show_users %}
+        <section
+            id="usuarios"
+            class="section"
+        >
 
-        <section class="section">
+            <div class="section-head">
 
-            <h2>
-                Membros
-            </h2>
-
-
-            <div class="table-wrap">
-
-                {% if usuarios %}
-
-                <table>
-
-                    <thead>
-
-                        <tr>
-
-                            <th>
-                                ID
-                            </th>
-
-                            <th>
-                                Usuário
-                            </th>
-
-                            <th>
-                                Gmail
-                            </th>
-
-                            <th>
-                                Level
-                            </th>
-
-                            <th>
-                                XP
-                            </th>
-
-                            <th>
-                                Status
-                            </th>
-
-                            <th>
-                                Criado
-                            </th>
-
-                            <th>
-                                Ações
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-
-                    <tbody>
-
-                        {% for usuario in usuarios %}
-
-                        <tr>
-
-                            <td>
-                                #{{ usuario["id"] }}
-                            </td>
-
-                            <td>
-                                {{ usuario["username"] }}
-                            </td>
-
-                            <td>
-                                {{ usuario["email"] }}
-                            </td>
-
-                            <td>
-                                {{ usuario["level"] }}
-                            </td>
-
-                            <td>
-                                {{ usuario["xp"] }}
-                            </td>
-
-                            <td>
-
-                                {% if usuario["status"] == "online" %}
-
-                                    <span class="status online">
-                                        Online
-                                    </span>
-
-                                {% elif usuario["status"] == "bloqueado" %}
-
-                                    <span class="status blocked">
-                                        Bloqueado
-                                    </span>
-
-                                {% else %}
-
-                                    <span class="status offline">
-                                        Offline
-                                    </span>
-
-                                {% endif %}
-
-                            </td>
-
-                            <td>
-                                {{ usuario["created_at"] }}
-                            </td>
-
-                            <td>
-
-                                <div class="small-actions">
-
-
-                                    {% if usuario["status"] == "bloqueado" %}
-
-                                    <form
-                                        action="/admin/membro/{{ usuario['id'] }}/desbloquear"
-                                        method="POST"
-                                    >
-
-                                        <button type="submit">
-                                            Desbloquear
-                                        </button>
-
-                                    </form>
-
-                                    {% else %}
-
-                                    <form
-                                        action="/admin/membro/{{ usuario['id'] }}/bloquear"
-                                        method="POST"
-                                    >
-
-                                        <button type="submit">
-                                            Bloquear
-                                        </button>
-
-                                    </form>
-
-                                    {% endif %}
-
-
-                                    <form
-                                        action="/admin/membro/{{ usuario['id'] }}/excluir"
-                                        method="POST"
-                                        onsubmit="return confirm('Tem certeza que deseja excluir este usuário?');"
-                                    >
-
-                                        <button
-                                            type="submit"
-                                            class="danger"
-                                        >
-                                            Excluir
-                                        </button>
-
-                                    </form>
-
-
-                                </div>
-
-                            </td>
-
-                        </tr>
-
-                        {% endfor %}
-
-                    </tbody>
-
-                </table>
-
-                {% else %}
-
-                <div class="empty">
-
-                    Nenhum usuário cadastrado.
-
+                <div>
+                    <h3>Usuários</h3>
+                    <p>Informações administrativas</p>
                 </div>
 
-                {% endif %}
+            </div>
+
+            <div class="panel">
+
+                <div class="panel-header">
+                    <h4>Administrador</h4>
+                </div>
+
+                <div style="padding: 20px;">
+
+                    <div style="
+                        color:#ddd;
+                        font-size:13px;
+                        margin-bottom:6px;
+                    ">
+                        {{ config.admin_name }}
+                    </div>
+
+                    <div style="
+                        color:#555;
+                        font-size:11px;
+                    ">
+                        Usuário administrativo principal
+                    </div>
+
+                </div>
 
             </div>
 
         </section>
 
-        {% endif %}
-
 
         <!-- =================================================
-             CONFIGURAÇÕES
-        ================================================== -->
+             ACESSOS
+             ================================================= -->
 
-        <section class="section">
+        <section
+            id="acessos"
+            class="section"
+        >
 
-            <h2>
-                Configurações
-            </h2>
+            <div class="section-head">
 
-
-            <form
-                action="/admin/config"
-                method="POST"
-            >
-
-                <div class="form-grid">
-
-
-                    <div class="field">
-
-                        <label>
-                            Nome do site
-                        </label>
-
-                        <input
-                            type="text"
-                            name="site_name"
-                            value="{{ config.site_name }}"
-                        >
-
-                    </div>
-
-
-                    <div class="field">
-
-                        <label>
-                            Nome do administrador
-                        </label>
-
-                        <input
-                            type="text"
-                            name="admin_name"
-                            value="{{ config.admin_name }}"
-                        >
-
-                    </div>
-
-
-                    <div class="field full">
-
-                        <label>
-                            Texto da página inicial
-                        </label>
-
-                        <input
-                            type="text"
-                            name="home_text"
-                            value="{{ config.home_text }}"
-                        >
-
-                    </div>
-
-
-                    <div class="field">
-
-                        <label>
-                            Cor principal
-                        </label>
-
-                        <input
-                            type="text"
-                            name="primary_color"
-                            value="{{ config.primary_color }}"
-                        >
-
-                    </div>
-
-
-                    <div class="field">
-
-                        <label>
-                            Usuário do admin
-                        </label>
-
-                        <input
-                            type="text"
-                            name="admin_username"
-                            value="{{ config.admin_username }}"
-                        >
-
-                    </div>
-
-
-                    <div class="field">
-
-                        <label>
-                            Nova senha do admin
-                        </label>
-
-                        <input
-                            type="password"
-                            name="admin_password"
-                            placeholder="Deixe vazio para manter"
-                        >
-
-                    </div>
-
-
+                <div>
+                    <h3>Acessos</h3>
+                    <p>Histórico de visitantes registrados</p>
                 </div>
-
-
-                <br>
-
-
-                <div class="actions">
-
-                    <button type="submit">
-                        SALVAR CONFIGURAÇÕES
-                    </button>
-
-                </div>
-
-            </form>
-
-
-            <br>
-
-
-            <form
-                action="/admin/config/restaurar"
-                method="POST"
-                onsubmit="return confirm('Restaurar todas as configurações padrão?');"
-            >
 
                 <button
-                    type="submit"
-                    class="button secondary"
+                    class="btn btn-danger"
+                    id="clearLogsButton"
+                    type="button"
                 >
-                    Restaurar configurações
+                    Limpar logs
                 </button>
 
-            </form>
+            </div>
+
+
+            <div class="panel">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h4>Registros</h4>
+                        <span id="logCounter">
+                            {{ logs|length }} registros
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <div class="table-wrap">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>IP</th>
+                                <th>Data</th>
+                                <th>Hora</th>
+                                <th>Rota</th>
+                                <th>Navegador</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="logsTable">
+
+                            {% for log in logs %}
+
+                            <tr>
+
+                                <td class="ip">
+                                    {{ log.ip }}
+                                </td>
+
+                                <td>
+                                    {{ log.data }}
+                                </td>
+
+                                <td>
+                                    {{ log.hora }}
+                                </td>
+
+                                <td>
+                                    {{ log.rota }}
+                                </td>
+
+                                <td>
+                                    {{ log.navegador }}
+                                </td>
+
+                            </tr>
+
+                            {% else %}
+
+                            <tr class="empty-row">
+
+                                <td
+                                    colspan="5"
+                                    class="empty"
+                                >
+                                    Nenhum log registrado.
+                                </td>
+
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
 
         </section>
 
 
+        <!-- =================================================
+             ARQUIVOS
+             ================================================= -->
+
+        <section
+            id="arquivos"
+            class="section"
+        >
+
+            <div class="section-head">
+
+                <div>
+                    <h3>Arquivos</h3>
+                    <p>Arquivos utilizados pelo sistema</p>
+                </div>
+
+            </div>
+
+            <div class="panel">
+
+                <div class="panel-header">
+                    <h4>Arquivos do projeto</h4>
+                </div>
+
+                <div class="table-wrap">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>Arquivo</th>
+                                <th>Função</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            <tr>
+                                <td class="ip">
+                                    access_logs.json
+                                </td>
+                                <td>
+                                    Armazenamento dos acessos
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="ip">
+                                    config.json
+                                </td>
+                                <td>
+                                    Configurações do painel
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="ip">
+                                    index.html
+                                </td>
+                                <td>
+                                    Página inicial
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td class="ip">
+                                    admin.html
+                                </td>
+                                <td>
+                                    Interface administrativa
+                                </td>
+                            </tr>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             LOGS
+             ================================================= -->
+
+        <section
+            id="logs"
+            class="section"
+        >
+
+            <div class="section-head">
+
+                <div>
+                    <h3>Logs</h3>
+                    <p>Registros técnicos do sistema</p>
+                </div>
+
+            </div>
+
+            <div class="panel">
+
+                <div class="empty">
+                    Sistema funcionando normalmente.
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             CONFIGURAÇÕES
+             ================================================= -->
+
+        <section
+            id="config"
+            class="section"
+        >
+
+            <div class="section-head">
+
+                <div>
+                    <h3>Configurações</h3>
+                    <p>Personalize o comportamento do painel</p>
+                </div>
+
+            </div>
+
+
+            <div class="config-grid">
+
+
+                <!-- GERAL -->
+
+                <div class="config-box">
+
+                    <div class="config-title">
+                        Geral
+                    </div>
+
+                    <div class="config-content">
+
+                        <div class="form-row">
+
+                            <label>
+                                Nome do painel
+                            </label>
+
+                            <input
+                                id="cfgSiteName"
+                                value="{{ config.site_name }}"
+                            >
+
+                        </div>
+
+                        <div class="form-row">
+
+                            <label>
+                                Nome do administrador
+                            </label>
+
+                            <input
+                                id="cfgAdminName"
+                                value="{{ config.admin_name }}"
+                            >
+
+                        </div>
+
+                        <div class="form-row">
+
+                            <label>
+                                Cor principal
+                            </label>
+
+                            <input
+                                type="text"
+                                id="cfgColor"
+                                value="{{ config.primary_color }}"
+                            >
+
+                        </div>
+
+                        <div class="form-row">
+
+                            <label>
+                                Texto da página inicial
+                            </label>
+
+                            <input
+                                id="cfgHomeText"
+                                value="{{ config.home_text }}"
+                            >
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ACESSOS -->
+
+                <div class="config-box">
+
+                    <div class="config-title">
+                        Acessos
+                    </div>
+
+                    <div class="config-content">
+
+                        <div class="switch-row">
+
+                            <div class="switch-info">
+                                <strong>Registrar IP</strong>
+                                <span>Guardar IP público dos visitantes</span>
+                            </div>
+
+                            <label class="switch">
+
+                                <input
+                                    type="checkbox"
+                                    id="cfgRegisterIp"
+                                    {% if config.register_ip %}checked{% endif %}
+                                >
+
+                                <span class="slider"></span>
+
+                            </label>
+
+                        </div>
+
+
+                        <div class="switch-row">
+
+                            <div class="switch-info">
+                                <strong>Registrar navegador</strong>
+                                <span>Guardar User-Agent</span>
+                            </div>
+
+                            <label class="switch">
+
+                                <input
+                                    type="checkbox"
+                                    id="cfgRegisterBrowser"
+                                    {% if config.register_browser %}checked{% endif %}
+                                >
+
+                                <span class="slider"></span>
+
+                            </label>
+
+                        </div>
+
+
+                        <div class="form-row" style="margin-top:15px;">
+
+                            <label>
+                                Máximo de logs
+                            </label>
+
+                            <input
+                                type="number"
+                                id="cfgMaxLogs"
+                                min="1"
+                                max="5000"
+                                value="{{ config.max_logs }}"
+                            >
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SEGURANÇA -->
+
+                <div class="config-box">
+
+                    <div class="config-title">
+                        Segurança
+                    </div>
+
+                    <div class="config-content">
+
+                        <div class="form-row">
+
+                            <label>
+                                Usuário administrador
+                            </label>
+
+                            <input
+                                id="cfgAdminUsername"
+                                placeholder="Deixe vazio para não alterar"
+                            >
+
+                        </div>
+
+                        <div class="form-row">
+
+                            <label>
+                                Nova senha
+                            </label>
+
+                            <input
+                                type="password"
+                                id="cfgAdminPassword"
+                                placeholder="Deixe vazio para não alterar"
+                            >
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PAINEL -->
+
+                <div class="config-box">
+
+                    <div class="config-title">
+                        Painel
+                    </div>
+
+                    <div class="config-content">
+
+                        <div class="switch-row">
+
+                            <div class="switch-info">
+                                <strong>Mostrar cards</strong>
+                                <span>Exibir estatísticas no dashboard</span>
+                            </div>
+
+                            <label class="switch">
+
+                                <input
+                                    type="checkbox"
+                                    id="cfgShowCards"
+                                    {% if config.show_cards %}checked{% endif %}
+                                >
+
+                                <span class="slider"></span>
+
+                            </label>
+
+                        </div>
+
+
+                        <div class="switch-row">
+
+                            <div class="switch-info">
+                                <strong>Mostrar IP</strong>
+                                <span>Exibir endereço nos registros</span>
+                            </div>
+
+                            <label class="switch">
+
+                                <input
+                                    type="checkbox"
+                                    id="cfgShowIp"
+                                    {% if config.show_ip %}checked{% endif %}
+                                >
+
+                                <span class="slider"></span>
+
+                            </label>
+
+                        </div>
+
+
+                        <div class="switch-row">
+
+                            <div class="switch-info">
+                                <strong>Status do servidor</strong>
+                                <span>Exibir indicador online</span>
+                            </div>
+
+                            <label class="switch">
+
+                                <input
+                                    type="checkbox"
+                                    id="cfgShowStatus"
+                                    {% if config.show_server_status %}checked{% endif %}
+                                >
+
+                                <span class="slider"></span>
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="config-actions">
+
+                <button
+                    class="btn"
+                    id="restoreConfig"
+                    type="button"
+                >
+                    Restaurar padrão
+                </button>
+
+                <button
+                    class="btn btn-primary"
+                    id="saveConfig"
+                    type="button"
+                >
+                    Salvar configurações
+                </button>
+
+            </div>
+
+        </section>
+
     </main>
 
+</div>
 
-    <footer class="footer">
 
-        {{ config.site_name }}
-        •
-        Painel administrativo
+<!-- =========================================================
+     TOAST
+     ========================================================= -->
 
-    </footer>
+<div
+    class="toast"
+    id="toast"
+></div>
 
+
+<script>
+
+    const sectionInfo = {
+
+        dashboard: {
+            title: "Dashboard",
+            description: "Visão geral do sistema"
+        },
+
+        usuarios: {
+            title: "Usuários",
+            description: "Informações administrativas"
+        },
+
+        acessos: {
+            title: "Acessos",
+            description: "Histórico de visitantes registrados"
+        },
+
+        arquivos: {
+            title: "Arquivos",
+            description: "Arquivos utilizados pelo sistema"
+        },
+
+        logs: {
+            title: "Logs",
+            description: "Registros técnicos do sistema"
+        },
+
+        config: {
+            title: "Configurações",
+            description: "Personalize o comportamento do painel"
+        }
+
+    };
+
+
+    /* =========================================================
+       NAVEGAÇÃO
+       ========================================================= */
+
+    function abrirSecao(nome) {
+
+        document
+            .querySelectorAll(".section")
+            .forEach(section => {
+
+                section.classList.remove("active");
+
+            });
+
+
+        document
+            .querySelectorAll(".menu button")
+            .forEach(button => {
+
+                button.classList.remove("active");
+
+            });
+
+
+        const section =
+            document.getElementById(nome);
+
+        const button =
+            document.querySelector(
+                `.menu button[data-section="${nome}"]`
+            );
+
+
+        if (section) {
+            section.classList.add("active");
+        }
+
+
+        if (button) {
+            button.classList.add("active");
+        }
+
+
+        if (sectionInfo[nome]) {
+
+            document.getElementById(
+                "pageTitle"
+            ).textContent =
+                sectionInfo[nome].title;
+
+            document.getElementById(
+                "pageDescription"
+            ).textContent =
+                sectionInfo[nome].description;
+        }
+    }
+
+
+    document
+        .querySelectorAll(".menu button[data-section]")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    abrirSecao(
+                        button.dataset.section
+                    );
+
+                }
+            );
+
+        });
+
+
+    /* =========================================================
+       TOAST
+       ========================================================= */
+
+    let toastTimer = null;
+
+
+    function mostrarToast(mensagem) {
+
+        const toast =
+            document.getElementById("toast");
+
+
+        toast.textContent = mensagem;
+
+        toast.classList.add("show");
+
+
+        clearTimeout(toastTimer);
+
+
+        toastTimer = setTimeout(
+            () => {
+
+                toast.classList.remove("show");
+
+            },
+            2500
+        );
+    }
+
+
+    /* =========================================================
+       LIMPAR LOGS
+       ========================================================= */
+
+    const clearButton =
+        document.getElementById(
+            "clearLogsButton"
+        );
+
+
+    clearButton.addEventListener(
+        "click",
+        async () => {
+
+            const confirmar =
+                confirm(
+                    "Tem certeza que deseja apagar todos os logs?"
+                );
+
+
+            if (!confirmar) {
+                return;
+            }
+
+
+            clearButton.disabled = true;
+
+            clearButton.textContent =
+                "Limpando...";
+
+
+            try {
+
+                const resposta =
+                    await fetch(
+                        "/admin/limpar-logs",
+                        {
+                            method: "POST",
+
+                            headers: {
+                                "Content-Type":
+                                    "application/json"
+                            }
+                        }
+                    );
+
+
+                const dados =
+                    await resposta.json();
+
+
+                if (
+                    !resposta.ok ||
+                    !dados.success
+                ) {
+
+                    throw new Error(
+                        dados.error ||
+                        "Erro ao limpar logs."
+                    );
+
+                }
+
+
+                /* Limpa a tabela */
+
+                const tabela =
+                    document.getElementById(
+                        "logsTable"
+                    );
+
+
+                tabela.innerHTML = `
+                    <tr class="empty-row">
+                        <td
+                            colspan="5"
+                            class="empty"
+                        >
+                            Nenhum log registrado.
+                        </td>
+                    </tr>
+                `;
+
+
+                /* Atualiza contador */
+
+                document.getElementById(
+                    "logCounter"
+                ).textContent =
+                    "0 registros";
+
+
+                document.getElementById(
+                    "totalAcessos"
+                ).textContent =
+                    "0";
+
+
+                document.getElementById(
+                    "totalIps"
+                ).textContent =
+                    "0";
+
+
+                /* Atualiza tabela recente */
+
+                document.getElementById(
+                    "recentTable"
+                ).innerHTML = `
+                    <tr>
+                        <td
+                            colspan="4"
+                            class="empty"
+                        >
+                            Nenhum acesso registrado.
+                        </td>
+                    </tr>
+                `;
+
+
+                mostrarToast(
+                    "Logs apagados com sucesso."
+                );
+
+
+            } catch (erro) {
+
+                console.error(erro);
+
+                mostrarToast(
+                    erro.message ||
+                    "Não foi possível limpar os logs."
+                );
+
+            } finally {
+
+                clearButton.disabled = false;
+
+                clearButton.textContent =
+                    "Limpar logs";
+
+            }
+
+        }
+    );
+
+
+    /* =========================================================
+       SALVAR CONFIGURAÇÕES
+       ========================================================= */
+
+    document
+        .getElementById("saveConfig")
+        .addEventListener(
+            "click",
+            async () => {
+
+                const dados = {
+
+                    site_name:
+                        document.getElementById(
+                            "cfgSiteName"
+                        ).value,
+
+                    admin_name:
+                        document.getElementById(
+                            "cfgAdminName"
+                        ).value,
+
+                    primary_color:
+                        document.getElementById(
+                            "cfgColor"
+                        ).value,
+
+                    home_text:
+                        document.getElementById(
+                            "cfgHomeText"
+                        ).value,
+
+                    register_ip:
+                        document.getElementById(
+                            "cfgRegisterIp"
+                        ).checked,
+
+                    register_browser:
+                        document.getElementById(
+                            "cfgRegisterBrowser"
+                        ).checked,
+
+                    max_logs:
+                        document.getElementById(
+                            "cfgMaxLogs"
+                        ).value,
+
+                    admin_username:
+                        document.getElementById(
+                            "cfgAdminUsername"
+                        ).value,
+
+                    admin_password:
+                        document.getElementById(
+                            "cfgAdminPassword"
+                        ).value,
+
+                    show_cards:
+                        document.getElementById(
+                            "cfgShowCards"
+                        ).checked,
+
+                    show_ip:
+                        document.getElementById(
+                            "cfgShowIp"
+                        ).checked,
+
+                    show_server_status:
+                        document.getElementById(
+                            "cfgShowStatus"
+                        ).checked
+
+                };
+
+
+                try {
+
+                    const resposta =
+                        await fetch(
+                            "/admin/config",
+                            {
+                                method: "POST",
+
+                                headers: {
+                                    "Content-Type":
+                                        "application/json"
+                                },
+
+                                body:
+                                    JSON.stringify(
+                                        dados
+                                    )
+                            }
+                        );
+
+
+                    const resultado =
+                        await resposta.json();
+
+
+                    if (
+                        !resposta.ok ||
+                        !resultado.success
+                    ) {
+
+                        throw new Error(
+                            resultado.error ||
+                            "Erro ao salvar."
+                        );
+
+                    }
+
+
+                    mostrarToast(
+                        "Configurações salvas."
+                    );
+
+
+                    setTimeout(
+                        () => {
+                            location.reload();
+                        },
+                        700
+                    );
+
+
+                } catch (erro) {
+
+                    console.error(erro);
+
+                    mostrarToast(
+                        erro.message ||
+                        "Erro ao salvar configurações."
+                    );
+
+                }
+
+            }
+        );
+
+
+    /* =========================================================
+       RESTAURAR CONFIGURAÇÕES
+       ========================================================= */
+
+    document
+        .getElementById("restoreConfig")
+        .addEventListener(
+            "click",
+            async () => {
+
+                if (
+                    !confirm(
+                        "Restaurar todas as configurações padrão?"
+                    )
+                ) {
+                    return;
+                }
+
+
+                try {
+
+                    const resposta =
+                        await fetch(
+                            "/admin/config/restaurar",
+                            {
+                                method: "POST"
+                            }
+                        );
+
+
+                    const resultado =
+                        await resposta.json();
+
+
+                    if (
+                        !resposta.ok ||
+                        !resultado.success
+                    ) {
+
+                        throw new Error(
+                            resultado.error ||
+                            "Erro ao restaurar."
+                        );
+
+                    }
+
+
+                    mostrarToast(
+                        "Configurações restauradas."
+                    );
+
+
+                    setTimeout(
+                        () => {
+                            location.reload();
+                        },
+                        700
+                    );
+
+
+                } catch (erro) {
+
+                    console.error(erro);
+
+                    mostrarToast(
+                        erro.message ||
+                        "Erro ao restaurar."
+                    );
+
+                }
+
+            }
+        );
+
+</script>
 
 </body>
-
 </html>

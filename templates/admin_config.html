@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Configurações Admin | {{ config.site_name }}</title>
+    <title>Configurações | {{ config.site_name }}</title>
 
     <style>
         * {
@@ -15,31 +15,31 @@
 
         :root {
             --red: {{ config.primary_color or '#e00000' }};
-            --red-dark: #8f0000;
+            --red-dark: #850000;
             --bg: #050505;
-            --panel: #0c0c0e;
-            --panel-2: #111114;
             --border: rgba(255,255,255,.08);
-            --text: #fff;
-            --muted: #858585;
-            --green: #27d17f;
+            --text: #f5f5f5;
         }
 
         body {
             min-height: 100vh;
             background:
-                radial-gradient(
-                    circle at 50% -15%,
-                    rgba(224,0,0,.18),
-                    transparent 35%
-                ),
-                linear-gradient(
-                    180deg,
-                    #070707 0%,
-                    #030303 100%
-                );
+                radial-gradient(circle at 15% 10%, rgba(224,0,0,.12), transparent 30%),
+                radial-gradient(circle at 85% 80%, rgba(224,0,0,.07), transparent 30%),
+                var(--bg);
             color: var(--text);
             font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background:
+                linear-gradient(rgba(255,255,255,.012) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.012) 1px, transparent 1px);
+            background-size: 40px 40px;
         }
 
         a {
@@ -47,244 +47,216 @@
             text-decoration: none;
         }
 
-        /* =========================
-           TOPBAR
-        ========================= */
+        /* SIDEBAR */
 
-        .topbar {
-            height: 76px;
-            padding: 0 32px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
-            position: sticky;
+        .sidebar {
+            position: fixed;
             top: 0;
+            left: 0;
+            bottom: 0;
+            width: 260px;
+            padding: 24px 15px;
+            background: linear-gradient(180deg, rgba(10,10,11,.98), rgba(5,5,6,.98));
+            border-right: 1px solid var(--border);
             z-index: 100;
-
-            background: rgba(5,5,5,.88);
-            backdrop-filter: blur(18px);
-
-            border-bottom: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 20px 0 70px rgba(0,0,0,.25);
         }
 
         .brand {
             display: flex;
             align-items: center;
             gap: 12px;
+            padding: 0 10px 25px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
 
-            font-size: 21px;
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: linear-gradient(145deg, var(--red), var(--red-dark));
+            color: white;
+            font-size: 18px;
+            font-weight: 900;
+            box-shadow: 0 0 30px rgba(224,0,0,.22);
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-text strong {
+            color: white;
+            font-size: 17px;
             font-weight: 900;
             letter-spacing: 2px;
         }
 
-        .brand-icon {
-            width: 40px;
-            height: 40px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            border-radius: 12px;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    var(--red),
-                    var(--red-dark)
-                );
-
-            box-shadow:
-                0 0 28px rgba(224,0,0,.25);
-
-            font-weight: 900;
-        }
-
-        .top-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .top-btn {
-            padding: 11px 15px;
-
-            border: 1px solid var(--border);
-            border-radius: 10px;
-
-            background: rgba(255,255,255,.035);
-
-            color: #ccc;
-            font-size: 13px;
-
-            transition: .2s;
-        }
-
-        .top-btn:hover {
-            color: #fff;
-            border-color: rgba(224,0,0,.45);
-            background: rgba(224,0,0,.07);
-        }
-
-        /* =========================
-           LAYOUT
-        ========================= */
-
-        .layout {
-            width: min(1250px, calc(100% - 36px));
-            margin: 42px auto 80px;
-
-            display: grid;
-            grid-template-columns: 235px 1fr;
-            gap: 24px;
-        }
-
-        /* =========================
-           SIDEBAR
-        ========================= */
-
-        .sidebar {
-            height: fit-content;
-
-            position: sticky;
-            top: 100px;
-
-            padding: 12px;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    rgba(18,18,20,.96),
-                    rgba(8,8,9,.96)
-                );
-
-            border: 1px solid var(--border);
-            border-radius: 18px;
-
-            box-shadow:
-                0 25px 70px rgba(0,0,0,.28);
+        .brand-text span {
+            margin-top: 3px;
+            color: #555;
+            font-size: 8px;
+            font-weight: 800;
+            letter-spacing: 1.7px;
         }
 
         .side-label {
-            padding: 12px 11px 8px;
-
-            color: #555;
-            font-size: 10px;
-            font-weight: 800;
+            padding: 0 11px 9px;
+            color: #444;
+            font-size: 9px;
+            font-weight: 900;
             letter-spacing: 1.8px;
             text-transform: uppercase;
         }
 
         .side-link {
             width: 100%;
-
             display: flex;
             align-items: center;
             gap: 11px;
-
-            padding: 12px;
-
+            padding: 11px;
             margin-bottom: 4px;
-
             border-radius: 10px;
-
-            color: #999;
+            color: #888;
             font-size: 13px;
-
+            border: 1px solid transparent;
             transition: .2s;
         }
 
         .side-link:hover {
             color: #fff;
-            background: rgba(255,255,255,.04);
+            background: rgba(255,255,255,.035);
         }
 
         .side-link.active {
             color: #fff;
-
-            background:
-                linear-gradient(
-                    90deg,
-                    rgba(224,0,0,.16),
-                    rgba(224,0,0,.035)
-                );
-
-            border: 1px solid rgba(224,0,0,.14);
+            background: linear-gradient(
+                90deg,
+                rgba(224,0,0,.16),
+                rgba(224,0,0,.035)
+            );
+            border-color: rgba(224,0,0,.14);
         }
 
         .side-icon {
-            width: 27px;
-            height: 27px;
-
+            width: 28px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
-
             border-radius: 8px;
-
             background: rgba(255,255,255,.04);
-
             font-size: 13px;
         }
 
         .active .side-icon {
-            background: rgba(224,0,0,.14);
             color: var(--red);
+            background: rgba(224,0,0,.14);
         }
 
-        /* =========================
-           MAIN
-        ========================= */
+        .sidebar-bottom {
+            margin-top: auto;
+            padding-top: 18px;
+            border-top: 1px solid var(--border);
+        }
+
+        .logout {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 11px;
+            margin-bottom: 4px;
+            border-radius: 10px;
+            color: #777;
+            font-size: 13px;
+            transition: .2s;
+        }
+
+        .logout:hover {
+            color: #fff;
+            background: rgba(255,255,255,.035);
+        }
+
+        /* MAIN */
 
         .main {
-            min-width: 0;
+            min-height: 100vh;
+            margin-left: 260px;
         }
 
-        .heading {
-            margin-bottom: 25px;
+        .topbar {
+            height: 78px;
+            padding: 0 35px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(5,5,5,.82);
+            backdrop-filter: blur(18px);
+            border-bottom: 1px solid var(--border);
         }
 
-        .heading-tag {
-            display: inline-block;
-
-            margin-bottom: 9px;
-
-            color: var(--red);
-
-            font-size: 10px;
-            font-weight: 900;
-
-            letter-spacing: 2px;
-            text-transform: uppercase;
+        .topbar h1 {
+            font-size: 18px;
+            font-weight: 800;
         }
 
-        .heading h1 {
-            font-size: clamp(30px, 4vw, 43px);
-            font-weight: 900;
-
-            letter-spacing: -1.5px;
+        .topbar p {
+            margin-top: 4px;
+            color: #666;
+            font-size: 11px;
         }
 
-        .heading p {
-            margin-top: 10px;
-
-            color: var(--muted);
-            font-size: 14px;
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 9px;
         }
 
-        /* =========================
-           FLASH
-        ========================= */
+        .top-button {
+            padding: 10px 14px;
+            border-radius: 9px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,.035);
+            color: #aaa;
+            font-size: 11px;
+            font-weight: 700;
+            transition: .2s;
+        }
+
+        .top-button:hover {
+            color: white;
+        }
+
+        .top-button.red {
+            color: white;
+            border-color: rgba(224,0,0,.2);
+            background: rgba(224,0,0,.09);
+        }
+
+        .content {
+            width: min(1250px, calc(100% - 70px));
+            margin: 0 auto;
+            padding: 35px 0 60px;
+        }
+
+        /* FLASH */
 
         .flash {
-            padding: 14px 16px;
+            padding: 13px 16px;
             margin-bottom: 18px;
-
             border-radius: 11px;
-
             border: 1px solid rgba(255,255,255,.08);
-
             font-size: 13px;
         }
 
@@ -300,81 +272,104 @@
             border-color: rgba(224,0,0,.2);
         }
 
-        /* =========================
-           CARDS
-        ========================= */
+        /* HERO */
+
+        .hero {
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 24px;
+            padding: 31px;
+            border-radius: 17px;
+            border: 1px solid rgba(224,0,0,.14);
+            background:
+                radial-gradient(circle at 85% 20%, rgba(224,0,0,.18), transparent 35%),
+                linear-gradient(135deg, rgba(22,10,10,.95), rgba(9,9,10,.96));
+            box-shadow: 0 25px 70px rgba(0,0,0,.24);
+        }
+
+        .hero-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin-bottom: 10px;
+            color: var(--red);
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 1.8px;
+            text-transform: uppercase;
+        }
+
+        .hero h2 {
+            font-size: clamp(25px, 3vw, 36px);
+            letter-spacing: -1px;
+        }
+
+        .hero p {
+            max-width: 700px;
+            margin-top: 10px;
+            color: #777;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        /* GRID */
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .full {
+            grid-column: 1 / -1;
+        }
+
+        /* CARD */
 
         .card {
-            margin-bottom: 20px;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    rgba(17,17,19,.97),
-                    rgba(8,8,9,.97)
-                );
-
-            border: 1px solid var(--border);
-            border-radius: 18px;
-
             overflow: hidden;
-
-            box-shadow:
-                0 20px 60px rgba(0,0,0,.25);
+            background: linear-gradient(145deg, rgba(17,17,19,.97), rgba(8,8,9,.97));
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            box-shadow: 0 20px 60px rgba(0,0,0,.25);
         }
 
         .card-header {
-            padding: 21px 23px;
-
+            padding: 20px 21px;
             display: flex;
             align-items: center;
-            gap: 13px;
-
+            gap: 12px;
             border-bottom: 1px solid var(--border);
         }
 
         .card-icon {
-            width: 39px;
-            height: 39px;
-
+            width: 38px;
+            height: 38px;
             display: flex;
             align-items: center;
             justify-content: center;
-
-            border-radius: 11px;
-
+            border-radius: 10px;
             color: var(--red);
-
             background: rgba(224,0,0,.09);
             border: 1px solid rgba(224,0,0,.15);
-
-            font-size: 16px;
         }
 
-        .card-header h2 {
-            font-size: 15px;
+        .card-header h3 {
+            font-size: 14px;
         }
 
         .card-header p {
             margin-top: 4px;
-
             color: #666;
-            font-size: 11px;
+            font-size: 10px;
         }
 
         .card-body {
-            padding: 23px;
+            padding: 21px;
         }
 
-        /* =========================
-           FORMS
-        ========================= */
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 17px;
-        }
+        /* FIELDS */
 
         .field {
             margin-bottom: 17px;
@@ -384,124 +379,107 @@
             margin-bottom: 0;
         }
 
-        .field.full {
-            grid-column: 1 / -1;
-        }
-
         label {
             display: block;
-
             margin-bottom: 7px;
-
             color: #ddd;
-
             font-size: 12px;
             font-weight: 700;
-        }
-
-        .hint {
-            margin-top: 6px;
-
-            color: #5d5d5d;
-            font-size: 10px;
         }
 
         input[type="text"],
         input[type="password"],
         input[type="url"],
-        input[type="color"],
-        textarea,
-        select {
+        textarea {
             width: 100%;
-
             outline: none;
-
             padding: 13px 14px;
-
             border-radius: 10px;
             border: 1px solid rgba(255,255,255,.08);
-
             background: #070708;
-
             color: #fff;
-
+            font-family: Arial, Helvetica, sans-serif;
             font-size: 13px;
-
             transition: .2s;
         }
 
         textarea {
-            min-height: 105px;
+            min-height: 115px;
             resize: vertical;
+            line-height: 1.5;
         }
 
         input:focus,
-        textarea:focus,
-        select:focus {
+        textarea:focus {
             border-color: var(--red);
-
-            box-shadow:
-                0 0 0 3px rgba(224,0,0,.07);
+            box-shadow: 0 0 0 3px rgba(224,0,0,.07);
         }
 
-        input[type="color"] {
-            height: 48px;
-            padding: 5px;
-            cursor: pointer;
+        .hint {
+            margin-top: 6px;
+            color: #555;
+            font-size: 10px;
+            line-height: 1.4;
         }
 
-        /* =========================
-           TOGGLES
-        ========================= */
+        /* COLOR */
 
-        .toggle-list {
-            display: grid;
+        .color-row {
+            display: flex;
+            align-items: center;
             gap: 10px;
         }
 
-        .toggle {
-            min-height: 67px;
+        input[type="color"] {
+            width: 52px;
+            height: 44px;
+            padding: 3px;
+            cursor: pointer;
+            border-radius: 9px;
+            border: 1px solid rgba(255,255,255,.08);
+            background: #070708;
+        }
 
+        .color-value {
+            flex: 1;
+        }
+
+        /* TOGGLES */
+
+        .toggle {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 20px;
-
-            padding: 14px 16px;
-
+            gap: 15px;
+            padding: 14px 15px;
+            margin-bottom: 10px;
+            border-radius: 11px;
             border: 1px solid rgba(255,255,255,.06);
-            border-radius: 12px;
-
             background: rgba(255,255,255,.025);
-
-            transition: .2s;
         }
 
-        .toggle:hover {
-            border-color: rgba(224,0,0,.18);
-            background: rgba(224,0,0,.025);
+        .toggle:last-child {
+            margin-bottom: 0;
         }
 
         .toggle-info strong {
             display: block;
-
-            margin-bottom: 4px;
-
             color: #eee;
-            font-size: 13px;
+            font-size: 12px;
         }
 
         .toggle-info span {
+            display: block;
+            margin-top: 4px;
             color: #666;
-            font-size: 11px;
+            font-size: 10px;
         }
 
         .switch {
             position: relative;
-
-            width: 48px;
-            min-width: 48px;
-            height: 27px;
+            width: 46px;
+            min-width: 46px;
+            height: 26px;
         }
 
         .switch input {
@@ -514,231 +492,208 @@
         .slider {
             position: absolute;
             inset: 0;
-
             cursor: pointer;
-
             border-radius: 999px;
-
             background: #29292b;
-
             transition: .25s;
         }
 
         .slider::before {
             content: "";
-
             position: absolute;
-
-            width: 21px;
-            height: 21px;
-
+            width: 20px;
+            height: 20px;
             left: 3px;
             top: 3px;
-
             border-radius: 50%;
-
-            background: #aaa;
-
+            background: #999;
             transition: .25s;
         }
 
         .switch input:checked + .slider {
             background: var(--red);
-
-            box-shadow:
-                0 0 16px rgba(224,0,0,.25);
+            box-shadow: 0 0 15px rgba(224,0,0,.25);
         }
 
         .switch input:checked + .slider::before {
-            transform: translateX(21px);
+            transform: translateX(20px);
             background: #fff;
         }
 
-        /* =========================
-           BUTTONS
-        ========================= */
+        /* BUTTONS */
 
-        .actions {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-
-            padding: 20px 23px;
-
-            border-top: 1px solid var(--border);
-
-            background: rgba(255,255,255,.015);
-        }
-
-        .btn {
-            border: 1px solid rgba(255,255,255,.08);
-
+        .submit {
+            width: 100%;
+            border: none;
             border-radius: 10px;
-
-            padding: 12px 17px;
-
+            padding: 13px 17px;
             cursor: pointer;
-
-            color: #bbb;
-
-            background: rgba(255,255,255,.035);
-
+            color: white;
+            background: linear-gradient(135deg, var(--red), var(--red-dark));
+            box-shadow: 0 8px 25px rgba(224,0,0,.18);
             font-size: 12px;
-            font-weight: 700;
-
+            font-weight: 800;
             transition: .2s;
         }
 
-        .btn:hover {
-            color: #fff;
-            border-color: rgba(255,255,255,.15);
-        }
-
-        .btn-save {
-            border: none;
-
-            color: #fff;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    var(--red),
-                    var(--red-dark)
-                );
-
-            box-shadow:
-                0 8px 25px rgba(224,0,0,.18);
-        }
-
-        .btn-save:hover {
+        .submit:hover {
             transform: translateY(-1px);
-
-            box-shadow:
-                0 12px 30px rgba(224,0,0,.28);
+            box-shadow: 0 12px 30px rgba(224,0,0,.28);
         }
 
-        .btn-danger {
-            color: #ff7777;
-            border-color: rgba(224,0,0,.15);
-        }
-
-        .btn-danger:hover {
-            background: rgba(224,0,0,.07);
-            border-color: rgba(224,0,0,.3);
-        }
-
-        /* =========================
-           DANGER
-        ========================= */
-
-        .danger {
-            border-color: rgba(224,0,0,.14);
-        }
-
-        .danger .card-header {
-            border-bottom-color: rgba(224,0,0,.12);
-        }
-
-        .danger .card-icon {
-            color: #ff6666;
-            background: rgba(224,0,0,.08);
-        }
-
-        .danger-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-        }
-
-        .danger-content h3 {
-            font-size: 13px;
-            margin-bottom: 5px;
-        }
-
-        .danger-content p {
-            max-width: 600px;
-
-            color: #666;
+        .restore {
+            width: 100%;
+            margin-top: 9px;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,.08);
+            background: rgba(255,255,255,.035);
+            color: #aaa;
+            cursor: pointer;
             font-size: 11px;
-            line-height: 1.5;
+            font-weight: 700;
         }
 
-        /* =========================
-           RESPONSIVE
-        ========================= */
+        .restore:hover {
+            color: white;
+        }
+
+        .footer {
+            padding: 25px 0 0;
+            color: #444;
+            text-align: center;
+            font-size: 10px;
+        }
+
+        /* RESPONSIVE */
 
         @media (max-width: 900px) {
-
-            .layout {
+            .grid {
                 grid-template-columns: 1fr;
             }
 
+            .full {
+                grid-column: auto;
+            }
+        }
+
+        @media (max-width: 800px) {
             .sidebar {
-                position: static;
-
-                display: flex;
-                align-items: center;
-
-                overflow-x: auto;
-
-                padding: 8px;
+                width: 72px;
+                padding: 20px 9px;
             }
 
+            .brand {
+                justify-content: center;
+                padding: 0 0 20px;
+            }
+
+            .brand-text,
             .side-label {
                 display: none;
             }
 
             .side-link {
-                min-width: max-content;
-                margin: 0;
+                justify-content: center;
+                padding: 12px 8px;
             }
 
-            .side-link span:last-child {
-                display: block;
+            .side-link span {
+                display: none;
+            }
+
+            .side-icon {
+                width: 34px;
+                height: 34px;
+            }
+
+            .logout {
+                justify-content: center;
+            }
+
+            .logout span:last-child {
+                display: none;
+            }
+
+            .main {
+                margin-left: 72px;
+            }
+
+            .topbar {
+                padding: 0 20px;
+            }
+
+            .content {
+                width: calc(100% - 40px);
             }
         }
 
         @media (max-width: 650px) {
+            .topbar {
+                height: auto;
+                min-height: 72px;
+                padding: 12px 15px;
+            }
+
+            .topbar h1 {
+                font-size: 15px;
+            }
+
+            .topbar p {
+                font-size: 9px;
+            }
+
+            .top-actions {
+                gap: 5px;
+            }
+
+            .top-button {
+                padding: 8px 9px;
+                font-size: 9px;
+            }
+
+            .content {
+                width: calc(100% - 24px);
+                padding-top: 24px;
+            }
+
+            .hero {
+                padding: 24px 20px;
+            }
+
+            .hero h2 {
+                font-size: 25px;
+            }
+        }
+
+        @media (max-width: 430px) {
+            .sidebar {
+                width: 60px;
+            }
+
+            .main {
+                margin-left: 60px;
+            }
 
             .topbar {
-                padding: 0 16px;
+                align-items: flex-start;
+                gap: 10px;
             }
 
-            .brand span {
-                display: none;
+            .top-actions {
+                flex-direction: column;
             }
 
-            .layout {
-                width: calc(100% - 20px);
-                margin-top: 25px;
-            }
-
-            .grid {
-                grid-template-columns: 1fr;
-            }
-
-            .field.full {
-                grid-column: auto;
-            }
-
-            .card-body {
-                padding: 18px;
-            }
-
-            .actions {
-                flex-direction: column-reverse;
-                align-items: stretch;
-            }
-
-            .btn {
+            .top-button {
                 width: 100%;
             }
 
-            .danger-content {
-                flex-direction: column;
-                align-items: stretch;
+            .content {
+                width: calc(100% - 16px);
+            }
+
+            .hero {
+                padding: 20px 16px;
             }
         }
     </style>
@@ -746,178 +701,133 @@
 
 <body>
 
-<header class="topbar">
+<aside class="sidebar">
 
-    <a href="/admin" class="brand">
-        <div class="brand-icon">E</div>
-        <span>{{ config.site_name }}</span>
+    <div class="brand">
+        <div class="brand-icon">▣</div>
+
+        <div class="brand-text">
+            <strong>EXPURG</strong>
+            <span>ADMIN CONTROL</span>
+        </div>
+    </div>
+
+    <div class="side-label">
+        Administração
+    </div>
+
+    <a href="/admin" class="side-link">
+        <div class="side-icon">▦</div>
+        <span>Dashboard</span>
     </a>
 
-    <div class="top-actions">
+    <a href="/admin/config" class="side-link active">
+        <div class="side-icon">⚙</div>
+        <span>Configurações</span>
+    </a>
 
-        <a href="/" class="top-btn">
-            Ver site
+    <a href="/admin/anuncios" class="side-link">
+        <div class="side-icon">◈</div>
+        <span>Anúncios</span>
+    </a>
+
+    <a href="/admin/banner" class="side-link">
+        <div class="side-icon">▣</div>
+        <span>Banner</span>
+    </a>
+
+    <a href="/chat" class="side-link">
+        <div class="side-icon">◌</div>
+        <span>Chat</span>
+    </a>
+
+    <div class="sidebar-bottom">
+
+        <a href="/" class="logout">
+            <span>↩</span>
+            <span>Voltar ao site</span>
         </a>
 
-        <a href="/admin" class="top-btn">
-            Painel
+        <a href="/logout" class="logout">
+            <span>⏻</span>
+            <span>Sair da conta</span>
         </a>
 
     </div>
 
-</header>
+</aside>
 
 
-<div class="layout">
+<main class="main">
 
-    <!-- =========================
-         SIDEBAR
-    ========================== -->
+    <header class="topbar">
 
-    <aside class="sidebar">
-
-        <div class="side-label">
-            Administração
-        </div>
-
-        <a href="/admin" class="side-link">
-
-            <div class="side-icon">▦</div>
-
-            <span>Dashboard</span>
-
-        </a>
-
-
-        <a href="/admin/config" class="side-link active">
-
-            <div class="side-icon">⚙</div>
-
-            <span>Configurações</span>
-
-        </a>
-
-
-        <a href="/admin/anuncios" class="side-link">
-
-            <div class="side-icon">◈</div>
-
-            <span>Anúncios</span>
-
-        </a>
-
-
-        <a href="/admin/banner" class="side-link">
-
-            <div class="side-icon">▣</div>
-
-            <span>Banner</span>
-
-        </a>
-
-
-        <a href="/chat" class="side-link">
-
-            <div class="side-icon">◌</div>
-
-            <span>Chat</span>
-
-        </a>
-
-
-        <div class="side-label">
-            Sistema
-        </div>
-
-
-        <a href="/" class="side-link">
-
-            <div class="side-icon">⌂</div>
-
-            <span>Página inicial</span>
-
-        </a>
-
-
-        <a href="/logout" class="side-link">
-
-            <div class="side-icon">↪</div>
-
-            <span>Sair</span>
-
-        </a>
-
-    </aside>
-
-
-    <!-- =========================
-         MAIN
-    ========================== -->
-
-    <main class="main">
-
-        <div class="heading">
-
-            <span class="heading-tag">
-                Controle administrativo
-            </span>
-
+        <div>
             <h1>Configurações</h1>
-
-            <p>
-                Controle a identidade, acesso e recursos da comunidade.
-            </p>
-
+            <p>Personalize o funcionamento do EXPURG</p>
         </div>
 
+        <div class="top-actions">
+            <a href="/" class="top-button">Ver site</a>
+            <a href="/admin" class="top-button red">Dashboard</a>
+        </div>
+
+    </header>
+
+
+    <div class="content">
 
         {% with mensagens = get_flashed_messages(with_categories=true) %}
-
             {% if mensagens %}
-
                 {% for categoria, mensagem in mensagens %}
-
                     <div class="flash {{ categoria }}">
                         {{ mensagem }}
                     </div>
-
                 {% endfor %}
-
             {% endif %}
-
         {% endwith %}
 
 
-        <form method="POST" action="/admin/config">
+        <section class="hero">
 
-            <!-- =========================
-                 IDENTIDADE
-            ========================== -->
+            <div class="hero-label">
+                ● Configuração do sistema
+            </div>
 
-            <section class="card">
+            <h2>
+                Central de configurações
+            </h2>
 
-                <div class="card-header">
+            <p>
+                Controle a aparência e os principais recursos
+                disponíveis no seu site.
+            </p>
 
-                    <div class="card-icon">
-                        ◇
+        </section>
+
+
+        <form method="POST" action="{{ url_for('admin_config') }}">
+
+            <div class="grid">
+
+                <!-- SITE -->
+
+                <section class="card">
+
+                    <div class="card-header">
+
+                        <div class="card-icon">
+                            ◈
+                        </div>
+
+                        <div>
+                            <h3>Identidade do site</h3>
+                            <p>Nome e informações principais.</p>
+                        </div>
+
                     </div>
 
-                    <div>
-
-                        <h2>Identidade do site</h2>
-
-                        <p>
-                            Personalize os elementos principais do EXPURG.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="card-body">
-
-                    <div class="grid">
+                    <div class="card-body">
 
                         <div class="field">
 
@@ -929,9 +839,8 @@
                                 type="text"
                                 id="site_name"
                                 name="site_name"
-                                value="{{ config.site_name }}"
+                                value="{{ config.site_name or '' }}"
                                 placeholder="EXPURG"
-                                required
                             >
 
                         </div>
@@ -940,42 +849,57 @@
                         <div class="field">
 
                             <label for="admin_name">
-                                Nome exibido do administrador
+                                Nome do administrador
                             </label>
 
                             <input
                                 type="text"
                                 id="admin_name"
                                 name="admin_name"
-                                value="{{ config.admin_name }}"
+                                value="{{ config.admin_name or '' }}"
                                 placeholder="ADMIN"
-                                required
                             >
 
                         </div>
 
 
-                        <div class="field full">
+                        <div class="field">
 
                             <label for="home_text">
                                 Texto principal da página inicial
                             </label>
 
-                            <input
-                                type="text"
+                            <textarea
                                 id="home_text"
                                 name="home_text"
-                                value="{{ config.home_text }}"
                                 placeholder="THE BEST COMMUNITY"
-                                required
-                            >
-
-                            <div class="hint">
-                                Texto principal exibido na home.
-                            </div>
+                            >{{ config.home_text or '' }}</textarea>
 
                         </div>
 
+                    </div>
+
+                </section>
+
+
+                <!-- APARÊNCIA -->
+
+                <section class="card">
+
+                    <div class="card-header">
+
+                        <div class="card-icon">
+                            ✦
+                        </div>
+
+                        <div>
+                            <h3>Aparência</h3>
+                            <p>Personalize as cores do painel.</p>
+                        </div>
+
+                    </div>
+
+                    <div class="card-body">
 
                         <div class="field">
 
@@ -983,137 +907,89 @@
                                 Cor principal
                             </label>
 
-                            <input
-                                type="color"
-                                id="primary_color"
-                                name="primary_color"
-                                value="{{ config.primary_color or '#e00000' }}"
-                            >
+                            <div class="color-row">
+
+                                <input
+                                    type="color"
+                                    id="primary_color"
+                                    name="primary_color"
+                                    value="{{ config.primary_color or '#e00000' }}"
+                                >
+
+                                <input
+                                    type="text"
+                                    id="primary_color_text"
+                                    class="color-value"
+                                    value="{{ config.primary_color or '#e00000' }}"
+                                    placeholder="#e00000"
+                                >
+
+                            </div>
+
+                            <div class="hint">
+                                Essa cor será usada nos detalhes vermelhos do site.
+                            </div>
 
                         </div>
 
-                    </div>
-
-                </div>
-
-            </section>
-
-
-            <!-- =========================
-                 ACESSO ADMIN
-            ========================== -->
-
-            <section class="card">
-
-                <div class="card-header">
-
-                    <div class="card-icon">
-                        🔐
-                    </div>
-
-                    <div>
-
-                        <h2>Acesso administrativo</h2>
-
-                        <p>
-                            Altere as credenciais usadas para entrar como administrador.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="card-body">
-
-                    <div class="grid">
 
                         <div class="field">
 
-                            <label for="admin_username">
-                                Usuário do administrador
+                            <label for="theme">
+                                Tema
                             </label>
 
                             <input
                                 type="text"
-                                id="admin_username"
-                                name="admin_username"
-                                value="{{ config.admin_username }}"
-                                required
-                            >
-
-                        </div>
-
-
-                        <div class="field">
-
-                            <label for="admin_password">
-                                Nova senha do administrador
-                            </label>
-
-                            <input
-                                type="password"
-                                id="admin_password"
-                                name="admin_password"
-                                placeholder="Deixe vazio para manter a atual"
+                                id="theme"
+                                name="theme"
+                                value="{{ config.theme or 'dark' }}"
+                                readonly
                             >
 
                             <div class="hint">
-                                Se deixar vazio, a senha atual continua a mesma.
+                                O tema atual do EXPURG é escuro.
                             </div>
 
                         </div>
 
                     </div>
 
-                </div>
-
-            </section>
+                </section>
 
 
-            <!-- =========================
-                 RECURSOS
-            ========================== -->
+                <!-- RECURSOS -->
 
-            <section class="card">
+                <section class="card full">
 
-                <div class="card-header">
+                    <div class="card-header">
 
-                    <div class="card-icon">
-                        ⚡
-                    </div>
+                        <div class="card-icon">
+                            ⚙
+                        </div>
 
-                    <div>
-
-                        <h2>Recursos da comunidade</h2>
-
-                        <p>
-                            Ative ou desative recursos públicos do site.
-                        </p>
+                        <div>
+                            <h3>Recursos do site</h3>
+                            <p>Ative ou desative funcionalidades.</p>
+                        </div>
 
                     </div>
 
-                </div>
-
-
-                <div class="card-body">
-
-                    <div class="toggle-list">
+                    <div class="card-body">
 
                         <div class="toggle">
 
                             <div class="toggle-info">
 
                                 <strong>
-                                    Chat da comunidade
+                                    Chat
                                 </strong>
 
                                 <span>
-                                    Permite que membros utilizem o chat.
+                                    Permitir que os membros utilizem o chat.
                                 </span>
 
                             </div>
-
 
                             <label class="switch">
 
@@ -1146,11 +1022,10 @@
                                 </strong>
 
                                 <span>
-                                    Exibe os anúncios publicados pelo administrador.
+                                    Exibir o sistema de anúncios do site.
                                 </span>
 
                             </div>
-
 
                             <label class="switch">
 
@@ -1179,15 +1054,14 @@
                             <div class="toggle-info">
 
                                 <strong>
-                                    Banner da página inicial
+                                    Banner
                                 </strong>
 
                                 <span>
-                                    Controlado também pelo painel de banner.
+                                    Permitir a exibição do banner principal.
                                 </span>
 
                             </div>
-
 
                             <label class="switch">
 
@@ -1210,54 +1084,113 @@
 
                         </div>
 
+
+                        <div class="toggle">
+
+                            <div class="toggle-info">
+
+                                <strong>
+                                    Registrar IP
+                                </strong>
+
+                                <span>
+                                    Registrar o endereço IPv4 dos acessos.
+                                </span>
+
+                            </div>
+
+                            <label class="switch">
+
+                                <input
+                                    type="hidden"
+                                    name="register_ip"
+                                    value="0"
+                                >
+
+                                <input
+                                    type="checkbox"
+                                    name="register_ip"
+                                    value="1"
+                                    {% if config.register_ip %}checked{% endif %}
+                                >
+
+                                <span class="slider"></span>
+
+                            </label>
+
+                        </div>
+
+
+                        <div class="toggle">
+
+                            <div class="toggle-info">
+
+                                <strong>
+                                    Exibir IP
+                                </strong>
+
+                                <span>
+                                    Mostrar informações de IP no painel.
+                                </span>
+
+                            </div>
+
+                            <label class="switch">
+
+                                <input
+                                    type="hidden"
+                                    name="show_ip"
+                                    value="0"
+                                >
+
+                                <input
+                                    type="checkbox"
+                                    name="show_ip"
+                                    value="1"
+                                    {% if config.show_ip %}checked{% endif %}
+                                >
+
+                                <span class="slider"></span>
+
+                            </label>
+
+                        </div>
+
                     </div>
 
-                </div>
-
-            </section>
+                </section>
 
 
-            <!-- =========================
-                 BANNER
-            ========================== -->
+                <!-- CONTA ADMIN -->
 
-            <section class="card">
+                <section class="card">
 
-                <div class="card-header">
+                    <div class="card-header">
 
-                    <div class="card-icon">
-                        ▣
-                    </div>
+                        <div class="card-icon">
+                            ◉
+                        </div>
 
-                    <div>
-
-                        <h2>Banner principal</h2>
-
-                        <p>
-                            Configure rapidamente o conteúdo exibido após o login.
-                        </p>
+                        <div>
+                            <h3>Conta administrativa</h3>
+                            <p>Informações da conta principal.</p>
+                        </div>
 
                     </div>
 
-                </div>
-
-
-                <div class="card-body">
-
-                    <div class="grid">
+                    <div class="card-body">
 
                         <div class="field">
 
-                            <label for="banner_title">
-                                Título do banner
+                            <label for="admin_username">
+                                Usuário administrativo
                             </label>
 
                             <input
                                 type="text"
-                                id="banner_title"
-                                name="banner_title"
-                                value="{{ config.banner_title }}"
-                                placeholder="THE WORLD IS YOURS"
+                                id="admin_username"
+                                name="admin_username"
+                                value="{{ config.admin_username or 'admin' }}"
                             >
 
                         </div>
@@ -1265,189 +1198,137 @@
 
                         <div class="field">
 
-                            <label for="banner_link">
-                                Link do banner
+                            <label for="admin_password">
+                                Senha administrativa
                             </label>
 
                             <input
-                                type="url"
-                                id="banner_link"
-                                name="banner_link"
-                                value="{{ config.banner_link }}"
-                                placeholder="https://..."
-                            >
-
-                        </div>
-
-
-                        <div class="field full">
-
-                            <label for="banner_image">
-                                URL da imagem
-                            </label>
-
-                            <input
-                                type="url"
-                                id="banner_image"
-                                name="banner_image"
-                                value="{{ config.banner_image }}"
-                                placeholder="https://site.com/imagem.jpg"
+                                type="password"
+                                id="admin_password"
+                                name="admin_password"
+                                value="{{ config.admin_password or '123456' }}"
                             >
 
                             <div class="hint">
-                                Cole aqui o endereço direto da imagem.
+                                A alteração desses campos depende da configuração do backend.
                             </div>
 
                         </div>
 
+                    </div>
 
-                        <div class="field full">
+                </section>
 
-                            <label for="banner_text">
-                                Texto do banner
-                            </label>
 
-                            <textarea
-                                id="banner_text"
-                                name="banner_text"
-                                placeholder="Escreva uma mensagem para os membros..."
-                            >{{ config.banner_text }}</textarea>
+                <!-- BANNER ATALHO -->
 
+                <section class="card">
+
+                    <div class="card-header">
+
+                        <div class="card-icon">
+                            ▣
+                        </div>
+
+                        <div>
+                            <h3>Banner</h3>
+                            <p>Acesse a central completa do banner.</p>
                         </div>
 
                     </div>
 
-                </div>
+                    <div class="card-body">
 
-            </section>
+                        <p style="
+                            color:#777;
+                            font-size:12px;
+                            line-height:1.6;
+                            margin-bottom:18px;
+                        ">
+                            O conteúdo do banner agora possui uma página própria
+                            para configurar título, texto, imagem e link.
+                        </p>
+
+                        <a
+                            href="/admin/banner"
+                            class="submit"
+                            style="
+                                display:flex;
+                                align-items:center;
+                                justify-content:center;
+                            "
+                        >
+                            Gerenciar banner
+                        </a>
+
+                    </div>
+
+                </section>
 
 
-            <!-- =========================
-                 SALVAR
-            ========================== -->
+                <!-- BOTÃO -->
 
-            <section class="card">
+                <section class="card full">
 
-                <div class="actions">
+                    <div class="card-body">
 
-                    <a
-                        href="/admin"
-                        class="btn"
-                    >
-                        Cancelar
-                    </a>
+                        <button
+                            type="submit"
+                            class="submit"
+                        >
+                            Salvar configurações
+                        </button>
 
+                    </div>
 
-                    <button
-                        type="submit"
-                        class="btn btn-save"
-                    >
-                        Salvar todas as configurações
-                    </button>
+                </section>
 
-                </div>
-
-            </section>
+            </div>
 
         </form>
 
 
-        <!-- =========================
-             RESTAURAR
-        ========================== -->
+        <div class="footer">
+            EXPURG • Painel administrativo
+        </div>
 
-        <section class="card danger">
+    </div>
 
-            <div class="card-header">
-
-                <div class="card-icon">
-                    !
-                </div>
-
-                <div>
-
-                    <h2>Zona avançada</h2>
-
-                    <p>
-                        Ações que restauram configurações do sistema.
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <div class="card-body">
-
-                <div class="danger-content">
-
-                    <div>
-
-                        <h3>
-                            Restaurar configurações padrão
-                        </h3>
-
-                        <p>
-                            Isso restaura as configurações para os valores
-                            padrão do EXPURG, incluindo nome, cor, recursos,
-                            banner e credenciais administrativas.
-                        </p>
-
-                    </div>
-
-
-                    <form
-                        method="POST"
-                        action="/admin/config/restaurar"
-                        onsubmit="return confirmarRestauracao();"
-                    >
-
-                        <button
-                            type="submit"
-                            class="btn btn-danger"
-                        >
-                            Restaurar padrão
-                        </button>
-
-                    </form>
-
-                </div>
-
-            </div>
-
-        </section>
-
-    </main>
-
-</div>
+</main>
 
 
 <script>
 
-    function confirmarRestauracao() {
+    const color =
+        document.getElementById("primary_color");
 
-        return confirm(
-            "Tem certeza que deseja restaurar todas as configurações para o padrão?"
-        );
-
-    }
+    const colorText =
+        document.getElementById("primary_color_text");
 
 
-    /*
-        Atualiza visualmente a cor principal
-        enquanto o administrador escolhe uma nova cor.
-    */
+    if (color && colorText) {
 
-    const colorInput = document.getElementById("primary_color");
+        color.addEventListener("input", function () {
 
-    if (colorInput) {
+            colorText.value =
+                this.value;
 
-        colorInput.addEventListener("input", function() {
+        });
 
-            document.documentElement.style.setProperty(
-                "--red",
-                this.value
-            );
+
+        colorText.addEventListener("input", function () {
+
+            let value =
+                this.value.trim();
+
+            if (
+                /^#[0-9A-Fa-f]{6}$/.test(value)
+            ) {
+
+                color.value =
+                    value;
+
+            }
 
         });
 
