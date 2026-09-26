@@ -10,7 +10,9 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Cadastro | {{ config.site_name }}</title>
+    <title>
+        Cadastro | {{ config.site_name }}
+    </title>
 
     <style>
 
@@ -20,301 +22,1514 @@
             padding: 0;
         }
 
+        :root {
+            --red: {{ config.primary_color or "#e00000" }};
+            --red-dark: #650000;
+            --bg: #020202;
+            --border: rgba(255,255,255,.07);
+        }
+
+        html {
+            min-height: 100%;
+        }
+
         body {
 
             min-height: 100vh;
 
             display: flex;
+
             align-items: center;
+
             justify-content: center;
 
-            font-family: Arial, sans-serif;
+            padding: 25px;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
 
             color: white;
 
             background:
                 radial-gradient(
-                    circle at 50% 20%,
-                    rgba(110, 0, 0, .18),
-                    transparent 45%
+                    circle at 50% 10%,
+                    rgba(180,0,0,.16),
+                    transparent 30%
                 ),
-                #030303;
+                radial-gradient(
+                    circle at 90% 90%,
+                    rgba(100,0,0,.09),
+                    transparent 28%
+                ),
+                #020202;
+
+            overflow-x: hidden;
         }
+
+
+        /* ============================================
+           GRID DO FUNDO
+        ============================================ */
+
+        body::before {
+
+            content: "";
+
+            position: fixed;
+
+            inset: 0;
+
+            pointer-events: none;
+
+            opacity: .22;
+
+            background-image:
+                linear-gradient(
+                    rgba(255,255,255,.025) 1px,
+                    transparent 1px
+                ),
+                linear-gradient(
+                    90deg,
+                    rgba(255,255,255,.025) 1px,
+                    transparent 1px
+                );
+
+            background-size: 45px 45px;
+
+            mask-image:
+                radial-gradient(
+                    circle at center,
+                    black,
+                    transparent 75%
+                );
+        }
+
+
+        /* ============================================
+           GLOW
+        ============================================ */
+
+        .glow {
+
+            position: fixed;
+
+            width: 430px;
+
+            height: 430px;
+
+            top: 50%;
+
+            left: 50%;
+
+            transform:
+                translate(-50%,-50%);
+
+            border-radius: 50%;
+
+            background:
+                var(--red);
+
+            opacity: .025;
+
+            filter:
+                blur(100px);
+
+            pointer-events: none;
+        }
+
+
+        /* ============================================
+           VOLTAR
+        ============================================ */
+
+        .back {
+
+            position: fixed;
+
+            top: 22px;
+
+            left: 22px;
+
+            z-index: 10;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            padding: 10px 13px;
+
+            border-radius: 9px;
+
+            color: #777;
+
+            background:
+                rgba(10,10,10,.7);
+
+            border:
+                1px solid rgba(255,255,255,.06);
+
+            text-decoration: none;
+
+            font-size: 11px;
+
+            backdrop-filter:
+                blur(12px);
+
+            transition:
+                .2s ease;
+        }
+
+        .back:hover {
+
+            color: white;
+
+            background:
+                rgba(30,0,0,.55);
+
+            border-color:
+                rgba(224,0,0,.25);
+
+            transform:
+                translateX(-2px);
+        }
+
+
+        /* ============================================
+           CAIXA
+        ============================================ */
 
         .box {
 
-            width: 400px;
+            position: relative;
 
-            max-width: calc(100% - 30px);
+            z-index: 2;
 
-            padding: 40px;
+            width: 430px;
 
-            background: rgba(10, 10, 10, .94);
+            max-width: 100%;
 
-            border: 1px solid #241010;
+            padding: 38px;
 
-            border-radius: 16px;
+            border-radius: 18px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(15,15,15,.97),
+                    rgba(5,5,5,.97)
+                );
+
+            border:
+                1px solid var(--border);
 
             box-shadow:
-                0 25px 80px rgba(0, 0, 0, .7);
+                0 35px 100px rgba(0,0,0,.75),
+                0 0 70px rgba(100,0,0,.07);
+
+            backdrop-filter:
+                blur(18px);
+
+            animation:
+                enter .5s
+                cubic-bezier(.2,.8,.2,1);
         }
 
-        .blood {
+        @keyframes enter {
 
-            text-align: center;
+            from {
 
-            font-size: 30px;
+                opacity: 0;
 
-            margin-bottom: 10px;
+                transform:
+                    translateY(18px)
+                    scale(.98);
+
+            }
+
+            to {
+
+                opacity: 1;
+
+                transform:
+                    translateY(0)
+                    scale(1);
+
+            }
+
         }
 
-        h1 {
 
-            text-align: center;
+        /* ============================================
+           LOGO
+        ============================================ */
+
+        .logo-area {
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            margin-bottom: 28px;
+        }
+
+        .logo {
+
+            width: 65px;
+
+            height: 65px;
+
+            display: grid;
+
+            place-items: center;
+
+            margin-bottom: 15px;
+
+            border-radius: 17px;
+
+            font-size: 27px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #260000,
+                    #650000
+                );
+
+            border:
+                1px solid rgba(224,0,0,.3);
+
+            box-shadow:
+                0 0 35px rgba(224,0,0,.14);
+
+            animation:
+                pulse 3s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+
+                box-shadow:
+                    0 0 25px
+                    rgba(224,0,0,.10);
+
+            }
+
+            50% {
+
+                box-shadow:
+                    0 0 45px
+                    rgba(224,0,0,.22);
+
+            }
+
+        }
+
+        .site-name {
 
             font-size: 25px;
 
-            letter-spacing: 2px;
+            font-weight: 900;
 
-            margin-bottom: 8px;
+            letter-spacing: 4px;
+
+            text-transform: uppercase;
+        }
+
+        .site-name span {
+            color: var(--red);
         }
 
         .subtitle {
 
+            margin-top: 8px;
+
+            color: #555;
+
+            font-size: 10px;
+
+            letter-spacing: 1px;
+
             text-align: center;
-
-            color: #666;
-
-            font-size: 13px;
-
-            margin-bottom: 30px;
         }
+
+
+        /* ============================================
+           ERRO
+        ============================================ */
+
+        .error {
+
+            display: flex;
+
+            align-items: flex-start;
+
+            gap: 10px;
+
+            margin-bottom: 18px;
+
+            padding: 12px 13px;
+
+            border-radius: 9px;
+
+            color: #ffaaaa;
+
+            background:
+                rgba(120,0,0,.12);
+
+            border:
+                1px solid rgba(160,0,0,.25);
+
+            font-size: 11px;
+
+            line-height: 1.5;
+        }
+
+        .error-icon {
+
+            flex-shrink: 0;
+
+            width: 18px;
+
+            height: 18px;
+
+            display: grid;
+
+            place-items: center;
+
+            border-radius: 50%;
+
+            color: #ff7777;
+
+            background:
+                rgba(255,0,0,.08);
+
+            font-size: 10px;
+        }
+
+
+        /* ============================================
+           CAMPOS
+        ============================================ */
 
         .field {
 
-            margin-bottom: 18px;
+            margin-bottom: 16px;
+        }
+
+        .field-header {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            margin-bottom: 7px;
         }
 
         label {
 
-            display: block;
+            color: #888;
 
-            color: #999;
+            font-size: 9px;
 
-            font-size: 12px;
-
-            font-weight: bold;
+            font-weight: 700;
 
             text-transform: uppercase;
 
-            letter-spacing: 1px;
+            letter-spacing: 1.2px;
+        }
 
-            margin-bottom: 8px;
+        .field-hint {
+
+            color: #3f3f3f;
+
+            font-size: 9px;
         }
 
         input {
 
             width: 100%;
 
-            height: 48px;
+            height: 47px;
 
-            padding: 0 14px;
+            padding:
+                0 14px;
 
-            border-radius: 8px;
+            border:
+                1px solid rgba(255,255,255,.075);
 
-            border: 1px solid #292929;
+            border-radius: 9px;
 
-            background: #070707;
+            outline: none;
 
             color: white;
 
-            outline: none;
+            background:
+                #060606;
+
+            font-size: 13px;
+
+            transition:
+                .2s ease;
+        }
+
+        input:hover {
+
+            border-color:
+                rgba(255,255,255,.11);
         }
 
         input:focus {
 
-            border-color: #720000;
+            border-color:
+                rgba(224,0,0,.45);
+
+            background:
+                #080808;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(224,0,0,.045);
         }
 
-        button {
+        input::placeholder {
+            color: #3f3f3f;
+        }
+
+
+        /* ============================================
+           SENHA
+        ============================================ */
+
+        .password-wrap {
+            position: relative;
+        }
+
+        .password-wrap input {
+            padding-right: 48px;
+        }
+
+        .toggle-password {
+
+            position: absolute;
+
+            right: 8px;
+
+            top: 50%;
+
+            transform:
+                translateY(-50%);
+
+            width: 34px;
+
+            height: 34px;
+
+            padding: 0;
+
+            border: none;
+
+            border-radius: 7px;
+
+            color: #555;
+
+            background:
+                transparent;
+
+            cursor: pointer;
+
+            font-size: 12px;
+
+            transition:
+                .2s;
+        }
+
+        .toggle-password:hover {
+
+            color: #aaa;
+
+            background:
+                rgba(255,255,255,.04);
+
+            box-shadow: none;
+
+            transform:
+                translateY(-50%);
+        }
+
+
+        /* ============================================
+           INDICADOR DE SENHA
+        ============================================ */
+
+        .password-strength {
+
+            display: flex;
+
+            gap: 4px;
+
+            margin-top: 7px;
+        }
+
+        .strength-bar {
+
+            flex: 1;
+
+            height: 3px;
+
+            border-radius: 10px;
+
+            background:
+                #1b1b1b;
+
+            transition:
+                .25s;
+        }
+
+        .strength-text {
+
+            margin-top: 5px;
+
+            color: #444;
+
+            font-size: 8px;
+
+            text-align: right;
+        }
+
+
+        /* ============================================
+           BOTÃO
+        ============================================ */
+
+        .register-button {
+
+            position: relative;
+
+            overflow: hidden;
 
             width: 100%;
 
             height: 50px;
 
-            border: 1px solid #720000;
+            margin-top: 7px;
 
-            border-radius: 8px;
+            border:
+                1px solid rgba(224,0,0,.4);
+
+            border-radius: 9px;
 
             color: white;
 
             background:
                 linear-gradient(
                     135deg,
-                    #390000,
-                    #720000,
-                    #390000
+                    #250000,
+                    #700000,
+                    #3b0000
                 );
 
             cursor: pointer;
 
-            font-weight: bold;
+            font-size: 11px;
+
+            font-weight: 800;
+
+            letter-spacing: 1.5px;
+
+            transition:
+                .25s ease;
         }
 
-        .error {
+        .register-button::before {
 
-            margin-bottom: 20px;
+            content: "";
 
-            padding: 12px;
+            position: absolute;
 
-            border-radius: 7px;
+            top: 0;
 
-            font-size: 12px;
+            left: -100%;
 
-            text-align: center;
+            width: 100%;
 
-            color: #ffaaaa;
+            height: 100%;
 
-            background: rgba(100, 0, 0, .12);
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(255,255,255,.08),
+                    transparent
+                );
 
-            border: 1px solid rgba(130, 0, 0, .3);
+            transition:
+                .5s;
         }
+
+        .register-button:hover {
+
+            transform:
+                translateY(-2px);
+
+            border-color:
+                rgba(255,80,80,.65);
+
+            box-shadow:
+                0 12px 35px
+                rgba(100,0,0,.28);
+        }
+
+        .register-button:hover::before {
+            left: 100%;
+        }
+
+        .register-button:active {
+            transform: translateY(0);
+        }
+
+        .register-button.loading {
+
+            opacity: .65;
+
+            pointer-events: none;
+        }
+
+
+        /* ============================================
+           DIVISOR
+        ============================================ */
+
+        .divider {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            margin: 22px 0;
+
+            color: #333;
+
+            font-size: 9px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 1px;
+        }
+
+        .divider::before,
+        .divider::after {
+
+            content: "";
+
+            flex: 1;
+
+            height: 1px;
+
+            background:
+                rgba(255,255,255,.055);
+        }
+
+
+        /* ============================================
+           LOGIN
+        ============================================ */
 
         .bottom {
 
             text-align: center;
 
-            margin-top: 25px;
-
             color: #555;
 
-            font-size: 12px;
+            font-size: 11px;
+
+            line-height: 1.7;
         }
 
         .bottom a {
 
-            color: #9b0000;
+            color: #d65353;
+
+            font-weight: 700;
 
             text-decoration: none;
+
+            transition:
+                .2s;
+        }
+
+        .bottom a:hover {
+            color: #ff8585;
+        }
+
+
+        /* ============================================
+           TERMOS
+        ============================================ */
+
+        .terms {
+
+            margin-top: 17px;
+
+            color: #393939;
+
+            font-size: 8px;
+
+            line-height: 1.6;
+
+            text-align: center;
+        }
+
+
+        /* ============================================
+           FOOTER
+        ============================================ */
+
+        .footer {
+
+            margin-top: 22px;
+
+            color: #303030;
+
+            font-size: 9px;
+
+            text-align: center;
+
+            letter-spacing: 1px;
+        }
+
+        .footer strong {
+            color: #560000;
+        }
+
+
+        /* ============================================
+           MOBILE
+        ============================================ */
+
+        @media (max-width: 520px) {
+
+            body {
+                padding: 18px;
+            }
+
+            .box {
+
+                padding:
+                    30px 22px;
+
+                border-radius: 15px;
+            }
+
+            .site-name {
+                font-size: 21px;
+            }
+
+            .logo {
+
+                width: 58px;
+
+                height: 58px;
+
+                font-size: 23px;
+            }
+
+            .back {
+
+                top: 12px;
+
+                left: 12px;
+
+                padding:
+                    8px 10px;
+            }
+
         }
 
     </style>
 
 </head>
 
+
 <body>
 
-    <main class="box">
 
-        <div class="blood">
+<div class="glow"></div>
+
+
+<a
+    href="/"
+    class="back"
+>
+    ← Voltar para o site
+</a>
+
+
+
+<main class="box">
+
+
+    <!-- ============================================
+         CABEÇALHO
+    ============================================ -->
+
+    <div class="logo-area">
+
+        <div class="logo">
             🩸
         </div>
 
-        <h1>
-            CADASTRO
-        </h1>
+        <div class="site-name">
 
-        <p class="subtitle">
-            Crie sua conta
-        </p>
-
-
-        {% if erro %}
-
-            <div class="error">
-                {{ erro }}
-            </div>
-
-        {% endif %}
-
-
-        <form
-            action="/cadastro"
-            method="POST"
-        >
-
-            <div class="field">
-
-                <label>
-                    Usuário
-                </label>
-
-                <input
-                    type="text"
-                    name="username"
-                    placeholder="Escolha um usuário"
-                    required
-                >
-
-            </div>
-
-
-            <div class="field">
-
-                <label>
-                    Gmail
-                </label>
-
-                <input
-                    type="email"
-                    name="email"
-                    placeholder="seuemail@gmail.com"
-                    required
-                >
-
-            </div>
-
-
-            <div class="field">
-
-                <label>
-                    Senha
-                </label>
-
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="Sua senha"
-                    required
-                >
-
-            </div>
-
-
-            <div class="field">
-
-                <label>
-                    Confirmar senha
-                </label>
-
-                <input
-                    type="password"
-                    name="password_confirm"
-                    placeholder="Digite novamente"
-                    required
-                >
-
-            </div>
-
-
-            <button type="submit">
-                CRIAR CONTA
-            </button>
-
-        </form>
-
-
-        <div class="bottom">
-
-            Já possui uma conta?
-
-            <a href="/login">
-                Entrar
-            </a>
+            {{ config.site_name }}
 
         </div>
 
-    </main>
+        <div class="subtitle">
+
+            CRIE SUA CONTA • ENTRE PARA A COMUNIDADE
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ============================================
+         ERRO
+    ============================================ -->
+
+    {% if erro %}
+
+    <div class="error">
+
+        <div class="error-icon">
+            !
+        </div>
+
+        <div>
+            {{ erro }}
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
+
+    <!-- ============================================
+         FORMULÁRIO
+    ============================================ -->
+
+    <form
+        action="/cadastro"
+        method="POST"
+        id="registerForm"
+    >
+
+
+        <!-- USUÁRIO -->
+
+        <div class="field">
+
+            <div class="field-header">
+
+                <label for="username">
+                    Usuário
+                </label>
+
+                <span class="field-hint">
+                    Seu nome público
+                </span>
+
+            </div>
+
+            <input
+                type="text"
+                id="username"
+                name="username"
+                placeholder="Escolha um usuário"
+                autocomplete="username"
+                minlength="3"
+                maxlength="30"
+                required
+            >
+
+        </div>
+
+
+
+        <!-- EMAIL -->
+
+        <div class="field">
+
+            <div class="field-header">
+
+                <label for="email">
+                    Gmail
+                </label>
+
+                <span class="field-hint">
+                    Seu e-mail
+                </span>
+
+            </div>
+
+            <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="seuemail@gmail.com"
+                autocomplete="email"
+                maxlength="120"
+                required
+            >
+
+        </div>
+
+
+
+        <!-- SENHA -->
+
+        <div class="field">
+
+            <div class="field-header">
+
+                <label for="password">
+                    Senha
+                </label>
+
+                <span
+                    class="field-hint"
+                    id="strengthLabel"
+                >
+                    Segurança
+                </span>
+
+            </div>
+
+            <div class="password-wrap">
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Crie uma senha"
+                    autocomplete="new-password"
+                    minlength="6"
+                    maxlength="200"
+                    required
+                >
+
+                <button
+                    type="button"
+                    class="toggle-password"
+                    data-target="password"
+                    aria-label="Mostrar senha"
+                >
+                    ◉
+                </button>
+
+            </div>
+
+
+            <div class="password-strength">
+
+                <span class="strength-bar"></span>
+
+                <span class="strength-bar"></span>
+
+                <span class="strength-bar"></span>
+
+                <span class="strength-bar"></span>
+
+            </div>
+
+            <div
+                class="strength-text"
+                id="strengthText"
+            >
+                Digite uma senha
+            </div>
+
+        </div>
+
+
+
+        <!-- CONFIRMAR SENHA -->
+
+        <div class="field">
+
+            <div class="field-header">
+
+                <label for="password_confirm">
+                    Confirmar senha
+                </label>
+
+                <span
+                    class="field-hint"
+                    id="matchLabel"
+                >
+                    -
+                </span>
+
+            </div>
+
+            <div class="password-wrap">
+
+                <input
+                    type="password"
+                    id="password_confirm"
+                    name="password_confirm"
+                    placeholder="Digite novamente"
+                    autocomplete="new-password"
+                    minlength="6"
+                    maxlength="200"
+                    required
+                >
+
+                <button
+                    type="button"
+                    class="toggle-password"
+                    data-target="password_confirm"
+                    aria-label="Mostrar senha"
+                >
+                    ◉
+                </button>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- BOTÃO -->
+
+        <button
+            type="submit"
+            class="register-button"
+            id="registerButton"
+        >
+
+            <span id="buttonText">
+                CRIAR CONTA
+            </span>
+
+        </button>
+
+
+    </form>
+
+
+
+    <div class="divider">
+        ou
+    </div>
+
+
+
+    <!-- LOGIN -->
+
+    <div class="bottom">
+
+        Já possui uma conta?
+
+        <a href="/login">
+            Entrar agora
+        </a>
+
+    </div>
+
+
+
+    <div class="terms">
+
+        Ao criar sua conta, você concorda em utilizar
+        o sistema de forma responsável.
+
+    </div>
+
+
+
+    <div class="footer">
+
+        {{ config.site_name }}
+
+        •
+
+        made by
+
+        <strong>
+            demon
+        </strong>
+
+    </div>
+
+
+</main>
+
+
+
+<script>
+
+    /* ============================================
+       MOSTRAR / OCULTAR SENHA
+    ============================================ */
+
+    document
+        .querySelectorAll(".toggle-password")
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        const targetId =
+                            this.dataset.target;
+
+                        const input =
+                            document.getElementById(
+                                targetId
+                            );
+
+                        if (
+                            input.type === "password"
+                        ) {
+
+                            input.type = "text";
+
+                            this.textContent = "◉";
+
+                            this.setAttribute(
+                                "aria-label",
+                                "Ocultar senha"
+                            );
+
+                        } else {
+
+                            input.type = "password";
+
+                            this.textContent = "◉";
+
+                            this.setAttribute(
+                                "aria-label",
+                                "Mostrar senha"
+                            );
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+
+    /* ============================================
+       FORÇA DA SENHA
+    ============================================ */
+
+    const password =
+        document.getElementById(
+            "password"
+        );
+
+    const bars =
+        document.querySelectorAll(
+            ".strength-bar"
+        );
+
+    const strengthText =
+        document.getElementById(
+            "strengthText"
+        );
+
+    const strengthLabel =
+        document.getElementById(
+            "strengthLabel"
+        );
+
+
+    function updatePasswordStrength() {
+
+        const value =
+            password.value;
+
+        let score = 0;
+
+
+        if (value.length >= 6) {
+            score++;
+        }
+
+        if (value.length >= 10) {
+            score++;
+        }
+
+        if (/[A-Z]/.test(value)) {
+            score++;
+        }
+
+        if (
+            /[0-9]/.test(value) ||
+            /[^A-Za-z0-9]/.test(value)
+        ) {
+            score++;
+        }
+
+
+        bars.forEach(
+            (bar, index) => {
+
+                bar.style.background =
+                    index < score
+                        ? "var(--red)"
+                        : "#1b1b1b";
+
+            }
+        );
+
+
+        if (!value) {
+
+            strengthText.textContent =
+                "Digite uma senha";
+
+            strengthLabel.textContent =
+                "Segurança";
+
+        } else if (score <= 1) {
+
+            strengthText.textContent =
+                "Senha fraca";
+
+            strengthLabel.textContent =
+                "Fraca";
+
+        } else if (score === 2) {
+
+            strengthText.textContent =
+                "Senha razoável";
+
+            strengthLabel.textContent =
+                "Média";
+
+        } else if (score === 3) {
+
+            strengthText.textContent =
+                "Senha boa";
+
+            strengthLabel.textContent =
+                "Boa";
+
+        } else {
+
+            strengthText.textContent =
+                "Senha forte";
+
+            strengthLabel.textContent =
+                "Forte";
+
+        }
+
+    }
+
+
+    password.addEventListener(
+        "input",
+        updatePasswordStrength
+    );
+
+
+    /* ============================================
+       CONFIRMAÇÃO DE SENHA
+    ============================================ */
+
+    const confirmPassword =
+        document.getElementById(
+            "password_confirm"
+        );
+
+    const matchLabel =
+        document.getElementById(
+            "matchLabel"
+        );
+
+
+    function checkPasswordMatch() {
+
+        if (!confirmPassword.value) {
+
+            matchLabel.textContent =
+                "-";
+
+            matchLabel.style.color =
+                "#3f3f3f";
+
+            return;
+
+        }
+
+
+        if (
+            password.value ===
+            confirmPassword.value
+        ) {
+
+            matchLabel.textContent =
+                "Coincide";
+
+            matchLabel.style.color =
+                "#55c986";
+
+        } else {
+
+            matchLabel.textContent =
+                "Diferente";
+
+            matchLabel.style.color =
+                "#e26a6a";
+
+        }
+
+    }
+
+
+    password.addEventListener(
+        "input",
+        checkPasswordMatch
+    );
+
+    confirmPassword.addEventListener(
+        "input",
+        checkPasswordMatch
+    );
+
+
+    /* ============================================
+       VALIDAÇÃO ANTES DE ENVIAR
+    ============================================ */
+
+    const form =
+        document.getElementById(
+            "registerForm"
+        );
+
+    const button =
+        document.getElementById(
+            "registerButton"
+        );
+
+    const buttonText =
+        document.getElementById(
+            "buttonText"
+        );
+
+
+    form.addEventListener(
+        "submit",
+        function (event) {
+
+            const username =
+                document.getElementById(
+                    "username"
+                ).value.trim();
+
+            const email =
+                document.getElementById(
+                    "email"
+                ).value.trim();
+
+            const pass =
+                password.value;
+
+            const confirm =
+                confirmPassword.value;
+
+
+            if (
+                username.length < 3
+            ) {
+
+                event.preventDefault();
+
+                alert(
+                    "O usuário precisa ter pelo menos 3 caracteres."
+                );
+
+                return;
+
+            }
+
+
+            if (
+                !email.includes("@")
+            ) {
+
+                event.preventDefault();
+
+                alert(
+                    "Digite um Gmail válido."
+                );
+
+                return;
+
+            }
+
+
+            if (
+                pass.length < 6
+            ) {
+
+                event.preventDefault();
+
+                alert(
+                    "A senha precisa ter pelo menos 6 caracteres."
+                );
+
+                return;
+
+            }
+
+
+            if (
+                pass !== confirm
+            ) {
+
+                event.preventDefault();
+
+                alert(
+                    "As senhas não são iguais."
+                );
+
+                return;
+
+            }
+
+
+            button.classList.add(
+                "loading"
+            );
+
+            buttonText.textContent =
+                "CRIANDO CONTA";
+
+        }
+    );
+
+</script>
+
 
 </body>
 

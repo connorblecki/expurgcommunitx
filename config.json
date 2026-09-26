@@ -27,5 +27,13 @@
     "show_files": true,
     "show_server_status": true,
     "recent_accesses": 8,
-    "admin_username": "admin"
+    "admin_username": "admin",
+    "admin_password": "123456",
+    "banner_enabled": true,
+    "banner_image": "",
+    "banner_title": "THE WORLD IS YOURS",
+    "banner_text": "",
+    "banner_link": "",
+    "chat_enabled": true,
+    "announcements_enabled": true
 }

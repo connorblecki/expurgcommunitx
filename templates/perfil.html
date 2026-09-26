@@ -22,186 +22,1034 @@
             padding: 0;
         }
 
+        :root {
+            --red: {{ config.primary_color or "#e00000" }};
+            --red-dark: #650000;
+            --bg: #020202;
+            --panel: rgba(10, 10, 10, .94);
+            --border: rgba(255,255,255,.07);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
+
             min-height: 100vh;
+
+            color: white;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
 
             background:
                 radial-gradient(
                     circle at 50% 0%,
-                    rgba(100, 0, 0, .16),
-                    transparent 45%
+                    rgba(170,0,0,.15),
+                    transparent 35%
                 ),
-                #030303;
+                radial-gradient(
+                    circle at 100% 100%,
+                    rgba(100,0,0,.08),
+                    transparent 30%
+                ),
+                #020202;
 
-            color: white;
-
-            font-family: Arial, sans-serif;
+            overflow-x: hidden;
         }
+
+
+        /* ============================================
+           FUNDO
+        ============================================ */
+
+        body::before {
+
+            content: "";
+
+            position: fixed;
+
+            inset: 0;
+
+            pointer-events: none;
+
+            opacity: .2;
+
+            background-image:
+                linear-gradient(
+                    rgba(255,255,255,.025) 1px,
+                    transparent 1px
+                ),
+                linear-gradient(
+                    90deg,
+                    rgba(255,255,255,.025) 1px,
+                    transparent 1px
+                );
+
+            background-size: 45px 45px;
+
+            mask-image:
+                radial-gradient(
+                    circle at center,
+                    black,
+                    transparent 78%
+                );
+        }
+
+
+        .background-glow {
+
+            position: fixed;
+
+            width: 500px;
+
+            height: 500px;
+
+            top: 15%;
+
+            left: 50%;
+
+            transform:
+                translateX(-50%);
+
+            border-radius: 50%;
+
+            background:
+                var(--red);
+
+            opacity: .025;
+
+            filter:
+                blur(120px);
+
+            pointer-events: none;
+        }
+
+
+        /* ============================================
+           HEADER
+        ============================================ */
 
         header {
-            height: 70px;
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 20;
+
+            height: 72px;
 
             display: flex;
+
             align-items: center;
+
             justify-content: space-between;
 
-            padding: 0 7%;
+            padding:
+                0 6%;
 
-            border-bottom: 1px solid #171717;
+            border-bottom:
+                1px solid rgba(255,255,255,.055);
 
-            background: rgba(5, 5, 5, .9);
+            background:
+                rgba(3,3,3,.82);
+
+            backdrop-filter:
+                blur(18px);
         }
 
-        .logo {
-            font-size: 18px;
 
-            font-weight: bold;
+        .logo {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 9px;
+
+            color: #eee;
+
+            font-size: 15px;
+
+            font-weight: 900;
 
             letter-spacing: 3px;
         }
 
-        .logo span {
-            color: #8b0000;
-        }
+        .logo-icon {
 
-        header a {
-            color: #777;
+            width: 31px;
 
-            text-decoration: none;
+            height: 31px;
 
-            font-size: 12px;
-        }
+            display: grid;
 
-        header a:hover {
-            color: #b00000;
-        }
+            place-items: center;
 
-        .container {
-            max-width: 850px;
-
-            margin: 70px auto;
-
-            padding: 0 25px;
-        }
-
-        .profile {
-            padding: 40px;
-
-            background: rgba(10, 10, 10, .9);
-
-            border: 1px solid #211010;
-
-            border-radius: 16px;
-
-            box-shadow:
-                0 25px 80px rgba(0, 0, 0, .5);
-        }
-
-        .avatar {
-            width: 90px;
-            height: 90px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            border-radius: 50%;
-
-            margin-bottom: 25px;
+            border-radius: 9px;
 
             background:
                 linear-gradient(
                     135deg,
-                    #300000,
-                    #080808
+                    #350000,
+                    #090909
                 );
 
-            border: 1px solid #650000;
+            border:
+                1px solid
+                rgba(224,0,0,.25);
 
-            font-size: 30px;
+            font-size: 13px;
+
+            box-shadow:
+                0 0 20px
+                rgba(224,0,0,.08);
         }
 
-        h1 {
-            font-size: 30px;
+        .logo span {
+            color: var(--red);
         }
 
-        .level {
-            display: inline-block;
 
-            margin-top: 10px;
+        .header-actions {
 
-            padding: 6px 12px;
+            display: flex;
 
-            color: #d28b8b;
+            align-items: center;
 
-            background: rgba(100, 0, 0, .15);
+            gap: 9px;
+        }
 
-            border: 1px solid #390000;
+
+        .header-button {
+
+            height: 37px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 7px;
+
+            padding:
+                0 13px;
+
+            border-radius: 8px;
+
+            color: #777;
+
+            background:
+                rgba(255,255,255,.025);
+
+            border:
+                1px solid rgba(255,255,255,.06);
+
+            text-decoration: none;
+
+            font-size: 10px;
+
+            font-weight: 700;
+
+            letter-spacing: .7px;
+
+            transition:
+                .2s ease;
+        }
+
+        .header-button:hover {
+
+            color: white;
+
+            border-color:
+                rgba(224,0,0,.25);
+
+            background:
+                rgba(100,0,0,.13);
+
+            transform:
+                translateY(-1px);
+        }
+
+
+        .logout {
+
+            color: #9b5555;
+        }
+
+        .logout:hover {
+
+            color: #ff7777;
+
+            border-color:
+                rgba(255,0,0,.3);
+        }
+
+
+        /* ============================================
+           CONTAINER
+        ============================================ */
+
+        .container {
+
+            position: relative;
+
+            z-index: 2;
+
+            width: min(
+                1050px,
+                calc(100% - 34px)
+            );
+
+            margin:
+                55px auto 70px;
+        }
+
+
+        /* ============================================
+           TOPO
+        ============================================ */
+
+        .page-heading {
+
+            margin-bottom: 25px;
+        }
+
+        .eyebrow {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 7px;
+
+            margin-bottom: 10px;
+
+            color: #777;
+
+            font-size: 9px;
+
+            font-weight: 800;
+
+            letter-spacing: 1.8px;
+
+            text-transform: uppercase;
+        }
+
+        .eyebrow-dot {
+
+            width: 6px;
+
+            height: 6px;
+
+            border-radius: 50%;
+
+            background:
+                var(--red);
+
+            box-shadow:
+                0 0 10px
+                rgba(224,0,0,.55);
+        }
+
+        .page-heading h1 {
+
+            font-size: 29px;
+
+            line-height: 1.2;
+
+            letter-spacing: -.5px;
+        }
+
+        .page-heading p {
+
+            margin-top: 8px;
+
+            color: #555;
+
+            font-size: 12px;
+        }
+
+
+        /* ============================================
+           PROFILE CARD
+        ============================================ */
+
+        .profile {
+
+            position: relative;
+
+            overflow: hidden;
+
+            padding: 34px;
+
+            border-radius: 18px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(15,15,15,.96),
+                    rgba(5,5,5,.96)
+                );
+
+            border:
+                1px solid var(--border);
+
+            box-shadow:
+                0 30px 90px
+                rgba(0,0,0,.65);
+
+            animation:
+                profileEnter .55s
+                cubic-bezier(.2,.8,.2,1);
+        }
+
+        @keyframes profileEnter {
+
+            from {
+
+                opacity: 0;
+
+                transform:
+                    translateY(15px);
+
+            }
+
+            to {
+
+                opacity: 1;
+
+                transform:
+                    translateY(0);
+
+            }
+
+        }
+
+
+        .profile::before {
+
+            content: "";
+
+            position: absolute;
+
+            top: 0;
+
+            left: 0;
+
+            right: 0;
+
+            height: 1px;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(224,0,0,.55),
+                    transparent
+                );
+        }
+
+
+        /* ============================================
+           PERFIL TOPO
+        ============================================ */
+
+        .profile-top {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 25px;
+
+            padding-bottom: 30px;
+
+            border-bottom:
+                1px solid
+                rgba(255,255,255,.055);
+        }
+
+
+        .avatar {
+
+            position: relative;
+
+            flex-shrink: 0;
+
+            width: 100px;
+
+            height: 100px;
+
+            display: grid;
+
+            place-items: center;
+
+            border-radius: 25px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #3a0000,
+                    #090909 70%
+                );
+
+            border:
+                1px solid
+                rgba(224,0,0,.32);
+
+            font-size: 36px;
+
+            box-shadow:
+                0 0 45px
+                rgba(120,0,0,.13);
+        }
+
+        .avatar::after {
+
+            content: "";
+
+            position: absolute;
+
+            right: -4px;
+
+            bottom: -4px;
+
+            width: 18px;
+
+            height: 18px;
+
+            border-radius: 50%;
+
+            background:
+                #42d17d;
+
+            border:
+                4px solid #080808;
+
+            box-shadow:
+                0 0 12px
+                rgba(66,209,125,.35);
+        }
+
+
+        .identity {
+
+            min-width: 0;
+        }
+
+        .identity h2 {
+
+            font-size: 27px;
+
+            word-break: break-word;
+        }
+
+        .identity-email {
+
+            margin-top: 7px;
+
+            color: #555;
+
+            font-size: 11px;
+
+            word-break: break-all;
+        }
+
+
+        .badges {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 7px;
+
+            margin-top: 13px;
+        }
+
+        .badge {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 6px;
+
+            padding:
+                6px 10px;
 
             border-radius: 20px;
 
-            font-size: 11px;
+            color: #b97878;
+
+            background:
+                rgba(100,0,0,.13);
+
+            border:
+                1px solid
+                rgba(150,0,0,.2);
+
+            font-size: 9px;
+
+            font-weight: 800;
+
+            letter-spacing: .7px;
         }
 
-        .grid {
+        .badge.level {
+
+            color: #d29b9b;
+        }
+
+        .badge.status {
+
+            color: #70d596;
+
+            background:
+                rgba(0,100,45,.08);
+
+            border-color:
+                rgba(0,140,65,.18);
+        }
+
+
+        /* ============================================
+           ESTATÍSTICAS
+        ============================================ */
+
+        .stats {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 12px;
+
+            margin-top: 25px;
+        }
+
+
+        .stat {
+
+            position: relative;
+
+            padding: 20px;
+
+            overflow: hidden;
+
+            border-radius: 12px;
+
+            background:
+                rgba(255,255,255,.018);
+
+            border:
+                1px solid
+                rgba(255,255,255,.055);
+
+            transition:
+                .2s ease;
+        }
+
+        .stat:hover {
+
+            transform:
+                translateY(-2px);
+
+            border-color:
+                rgba(224,0,0,.2);
+
+            background:
+                rgba(100,0,0,.045);
+        }
+
+        .stat::after {
+
+            content: "";
+
+            position: absolute;
+
+            right: -25px;
+
+            bottom: -35px;
+
+            width: 90px;
+
+            height: 90px;
+
+            border-radius: 50%;
+
+            background:
+                var(--red);
+
+            opacity: .025;
+
+            filter:
+                blur(25px);
+        }
+
+        .stat-label {
+
+            color: #555;
+
+            font-size: 9px;
+
+            font-weight: 800;
+
+            letter-spacing: 1px;
+
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+
+            margin-top: 9px;
+
+            color: #eee;
+
+            font-size: 20px;
+
+            font-weight: 800;
+
+            word-break: break-word;
+        }
+
+
+        /* ============================================
+           INFORMAÇÕES
+        ============================================ */
+
+        .section-title {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            margin-top: 30px;
+
+            margin-bottom: 13px;
+
+            color: #888;
+
+            font-size: 10px;
+
+            font-weight: 800;
+
+            letter-spacing: 1.5px;
+
+            text-transform: uppercase;
+        }
+
+        .section-title::after {
+
+            content: "";
+
+            flex: 1;
+
+            height: 1px;
+
+            background:
+                rgba(255,255,255,.055);
+        }
+
+
+        .info-grid {
+
             display: grid;
 
             grid-template-columns:
                 repeat(2, 1fr);
 
-            gap: 15px;
-
-            margin-top: 35px;
+            gap: 12px;
         }
 
-        .item {
-            padding: 20px;
 
-            background: #070707;
+        .info {
 
-            border: 1px solid #191919;
+            padding: 18px;
 
-            border-radius: 10px;
+            border-radius: 11px;
+
+            background:
+                #070707;
+
+            border:
+                1px solid
+                rgba(255,255,255,.05);
+
+            transition:
+                .2s;
         }
 
-        .item small {
+        .info:hover {
+
+            border-color:
+                rgba(255,255,255,.09);
+        }
+
+        .info small {
+
             display: block;
 
-            color: #555;
+            margin-bottom: 7px;
 
-            margin-bottom: 8px;
+            color: #484848;
 
-            font-size: 10px;
+            font-size: 8px;
+
+            font-weight: 800;
+
+            letter-spacing: 1px;
 
             text-transform: uppercase;
         }
 
-        .item strong {
-            font-size: 14px;
+        .info strong {
+
+            display: block;
+
+            color: #ddd;
+
+            font-size: 12px;
+
+            word-break: break-word;
+
+            line-height: 1.5;
         }
 
+
+        /* ============================================
+           AÇÕES
+        ============================================ */
+
+        .actions {
+
+            display: flex;
+
+            flex-wrap: wrap;
+
+            gap: 10px;
+
+            margin-top: 28px;
+
+            padding-top: 25px;
+
+            border-top:
+                1px solid
+                rgba(255,255,255,.055);
+        }
+
+
+        .action {
+
+            min-height: 42px;
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 8px;
+
+            padding:
+                0 16px;
+
+            border-radius: 9px;
+
+            color: #999;
+
+            background:
+                rgba(255,255,255,.025);
+
+            border:
+                1px solid
+                rgba(255,255,255,.065);
+
+            text-decoration: none;
+
+            font-size: 10px;
+
+            font-weight: 800;
+
+            letter-spacing: .7px;
+
+            transition:
+                .2s ease;
+        }
+
+        .action:hover {
+
+            color: white;
+
+            border-color:
+                rgba(224,0,0,.28);
+
+            background:
+                rgba(100,0,0,.13);
+
+            transform:
+                translateY(-2px);
+        }
+
+
+        .action.primary {
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #360000,
+                    #700000
+                );
+
+            border-color:
+                rgba(224,0,0,.35);
+        }
+
+        .action.primary:hover {
+
+            box-shadow:
+                0 10px 25px
+                rgba(100,0,0,.25);
+        }
+
+
+        /* ============================================
+           RODAPÉ
+        ============================================ */
+
         .made {
-            margin-top: 40px;
+
+            margin-top: 30px;
 
             text-align: center;
 
-            color: #444;
+            color: #303030;
 
-            font-size: 11px;
+            font-size: 9px;
+
+            letter-spacing: .8px;
         }
 
         .made strong {
-            color: #720000;
+            color: #650000;
         }
 
-        @media(max-width: 600px) {
 
-            .profile {
-                padding: 25px;
+        /* ============================================
+           RESPONSIVO
+        ============================================ */
+
+        @media (max-width: 700px) {
+
+            header {
+
+                padding:
+                    0 20px;
             }
 
-            .grid {
-                grid-template-columns: 1fr;
+            .header-button span {
+                display: none;
+            }
+
+            .header-button {
+
+                width: 37px;
+
+                padding: 0;
+
+                justify-content: center;
+            }
+
+            .container {
+
+                width:
+                    calc(100% - 24px);
+
+                margin:
+                    30px auto 50px;
+            }
+
+            .profile {
+
+                padding: 23px;
+            }
+
+            .profile-top {
+
+                align-items: flex-start;
+
+                flex-direction: column;
+
+                gap: 18px;
+            }
+
+            .stats {
+
+                grid-template-columns:
+                    1fr;
+            }
+
+            .info-grid {
+
+                grid-template-columns:
+                    1fr;
+            }
+
+        }
+
+
+        @media (max-width: 420px) {
+
+            .logo {
+
+                font-size: 12px;
+
+                letter-spacing: 2px;
+            }
+
+            .logo-icon {
+
+                width: 28px;
+
+                height: 28px;
+            }
+
+            .page-heading h1 {
+
+                font-size: 24px;
+            }
+
+            .identity h2 {
+
+                font-size: 23px;
+            }
+
+            .avatar {
+
+                width: 82px;
+
+                height: 82px;
+
+                font-size: 30px;
+            }
+
+            .actions {
+
+                flex-direction: column;
+            }
+
+            .action {
+
+                width: 100%;
             }
 
         }
@@ -210,95 +1058,352 @@
 
 </head>
 
+
 <body>
 
-    <header>
 
-        <div class="logo">
-            <span>🩸</span> DEMON
+<div class="background-glow"></div>
+
+
+<!-- ============================================
+     HEADER
+============================================ -->
+
+<header>
+
+    <div class="logo">
+
+        <div class="logo-icon">
+            🩸
         </div>
 
-        <a href="/logout">
+        <div>
+            {{ config.site_name }}
+        </div>
+
+    </div>
+
+
+    <div class="header-actions">
+
+        <a
+            href="/"
+            class="header-button"
+        >
+            <span>⌂</span>
+            SITE
+        </a>
+
+        <a
+            href="/configuracoes"
+            class="header-button"
+        >
+            <span>⚙</span>
+            CONFIG
+        </a>
+
+        <a
+            href="/logout"
+            class="header-button logout"
+        >
+            <span>↪</span>
             SAIR
         </a>
 
-    </header>
+    </div>
 
-    <main class="container">
+</header>
 
-        <section class="profile">
+
+
+<!-- ============================================
+     CONTEÚDO
+============================================ -->
+
+<main class="container">
+
+
+    <div class="page-heading">
+
+        <div class="eyebrow">
+
+            <span class="eyebrow-dot"></span>
+
+            Área do membro
+
+        </div>
+
+        <h1>
+            Seu perfil
+        </h1>
+
+        <p>
+            Informações e estatísticas da sua conta.
+        </p>
+
+    </div>
+
+
+
+    <!-- ============================================
+         PERFIL
+    ============================================ -->
+
+    <section class="profile">
+
+
+        <div class="profile-top">
+
 
             <div class="avatar">
                 🩸
             </div>
 
-            <h1>
-                {{ usuario.username }}
-            </h1>
 
-            <div class="level">
-                NÍVEL {{ usuario.level }}
-            </div>
+            <div class="identity">
 
-            <div class="grid">
+                <h2>
+                    {{ usuario.username }}
+                </h2>
 
-                <div class="item">
-
-                    <small>
-                        Gmail
-                    </small>
-
-                    <strong>
-                        {{ usuario.email }}
-                    </strong>
-
+                <div class="identity-email">
+                    {{ usuario.email }}
                 </div>
 
-                <div class="item">
 
-                    <small>
-                        XP
-                    </small>
+                <div class="badges">
 
-                    <strong>
-                        {{ usuario.xp }}
-                    </strong>
+                    <div class="badge level">
 
-                </div>
+                        ◆
 
-                <div class="item">
+                        NÍVEL
+                        {{ usuario.level }}
 
-                    <small>
-                        Status
-                    </small>
+                    </div>
 
-                    <strong>
-                        {{ usuario.status }}
-                    </strong>
 
-                </div>
+                    <div class="badge status">
 
-                <div class="item">
+                        ●
 
-                    <small>
-                        Membro desde
-                    </small>
+                        {% if usuario.status == "online" %}
+                            ONLINE
+                        {% elif usuario.status == "bloqueado" %}
+                            BLOQUEADO
+                        {% else %}
+                            OFFLINE
+                        {% endif %}
 
-                    <strong>
-                        {{ usuario.created_at }}
-                    </strong>
+                    </div>
 
                 </div>
 
             </div>
 
-            <div class="made">
-                made by <strong>demon</strong>
+
+        </div>
+
+
+
+        <!-- ========================================
+             ESTATÍSTICAS
+        ======================================== -->
+
+        <div class="stats">
+
+
+            <div class="stat">
+
+                <div class="stat-label">
+                    Nível
+                </div>
+
+                <div class="stat-value">
+                    {{ usuario.level }}
+                </div>
+
             </div>
 
-        </section>
 
-    </main>
+            <div class="stat">
+
+                <div class="stat-label">
+                    Experiência
+                </div>
+
+                <div class="stat-value">
+                    {{ usuario.xp }} XP
+                </div>
+
+            </div>
+
+
+            <div class="stat">
+
+                <div class="stat-label">
+                    Tema
+                </div>
+
+                <div class="stat-value">
+                    {% if usuario.theme == "light" %}
+                        Claro
+                    {% else %}
+                        Escuro
+                    {% endif %}
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- ========================================
+             INFORMAÇÕES
+        ======================================== -->
+
+        <div class="section-title">
+            Informações da conta
+        </div>
+
+
+        <div class="info-grid">
+
+
+            <div class="info">
+
+                <small>
+                    Usuário
+                </small>
+
+                <strong>
+                    {{ usuario.username }}
+                </strong>
+
+            </div>
+
+
+            <div class="info">
+
+                <small>
+                    Gmail
+                </small>
+
+                <strong>
+                    {{ usuario.email }}
+                </strong>
+
+            </div>
+
+
+            <div class="info">
+
+                <small>
+                    Membro desde
+                </small>
+
+                <strong>
+                    {{ usuario.created_at }}
+                </strong>
+
+            </div>
+
+
+            <div class="info">
+
+                <small>
+                    Último login
+                </small>
+
+                <strong>
+
+                    {% if usuario.last_login %}
+
+                        {{ usuario.last_login }}
+
+                    {% else %}
+
+                        Primeiro acesso
+
+                    {% endif %}
+
+                </strong>
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- ========================================
+             AÇÕES
+        ======================================== -->
+
+        <div class="actions">
+
+
+            <a
+                href="/configuracoes"
+                class="action primary"
+            >
+                ⚙ Configurações
+            </a>
+
+
+            <a
+                href="/"
+                class="action"
+            >
+                ← Voltar ao início
+            </a>
+
+
+            {% if config.chat_enabled %}
+
+            <a
+                href="/chat"
+                class="action"
+            >
+                💬 Abrir chat
+            </a>
+
+            {% endif %}
+
+
+            <a
+                href="/logout"
+                class="action"
+            >
+                ↪ Sair da conta
+            </a>
+
+
+        </div>
+
+
+    </section>
+
+
+
+    <div class="made">
+
+        {{ config.site_name }}
+
+        • feito por
+
+        <strong>
+            demon
+        </strong>
+
+    </div>
+
+
+</main>
+
+
 
 </body>
 

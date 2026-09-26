@@ -10,7 +10,9 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Login | {{ config.site_name }}</title>
+    <title>
+        Login | {{ config.site_name }}
+    </title>
 
     <style>
 
@@ -20,96 +22,425 @@
             padding: 0;
         }
 
+        :root {
+            --red: {{ config.primary_color or "#e00000" }};
+            --bg: #020202;
+            --panel: rgba(9, 9, 9, .92);
+            --border: rgba(255, 255, 255, .07);
+        }
+
+        html {
+            min-height: 100%;
+        }
+
         body {
 
             min-height: 100vh;
 
             display: flex;
+
             align-items: center;
+
             justify-content: center;
 
-            font-family: Arial, sans-serif;
+            padding: 25px;
+
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
 
             color: white;
 
             background:
                 radial-gradient(
-                    circle at 50% 20%,
-                    rgba(110, 0, 0, .18),
-                    transparent 45%
+                    circle at 50% 15%,
+                    rgba(180, 0, 0, .16),
+                    transparent 30%
                 ),
-                #030303;
+                radial-gradient(
+                    circle at 10% 90%,
+                    rgba(100, 0, 0, .09),
+                    transparent 28%
+                ),
+                #020202;
+
+            overflow: hidden;
         }
+
+
+        /* ============================================
+           BACKGROUND GRID
+        ============================================ */
+
+        body::before {
+
+            content: "";
+
+            position: fixed;
+
+            inset: 0;
+
+            pointer-events: none;
+
+            opacity: .22;
+
+            background-image:
+                linear-gradient(
+                    rgba(255,255,255,.025) 1px,
+                    transparent 1px
+                ),
+                linear-gradient(
+                    90deg,
+                    rgba(255,255,255,.025) 1px,
+                    transparent 1px
+                );
+
+            background-size:
+                45px 45px;
+
+            mask-image:
+                radial-gradient(
+                    circle at center,
+                    black,
+                    transparent 75%
+                );
+        }
+
+
+        /* ============================================
+           RED GLOW
+        ============================================ */
+
+        .glow {
+
+            position: fixed;
+
+            width: 420px;
+
+            height: 420px;
+
+            left: 50%;
+
+            top: 50%;
+
+            transform:
+                translate(-50%, -50%);
+
+            border-radius: 50%;
+
+            background:
+                var(--red);
+
+            opacity: .025;
+
+            filter:
+                blur(90px);
+
+            pointer-events: none;
+        }
+
+
+        /* ============================================
+           BACK BUTTON
+        ============================================ */
+
+        .back {
+
+            position: fixed;
+
+            top: 22px;
+
+            left: 22px;
+
+            z-index: 10;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            padding: 10px 13px;
+
+            border-radius: 9px;
+
+            color: #777;
+
+            background:
+                rgba(10,10,10,.7);
+
+            border:
+                1px solid rgba(255,255,255,.06);
+
+            text-decoration: none;
+
+            font-size: 11px;
+
+            backdrop-filter:
+                blur(12px);
+
+            transition: .2s ease;
+        }
+
+        .back:hover {
+
+            color: white;
+
+            border-color:
+                rgba(224,0,0,.25);
+
+            background:
+                rgba(30,0,0,.55);
+
+            transform:
+                translateX(-2px);
+        }
+
+
+        /* ============================================
+           LOGIN BOX
+        ============================================ */
 
         .box {
 
-            width: 400px;
+            position: relative;
 
-            max-width: calc(100% - 30px);
+            z-index: 2;
 
-            padding: 40px;
+            width: 420px;
 
-            background: rgba(10, 10, 10, .94);
+            max-width: 100%;
 
-            border: 1px solid #241010;
+            padding: 38px;
 
-            border-radius: 16px;
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(15,15,15,.96),
+                    rgba(5,5,5,.96)
+                );
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 18px;
 
             box-shadow:
-                0 25px 80px rgba(0, 0, 0, .7);
+                0 35px 100px rgba(0,0,0,.75),
+                0 0 70px rgba(100,0,0,.07);
+
+            backdrop-filter:
+                blur(18px);
+
+            animation:
+                boxEnter .5s
+                cubic-bezier(.2,.8,.2,1);
         }
 
-        .blood {
+        @keyframes boxEnter {
 
-            text-align: center;
+            from {
+                opacity: 0;
+                transform:
+                    translateY(18px)
+                    scale(.98);
+            }
 
-            font-size: 30px;
-
-            margin-bottom: 10px;
+            to {
+                opacity: 1;
+                transform:
+                    translateY(0)
+                    scale(1);
+            }
         }
 
-        h1 {
 
-            text-align: center;
+        /* ============================================
+           LOGO
+        ============================================ */
 
-            font-size: 25px;
+        .logo-area {
 
-            letter-spacing: 2px;
+            display: flex;
 
-            margin-bottom: 8px;
-        }
+            flex-direction: column;
 
-        .subtitle {
-
-            text-align: center;
-
-            color: #666;
-
-            font-size: 13px;
+            align-items: center;
 
             margin-bottom: 30px;
         }
 
-        label {
+        .logo {
 
-            display: block;
+            width: 65px;
 
-            color: #999;
+            height: 65px;
 
-            font-size: 12px;
+            display: grid;
 
-            font-weight: bold;
+            place-items: center;
+
+            margin-bottom: 16px;
+
+            border-radius: 17px;
+
+            font-size: 27px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    #260000,
+                    #650000
+                );
+
+            border:
+                1px solid rgba(224,0,0,.3);
+
+            box-shadow:
+                0 0 35px rgba(224,0,0,.14);
+
+            animation:
+                logoPulse 3s infinite;
+        }
+
+        @keyframes logoPulse {
+
+            0%,
+            100% {
+                box-shadow:
+                    0 0 25px rgba(224,0,0,.10);
+            }
+
+            50% {
+                box-shadow:
+                    0 0 45px rgba(224,0,0,.22);
+            }
+        }
+
+        .site-name {
+
+            font-size: 25px;
+
+            font-weight: 900;
+
+            letter-spacing: 4px;
 
             text-transform: uppercase;
+        }
+
+        .site-name span {
+            color: var(--red);
+        }
+
+        .subtitle {
+
+            margin-top: 8px;
+
+            color: #555;
+
+            font-size: 11px;
 
             letter-spacing: 1px;
-
-            margin-bottom: 8px;
         }
+
+
+        /* ============================================
+           ALERTS
+        ============================================ */
+
+        .alert {
+
+            display: flex;
+
+            align-items: flex-start;
+
+            gap: 10px;
+
+            margin-bottom: 18px;
+
+            padding: 12px 13px;
+
+            border-radius: 9px;
+
+            font-size: 11px;
+
+            line-height: 1.5;
+        }
+
+        .alert-icon {
+
+            flex-shrink: 0;
+
+            font-size: 13px;
+        }
+
+        .error {
+
+            color: #ffaaaa;
+
+            background:
+                rgba(120,0,0,.12);
+
+            border:
+                1px solid rgba(160,0,0,.25);
+        }
+
+        .success {
+
+            color: #9de0b0;
+
+            background:
+                rgba(0,100,35,.11);
+
+            border:
+                1px solid rgba(0,120,50,.2);
+        }
+
+
+        /* ============================================
+           FORM
+        ============================================ */
 
         .field {
 
-            margin-bottom: 18px;
+            margin-bottom: 17px;
+        }
+
+        .field-header {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            margin-bottom: 7px;
+        }
+
+        label {
+
+            color: #888;
+
+            font-size: 9px;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            letter-spacing: 1.2px;
+        }
+
+        .field-icon {
+
+            color: #444;
+
+            font-size: 12px;
+        }
+
+        .input-wrap {
+
+            position: relative;
         }
 
         input {
@@ -118,247 +449,706 @@
 
             height: 48px;
 
-            padding: 0 14px;
+            padding:
+                0 14px;
 
-            border-radius: 8px;
+            border:
+                1px solid rgba(255,255,255,.075);
 
-            border: 1px solid #292929;
-
-            background: #070707;
-
-            color: white;
+            border-radius: 9px;
 
             outline: none;
 
-            transition: .25s;
+            color: white;
+
+            background:
+                #060606;
+
+            font-size: 13px;
+
+            transition:
+                .2s ease;
+        }
+
+        input:hover {
+
+            border-color:
+                rgba(255,255,255,.11);
         }
 
         input:focus {
 
-            border-color: #720000;
+            border-color:
+                rgba(224,0,0,.45);
+
+            background:
+                #080808;
 
             box-shadow:
-                0 0 20px rgba(100, 0, 0, .16);
+                0 0 0 3px rgba(224,0,0,.045),
+                0 8px 25px rgba(0,0,0,.25);
         }
 
-        button {
+        input::placeholder {
+            color: #3f3f3f;
+        }
+
+
+        /* ============================================
+           PASSWORD BUTTON
+        ============================================ */
+
+        .password-toggle {
+
+            position: absolute;
+
+            right: 10px;
+
+            top: 50%;
+
+            transform:
+                translateY(-50%);
+
+            width: 34px;
+
+            height: 34px;
+
+            padding: 0;
+
+            border: none;
+
+            border-radius: 7px;
+
+            color: #555;
+
+            background:
+                transparent;
+
+            cursor: pointer;
+
+            font-size: 13px;
+
+            transition: .2s;
+        }
+
+        .password-toggle:hover {
+
+            color: #aaa;
+
+            background:
+                rgba(255,255,255,.04);
+
+            box-shadow: none;
+
+            transform:
+                translateY(-50%);
+        }
+
+
+        /* ============================================
+           LOGIN BUTTON
+        ============================================ */
+
+        .login-button {
+
+            position: relative;
+
+            overflow: hidden;
 
             width: 100%;
 
             height: 50px;
 
-            border: 1px solid #720000;
+            margin-top: 7px;
 
-            border-radius: 8px;
+            border:
+                1px solid rgba(224,0,0,.4);
+
+            border-radius: 9px;
 
             color: white;
 
             background:
                 linear-gradient(
                     135deg,
-                    #390000,
-                    #720000,
-                    #390000
+                    #250000,
+                    #700000,
+                    #3b0000
                 );
 
             cursor: pointer;
 
-            font-weight: bold;
+            font-size: 11px;
 
-            letter-spacing: 1px;
+            font-weight: 800;
 
-            transition: .25s;
+            letter-spacing: 1.5px;
+
+            transition:
+                .25s ease;
         }
 
-        button:hover {
+        .login-button::before {
 
-            transform: translateY(-2px);
+            content: "";
+
+            position: absolute;
+
+            top: 0;
+
+            left: -100%;
+
+            width: 100%;
+
+            height: 100%;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    transparent,
+                    rgba(255,255,255,.08),
+                    transparent
+                );
+
+            transition:
+                .5s ease;
+        }
+
+        .login-button:hover {
+
+            transform:
+                translateY(-2px);
+
+            border-color:
+                rgba(255,80,80,.65);
 
             box-shadow:
-                0 10px 30px rgba(80, 0, 0, .3);
+                0 12px 35px rgba(100,0,0,.28);
         }
 
-        .error,
-        .success {
+        .login-button:hover::before {
+            left: 100%;
+        }
 
-            margin-bottom: 20px;
+        .login-button:active {
 
-            padding: 12px;
+            transform:
+                translateY(0);
+        }
 
-            border-radius: 7px;
 
-            font-size: 12px;
+        /* ============================================
+           DIVIDER
+        ============================================ */
+
+        .divider {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 12px;
+
+            margin: 24px 0;
+
+            color: #333;
+
+            font-size: 9px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 1px;
+        }
+
+        .divider::before,
+        .divider::after {
+
+            content: "";
+
+            flex: 1;
+
+            height: 1px;
+
+            background:
+                rgba(255,255,255,.055);
+        }
+
+
+        /* ============================================
+           REGISTER
+        ============================================ */
+
+        .register {
 
             text-align: center;
-        }
-
-        .error {
-
-            color: #ffaaaa;
-
-            background: rgba(100, 0, 0, .12);
-
-            border: 1px solid rgba(130, 0, 0, .3);
-        }
-
-        .success {
-
-            color: #b5d6b5;
-
-            background: rgba(0, 80, 20, .12);
-
-            border: 1px solid rgba(0, 100, 30, .25);
-        }
-
-        .bottom {
-
-            text-align: center;
-
-            margin-top: 25px;
 
             color: #555;
 
-            font-size: 12px;
+            font-size: 11px;
+
+            line-height: 1.7;
         }
 
-        .bottom a {
+        .register a {
 
-            color: #9b0000;
+            color: #d65353;
+
+            font-weight: 700;
 
             text-decoration: none;
+
+            transition: .2s;
         }
 
-        .bottom a:hover {
+        .register a:hover {
 
-            color: #d00000;
+            color: #ff8585;
         }
 
-        .made {
+
+        /* ============================================
+           FOOTER
+        ============================================ */
+
+        .footer {
+
+            margin-top: 24px;
 
             text-align: center;
 
-            margin-top: 25px;
+            color: #303030;
 
-            color: #444;
+            font-size: 9px;
 
-            font-size: 11px;
+            letter-spacing: 1px;
         }
 
-        .made strong {
+        .footer strong {
+            color: #560000;
+        }
 
-            color: #760000;
+
+        /* ============================================
+           LOADING
+        ============================================ */
+
+        .loading {
+
+            opacity: .65;
+
+            pointer-events: none;
+        }
+
+        .loading .login-text::after {
+
+            content: "...";
+
+            animation:
+                dots 1s infinite;
+        }
+
+        @keyframes dots {
+
+            0% {
+                content: ".";
+            }
+
+            33% {
+                content: "..";
+            }
+
+            66% {
+                content: "...";
+            }
+
+            100% {
+                content: ".";
+            }
+        }
+
+
+        /* ============================================
+           MOBILE
+        ============================================ */
+
+        @media (max-width: 520px) {
+
+            body {
+                padding: 18px;
+            }
+
+            .box {
+
+                padding:
+                    30px 22px;
+
+                border-radius: 15px;
+            }
+
+            .site-name {
+                font-size: 21px;
+            }
+
+            .logo {
+
+                width: 58px;
+
+                height: 58px;
+
+                font-size: 23px;
+            }
+
+            .back {
+
+                top: 12px;
+
+                left: 12px;
+
+                padding: 8px 10px;
+            }
+
         }
 
     </style>
 
 </head>
 
+
 <body>
 
-    <main class="box">
 
-        <div class="blood">
+<div class="glow"></div>
+
+
+<a
+    href="/"
+    class="back"
+>
+    ← Voltar para o site
+</a>
+
+
+
+<main class="box">
+
+
+    <!-- ============================================
+         LOGO
+    ============================================= -->
+
+    <div class="logo-area">
+
+        <div class="logo">
             🩸
         </div>
 
-        <h1>
-            LOGIN
-        </h1>
+        <div class="site-name">
 
-        <p class="subtitle">
-            Entre no underground
-        </p>
+            {{ config.site_name }}
 
-        {% if cadastro_sucesso %}
+        </div>
 
-            <div class="success">
+        <div class="subtitle">
+            ACESSO RESTRITO • ÁREA DE MEMBROS
+        </div>
 
-                Conta criada com sucesso.
-                Agora você pode entrar.
-
-            </div>
-
-        {% endif %}
+    </div>
 
 
-        {% if erro %}
 
-            <div class="error">
+    <!-- ============================================
+         MENSAGENS
+    ============================================= -->
 
-                {{ erro }}
+    {% if cadastro_sucesso %}
 
-            </div>
+    <div class="alert success">
 
-        {% endif %}
+        <span class="alert-icon">
+            ✓
+        </span>
+
+        <span>
+            Conta criada com sucesso.
+            Agora você pode entrar.
+        </span>
+
+    </div>
+
+    {% endif %}
 
 
-        <form
-            action="/login"
-            method="POST"
-        >
 
-            <div class="field">
+    {% if erro %}
+
+    <div class="alert error">
+
+        <span class="alert-icon">
+            !
+        </span>
+
+        <span>
+            {{ erro }}
+        </span>
+
+    </div>
+
+    {% endif %}
+
+
+
+    <!-- ============================================
+         LOGIN
+    ============================================= -->
+
+    <form
+        action="/login"
+        method="POST"
+        id="loginForm"
+    >
+
+
+        <div class="field">
+
+            <div class="field-header">
 
                 <label for="username">
                     Usuário ou Gmail
                 </label>
 
+                <span class="field-icon">
+                    ◉
+                </span>
+
+            </div>
+
+            <div class="input-wrap">
+
                 <input
                     type="text"
                     id="username"
                     name="username"
-                    placeholder="Seu usuário ou Gmail"
+                    placeholder="Digite seu usuário ou Gmail"
                     autocomplete="username"
+                    maxlength="100"
                     required
+                    autofocus
                 >
 
             </div>
 
+        </div>
 
-            <div class="field">
+
+
+        <div class="field">
+
+            <div class="field-header">
 
                 <label for="password">
                     Senha
                 </label>
 
+                <span class="field-icon">
+                    ●
+                </span>
+
+            </div>
+
+            <div class="input-wrap">
+
                 <input
                     type="password"
                     id="password"
                     name="password"
-                    placeholder="Sua senha"
+                    placeholder="Digite sua senha"
                     autocomplete="current-password"
+                    maxlength="200"
                     required
                 >
 
+                <button
+                    type="button"
+                    class="password-toggle"
+                    id="passwordToggle"
+                    aria-label="Mostrar senha"
+                >
+                    ◉
+                </button>
+
             </div>
 
+        </div>
 
-            <button type="submit">
+
+
+        <button
+            type="submit"
+            class="login-button"
+            id="loginButton"
+        >
+
+            <span class="login-text">
                 ENTRAR
-            </button>
+            </span>
 
-        </form>
-
-
-        <div class="bottom">
-
-            Ainda não possui uma conta?
-
-            <a href="/cadastro">
-                Criar conta
-            </a>
-
-        </div>
+        </button>
 
 
-        <div class="made">
+    </form>
 
-            made by
-            <strong>demon</strong>
 
-        </div>
 
-    </main>
+    <div class="divider">
+        ou
+    </div>
+
+
+
+    <!-- ============================================
+         CADASTRO
+    ============================================= -->
+
+    <div class="register">
+
+        Ainda não possui uma conta?
+
+        <a href="/cadastro">
+            Criar uma conta
+        </a>
+
+    </div>
+
+
+
+    <div class="footer">
+
+        {{ config.site_name }}
+
+        •
+
+        made by
+        <strong>
+            demon
+        </strong>
+
+    </div>
+
+
+</main>
+
+
+
+<script>
+
+    /* ============================================
+       MOSTRAR / OCULTAR SENHA
+    ============================================= */
+
+    const password =
+        document.getElementById(
+            "password"
+        );
+
+    const toggle =
+        document.getElementById(
+            "passwordToggle"
+        );
+
+    toggle.addEventListener(
+        "click",
+        function () {
+
+            if (
+                password.type === "password"
+            ) {
+
+                password.type = "text";
+
+                toggle.textContent = "◉";
+
+                toggle.setAttribute(
+                    "aria-label",
+                    "Ocultar senha"
+                );
+
+            } else {
+
+                password.type = "password";
+
+                toggle.textContent = "◉";
+
+                toggle.setAttribute(
+                    "aria-label",
+                    "Mostrar senha"
+                );
+
+            }
+
+        }
+    );
+
+
+    /* ============================================
+       BOTÃO DE LOGIN
+    ============================================= */
+
+    const form =
+        document.getElementById(
+            "loginForm"
+        );
+
+    const loginButton =
+        document.getElementById(
+            "loginButton"
+        );
+
+    form.addEventListener(
+        "submit",
+        function () {
+
+            loginButton.classList.add(
+                "loading"
+            );
+
+            loginButton.querySelector(
+                ".login-text"
+            ).textContent =
+                "ENTRANDO";
+
+        }
+    );
+
+
+    /* ============================================
+       ENTER NOS CAMPOS
+    ============================================= */
+
+    document
+        .querySelectorAll("input")
+        .forEach(
+            input => {
+
+                input.addEventListener(
+                    "keydown",
+                    function (event) {
+
+                        if (
+                            event.key === "Enter"
+                        ) {
+
+                            form.requestSubmit();
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+</script>
+
 
 </body>
 

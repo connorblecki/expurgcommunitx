@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Configurações | {{ config.site_name }}</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --red: {{ config.primary_color or '#e00000' }};
+            --red-dark: #8f0000;
+            --bg: #050505;
+            --bg2: #090909;
+            --card: rgba(17, 17, 17, 0.82);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #f5f5f5;
+            --muted: #8d8d8d;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                radial-gradient(circle at 15% 10%, rgba(224, 0, 0, 0.10), transparent 30%),
+                radial-gradient(circle at 85% 80%, rgba(224, 0, 0, 0.06), transparent 30%),
+                var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background:
+                linear-gradient(rgba(255,255,255,0.012) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.012) 1px, transparent 1px);
+            background-size: 40px 40px;
+            mask-image: linear-gradient(to bottom, black, transparent);
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+
+        .sidebar {
+            width: 260px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            padding: 25px 16px;
+            background: rgba(7, 7, 7, 0.94);
+            border-right: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 10px 28px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 22px;
+        }
+
+        .brand-icon {
+            width: 43px;
+            height: 43px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: linear-gradient(145deg, var(--red), #4c0000);
+            box-shadow: 0 0 25px rgba(224, 0, 0, 0.25);
+            font-size: 21px;
+        }
+
+        .brand-text strong {
+            display: block;
+            font-size: 17px;
+            letter-spacing: 2px;
+        }
+
+        .brand-text span {
+            color: var(--muted);
+            font-size: 10px;
+            letter-spacing: 1.5px;
+        }
+
+        .menu-title {
+            color: #555;
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            padding: 0 12px 10px;
+        }
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .nav a {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 13px 14px;
+            border-radius: 11px;
+            color: #9a9a9a;
+            font-size: 13px;
+            transition: 0.25s ease;
+            border: 1px solid transparent;
+        }
+
+        .nav a:hover {
+            color: white;
+            background: rgba(255,255,255,0.04);
+            border-color: var(--border);
+            transform: translateX(3px);
+        }
+
+        .nav a.active {
+            color: white;
+            background: linear-gradient(
+                90deg,
+                rgba(224, 0, 0, 0.18),
+                rgba(224, 0, 0, 0.03)
+            );
+            border-color: rgba(224, 0, 0, 0.25);
+            box-shadow: inset 3px 0 0 var(--red);
+        }
+
+        .nav-icon {
+            width: 25px;
+            text-align: center;
+            font-size: 17px;
+        }
+
+        .sidebar-bottom {
+            position: absolute;
+            bottom: 22px;
+            left: 16px;
+            right: 16px;
+        }
+
+        .logout {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            color: #888;
+            font-size: 13px;
+            transition: 0.25s;
+        }
+
+        .logout:hover {
+            background: rgba(255,0,0,0.08);
+            color: #ff5a5a;
+        }
+
+        /* MAIN */
+
+        .main {
+            margin-left: 260px;
+            width: calc(100% - 260px);
+            min-height: 100vh;
+        }
+
+        .topbar {
+            height: 78px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 34px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(5,5,5,0.72);
+            backdrop-filter: blur(18px);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .topbar-left h1 {
+            font-size: 19px;
+            letter-spacing: 0.5px;
+        }
+
+        .topbar-left p {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .topbar-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .top-button {
+            padding: 10px 15px;
+            border-radius: 9px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.035);
+            color: #ddd;
+            font-size: 12px;
+            transition: 0.25s;
+        }
+
+        .top-button:hover {
+            background: rgba(255,255,255,0.07);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .top-button.red {
+            background: rgba(224,0,0,0.12);
+            border-color: rgba(224,0,0,0.25);
+            color: #ff6969;
+        }
+
+        .content {
+            max-width: 1200px;
+            margin: auto;
+            padding: 35px;
+        }
+
+        /* HERO */
+
+        .page-hero {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 30px;
+            margin-bottom: 24px;
+            background:
+                radial-gradient(circle at 90% 20%, rgba(224,0,0,0.18), transparent 32%),
+                linear-gradient(135deg, rgba(20,20,20,0.94), rgba(9,9,9,0.92));
+            box-shadow: 0 20px 70px rgba(0,0,0,0.25);
+        }
+
+        .page-hero::after {
+            content: "";
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            right: -70px;
+            bottom: -100px;
+            border-radius: 50%;
+            background: var(--red);
+            filter: blur(90px);
+            opacity: 0.18;
+        }
+
+        .hero-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 6px 10px;
+            border-radius: 100px;
+            background: rgba(224,0,0,0.10);
+            border: 1px solid rgba(224,0,0,0.20);
+            color: #ff6565;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 13px;
+        }
+
+        .page-hero h2 {
+            font-size: 29px;
+            margin-bottom: 8px;
+        }
+
+        .page-hero p {
+            color: #858585;
+            font-size: 13px;
+            max-width: 650px;
+            line-height: 1.7;
+        }
+
+        /* GRID */
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 17px;
+            padding: 24px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.20);
+        }
+
+        .card.full {
+            grid-column: 1 / -1;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            margin-bottom: 22px;
+            padding-bottom: 17px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-icon {
+            width: 39px;
+            height: 39px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(224,0,0,0.10);
+            border: 1px solid rgba(224,0,0,0.18);
+            font-size: 17px;
+        }
+
+        .card-header h3 {
+            font-size: 15px;
+        }
+
+        .card-header p {
+            color: #686868;
+            font-size: 11px;
+            margin-top: 4px;
+        }
+
+        .field {
+            margin-bottom: 18px;
+        }
+
+        .field:last-child {
+            margin-bottom: 0;
+        }
+
+        .field label {
+            display: block;
+            font-size: 11px;
+            color: #a8a8a8;
+            margin-bottom: 8px;
+            letter-spacing: 0.3px;
+        }
+
+        .field input,
+        .field textarea {
+            width: 100%;
+            border: 1px solid #202020;
+            background: #0b0b0b;
+            color: white;
+            border-radius: 10px;
+            padding: 13px 14px;
+            outline: none;
+            font-size: 13px;
+            transition: 0.25s;
+        }
+
+        .field textarea {
+            resize: vertical;
+            min-height: 105px;
+            line-height: 1.5;
+        }
+
+        .field input:focus,
+        .field textarea:focus {
+            border-color: rgba(224,0,0,0.65);
+            box-shadow: 0 0 0 3px rgba(224,0,0,0.08);
+        }
+
+        .field small {
+            display: block;
+            color: #555;
+            font-size: 10px;
+            margin-top: 7px;
+        }
+
+        /* COLOR */
+
+        .color-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .color-picker {
+            width: 56px !important;
+            height: 45px;
+            padding: 4px !important;
+            cursor: pointer;
+        }
+
+        .color-text {
+            flex: 1;
+        }
+
+        /* SWITCHES */
+
+        .switch-list {
+            display: flex;
+            flex-direction: column;
+            gap: 11px;
+        }
+
+        .switch-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 15px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.025);
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: 0.25s;
+        }
+
+        .switch-item:hover {
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(255,255,255,0.08);
+        }
+
+        .switch-info strong {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .switch-info span {
+            color: #666;
+            font-size: 10px;
+        }
+
+        .switch {
+            position: relative;
+            width: 48px;
+            height: 27px;
+            flex-shrink: 0;
+        }
+
+        .switch input {
+            display: none;
+        }
+
+        .slider {
+            position: absolute;
+            inset: 0;
+            cursor: pointer;
+            background: #222;
+            border: 1px solid #333;
+            border-radius: 100px;
+            transition: 0.25s;
+        }
+
+        .slider::before {
+            content: "";
+            position: absolute;
+            width: 19px;
+            height: 19px;
+            left: 3px;
+            top: 3px;
+            border-radius: 50%;
+            background: #777;
+            transition: 0.25s;
+        }
+
+        .switch input:checked + .slider {
+            background: rgba(224,0,0,0.28);
+            border-color: rgba(224,0,0,0.55);
+        }
+
+        .switch input:checked + .slider::before {
+            transform: translateX(21px);
+            background: var(--red);
+            box-shadow: 0 0 12px rgba(224,0,0,0.5);
+        }
+
+        /* SECURITY */
+
+        .warning {
+            margin-top: 16px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: rgba(224,0,0,0.06);
+            border: 1px solid rgba(224,0,0,0.14);
+            color: #a9a9a9;
+            font-size: 10px;
+            line-height: 1.6;
+        }
+
+        .warning strong {
+            color: #ff6060;
+        }
+
+        /* ACTIONS */
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-top: 22px;
+            padding-top: 22px;
+            border-top: 1px solid var(--border);
+        }
+
+        .restore {
+            color: #777;
+            font-size: 11px;
+            padding: 11px 15px;
+            border-radius: 9px;
+            border: 1px solid var(--border);
+            transition: 0.25s;
+        }
+
+        .restore:hover {
+            color: #ff6666;
+            border-color: rgba(224,0,0,0.25);
+            background: rgba(224,0,0,0.05);
+        }
+
+        .save {
+            border: 0;
+            cursor: pointer;
+            padding: 13px 24px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+            background: linear-gradient(135deg, var(--red), var(--red-dark));
+            box-shadow: 0 8px 25px rgba(224,0,0,0.20);
+            transition: 0.25s;
+        }
+
+        .save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(224,0,0,0.30);
+        }
+
+        .save:active {
+            transform: translateY(0);
+        }
+
+        /* FOOTER */
+
+        .footer {
+            text-align: center;
+            padding: 25px 0 10px;
+            color: #444;
+            font-size: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        /* MOBILE */
+
+        .mobile-top {
+            display: none;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                width: 220px;
+            }
+
+            .main {
+                margin-left: 220px;
+                width: calc(100% - 220px);
+            }
+
+            .settings-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card.full {
+                grid-column: auto;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+                padding: 15px;
+            }
+
+            .layout {
+                display: block;
+            }
+
+            .brand {
+                margin-bottom: 12px;
+                padding-bottom: 15px;
+            }
+
+            .nav {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .sidebar-bottom {
+                position: static;
+                margin-top: 10px;
+            }
+
+            .main {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .topbar {
+                padding: 0 18px;
+            }
+
+            .topbar-actions .top-button:first-child {
+                display: none;
+            }
+
+            .content {
+                padding: 18px;
+            }
+
+            .page-hero {
+                padding: 22px;
+            }
+
+            .page-hero h2 {
+                font-size: 23px;
+            }
+
+            .actions {
+                flex-direction: column-reverse;
+                align-items: stretch;
+            }
+
+            .save,
+            .restore {
+                text-align: center;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 430px) {
+            .nav {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar-left h1 {
+                font-size: 16px;
+            }
+
+            .card {
+                padding: 18px;
+            }
+
+            .switch-item {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">⚙</div>
+
+            <div class="brand-text">
+                <strong>EXPURG</strong>
+                <span>ADMIN CONTROL</span>
+            </div>
+        </div>
+
+        <div class="menu-title">
+            Navegação
+        </div>
+
+        <nav class="nav">
+
+            <a href="/admin">
+                <span class="nav-icon">⌂</span>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/admin/config" class="active">
+                <span class="nav-icon">⚙</span>
+                <span>Configurações</span>
+            </a>
+
+            <a href="/admin/anuncios">
+                <span class="nav-icon">▣</span>
+                <span>Anúncios</span>
+            </a>
+
+            <a href="/admin/banner">
+                <span class="nav-icon">▤</span>
+                <span>Banner</span>
+            </a>
+
+            <a href="/chat">
+                <span class="nav-icon">◉</span>
+                <span>Chat</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <a href="/" class="logout">
+                <span>↩</span>
+                <span>Voltar ao site</span>
+            </a>
+
+            <a href="/logout" class="logout">
+                <span>⏻</span>
+                <span>Sair da conta</span>
+            </a>
+
+        </div>
+
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+
+        <header class="topbar">
+
+            <div class="topbar-left">
+                <h1>Configurações do sistema</h1>
+                <p>Controle central do EXPURG</p>
+            </div>
+
+            <div class="topbar-actions">
+
+                <a href="/" class="top-button">
+                    Ver site
+                </a>
+
+                <a href="/admin" class="top-button red">
+                    Dashboard
+                </a>
+
+            </div>
+
+        </header>
+
+        <div class="content">
+
+            <!-- HERO -->
+
+            <section class="page-hero">
+
+                <div class="hero-label">
+                    <span>●</span>
+                    Área administrativa
+                </div>
+
+                <h2>Configurações</h2>
+
+                <p>
+                    Personalize a identidade do site, controle o acesso administrativo
+                    e ative ou desative os principais módulos do EXPURG.
+                </p>
+
+            </section>
+
+            <!-- FORM -->
+
+            <form method="POST" action="/admin/config">
+
+                <div class="settings-grid">
+
+                    <!-- IDENTIDADE -->
+
+                    <section class="card">
+
+                        <div class="card-header">
+
+                            <div class="card-icon">
+                                ◈
+                            </div>
+
+                            <div>
+                                <h3>Identidade do site</h3>
+                                <p>Personalização visual e textual</p>
+                            </div>
+
+                        </div>
+
+                        <div class="field">
+
+                            <label for="site_name">
+                                Nome do site
+                            </label>
+
+                            <input
+                                type="text"
+                                id="site_name"
+                                name="site_name"
+                                value="{{ config.site_name or '' }}"
+                                maxlength="80"
+                                required
+                            >
+
+                        </div>
+
+                        <div class="field">
+
+                            <label for="admin_name">
+                                Nome do administrador
+                            </label>
+
+                            <input
+                                type="text"
+                                id="admin_name"
+                                name="admin_name"
+                                value="{{ config.admin_name or '' }}"
+                                maxlength="80"
+                            >
+
+                        </div>
+
+                        <div class="field">
+
+                            <label for="home_text">
+                                Texto principal da página inicial
+                            </label>
+
+                            <textarea
+                                id="home_text"
+                                name="home_text"
+                                maxlength="500"
+                            >{{ config.home_text or '' }}</textarea>
+
+                        </div>
+
+                        <div class="field">
+
+                            <label for="primary_color">
+                                Cor principal
+                            </label>
+
+                            <div class="color-row">
+
+                                <input
+                                    type="color"
+                                    id="primary_color_picker"
+                                    class="color-picker"
+                                    value="{{ config.primary_color or '#e00000' }}"
+                                >
+
+                                <input
+                                    type="text"
+                                    id="primary_color"
+                                    name="primary_color"
+                                    class="color-text"
+                                    value="{{ config.primary_color or '#e00000' }}"
+                                    maxlength="20"
+                                >
+
+                            </div>
+
+                            <small>
+                                Essa cor será utilizada nos principais elementos do site.
+                            </small>
+
+                        </div>
+
+                    </section>
+
+                    <!-- ADMIN -->
+
+                    <section class="card">
+
+                        <div class="card-header">
+
+                            <div class="card-icon">
+                                🔐
+                            </div>
+
+                            <div>
+                                <h3>Acesso administrativo</h3>
+                                <p>Credenciais da área de administração</p>
+                            </div>
+
+                        </div>
+
+                        <div class="field">
+
+                            <label for="admin_username">
+                                Usuário administrador
+                            </label>
+
+                            <input
+                                type="text"
+                                id="admin_username"
+                                name="admin_username"
+                                value="{{ config.admin_username or 'admin' }}"
+                                autocomplete="off"
+                            >
+
+                        </div>
+
+                        <div class="field">
+
+                            <label for="admin_password">
+                                Senha administrativa
+                            </label>
+
+                            <input
+                                type="password"
+                                id="admin_password"
+                                name="admin_password"
+                                value="{{ config.admin_password or '123456' }}"
+                                autocomplete="new-password"
+                            >
+
+                            <small>
+                                A senha é usada no login administrativo.
+                            </small>
+
+                        </div>
+
+                        <div class="warning">
+                            <strong>⚠ Atenção:</strong>
+                            alterar essas informações pode mudar a forma como você
+                            acessa o painel administrativo.
+                        </div>
+
+                    </section>
+
+                    <!-- MODULOS -->
+
+                    <section class="card full">
+
+                        <div class="card-header">
+
+                            <div class="card-icon">
+                                ◉
+                            </div>
+
+                            <div>
+                                <h3>Módulos do sistema</h3>
+                                <p>Controle os recursos disponíveis no site</p>
+                            </div>
+
+                        </div>
+
+                        <div class="switch-list">
+
+                            <!-- CHAT -->
+
+                            <div class="switch-item">
+
+                                <div class="switch-info">
+
+                                    <strong>Chat</strong>
+
+                                    <span>
+                                        Permite que membros utilizem o sistema de chat.
+                                    </span>
+
+                                </div>
+
+                                <label class="switch">
+
+                                    <input
+                                        type="hidden"
+                                        name="chat_enabled"
+                                        value="0"
+                                    >
+
+                                    <input
+                                        type="checkbox"
+                                        name="chat_enabled"
+                                        value="1"
+                                        {% if config.chat_enabled %}checked{% endif %}
+                                    >
+
+                                    <span class="slider"></span>
+
+                                </label>
+
+                            </div>
+
+                            <!-- ANUNCIOS -->
+
+                            <div class="switch-item">
+
+                                <div class="switch-info">
+
+                                    <strong>Anúncios</strong>
+
+                                    <span>
+                                        Exibe os anúncios administrados pelo painel.
+                                    </span>
+
+                                </div>
+
+                                <label class="switch">
+
+                                    <input
+                                        type="hidden"
+                                        name="announcements_enabled"
+                                        value="0"
+                                    >
+
+                                    <input
+                                        type="checkbox"
+                                        name="announcements_enabled"
+                                        value="1"
+                                        {% if config.announcements_enabled %}checked{% endif %}
+                                    >
+
+                                    <span class="slider"></span>
+
+                                </label>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                </div>
+
+                <!-- ACTIONS -->
+
+                <div class="actions">
+
+                    <a
+                        href="/admin/config/restaurar"
+                        class="restore"
+                        onclick="return confirm('Restaurar todas as configurações padrão?')"
+                    >
+                        ↺ Restaurar configurações padrão
+                    </a>
+
+                    <button type="submit" class="save">
+                        ✓ Salvar configurações
+                    </button>
+
+                </div>
+
+            </form>
+
+            <div class="footer">
+                EXPURG • Painel administrativo • Configurações
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script>
+    const colorPicker = document.getElementById("primary_color_picker");
+    const colorText = document.getElementById("primary_color");
+
+    colorPicker.addEventListener("input", function () {
+        colorText.value = this.value;
+        document.documentElement.style.setProperty("--red", this.value);
+    });
+
+    colorText.addEventListener("input", function () {
+
+        let value = this.value.trim();
+
+        if (/^#[0-9A-Fa-f]{6}$/.test(value)) {
+            colorPicker.value = value;
+            document.documentElement.style.setProperty("--red", value);
+        }
+
+    });
+
+    document.querySelector("form").addEventListener("submit", function () {
+
+        const button = document.querySelector(".save");
+
+        button.innerHTML = "⏳ Salvando...";
+        button.style.pointerEvents = "none";
+
+    });
+</script>
+
+</body>
+</html>

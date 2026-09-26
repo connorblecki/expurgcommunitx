@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Banner | {{ config.site_name }}</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --red: {{ config.primary_color or '#e00000' }};
+            --red-dark: #850000;
+            --bg: #050505;
+            --card: rgba(15, 15, 15, .88);
+            --border: rgba(255,255,255,.08);
+            --text: #f5f5f5;
+            --muted: #777;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 15% 10%, rgba(224,0,0,.12), transparent 30%),
+                radial-gradient(circle at 85% 80%, rgba(224,0,0,.07), transparent 30%),
+                var(--bg);
+            color: var(--text);
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background:
+                linear-gradient(rgba(255,255,255,.012) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.012) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+
+        .sidebar {
+            width: 260px;
+            position: fixed;
+            inset: 0 auto 0 0;
+            padding: 25px 16px;
+            background: rgba(7,7,7,.95);
+            border-right: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 10px 28px;
+            margin-bottom: 22px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand-icon {
+            width: 43px;
+            height: 43px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: linear-gradient(145deg, var(--red), #4c0000);
+            box-shadow: 0 0 25px rgba(224,0,0,.25);
+            font-size: 20px;
+        }
+
+        .brand-text strong {
+            display: block;
+            font-size: 17px;
+            letter-spacing: 2px;
+        }
+
+        .brand-text span {
+            color: #666;
+            font-size: 9px;
+            letter-spacing: 1.5px;
+        }
+
+        .menu-title {
+            padding: 0 12px 10px;
+            color: #4d4d4d;
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .nav a {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 13px 14px;
+            border-radius: 11px;
+            border: 1px solid transparent;
+            color: #929292;
+            font-size: 13px;
+            transition: .25s;
+        }
+
+        .nav a:hover {
+            color: white;
+            background: rgba(255,255,255,.04);
+            border-color: var(--border);
+            transform: translateX(3px);
+        }
+
+        .nav a.active {
+            color: white;
+            background: linear-gradient(
+                90deg,
+                rgba(224,0,0,.18),
+                rgba(224,0,0,.03)
+            );
+            border-color: rgba(224,0,0,.25);
+            box-shadow: inset 3px 0 0 var(--red);
+        }
+
+        .nav-icon {
+            width: 25px;
+            text-align: center;
+            font-size: 17px;
+        }
+
+        .sidebar-bottom {
+            position: absolute;
+            left: 16px;
+            right: 16px;
+            bottom: 22px;
+        }
+
+        .logout {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            color: #777;
+            font-size: 13px;
+            transition: .25s;
+        }
+
+        .logout:hover {
+            background: rgba(224,0,0,.08);
+            color: #ff5b5b;
+        }
+
+        /* MAIN */
+
+        .main {
+            width: calc(100% - 260px);
+            margin-left: 260px;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            height: 78px;
+            padding: 0 34px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(5,5,5,.75);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(18px);
+        }
+
+        .topbar h1 {
+            font-size: 19px;
+        }
+
+        .topbar p {
+            margin-top: 4px;
+            color: #666;
+            font-size: 11px;
+        }
+
+        .top-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .top-button {
+            padding: 10px 15px;
+            border-radius: 9px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,.035);
+            color: #ccc;
+            font-size: 12px;
+            transition: .25s;
+        }
+
+        .top-button:hover {
+            background: rgba(255,255,255,.07);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .top-button.red {
+            color: #ff6868;
+            border-color: rgba(224,0,0,.25);
+            background: rgba(224,0,0,.10);
+        }
+
+        .content {
+            max-width: 1200px;
+            margin: auto;
+            padding: 35px;
+        }
+
+        /* HERO */
+
+        .hero {
+            position: relative;
+            overflow: hidden;
+            padding: 30px;
+            margin-bottom: 24px;
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            background:
+                radial-gradient(circle at 90% 20%, rgba(224,0,0,.18), transparent 30%),
+                linear-gradient(135deg, rgba(20,20,20,.95), rgba(8,8,8,.95));
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            right: -80px;
+            bottom: -110px;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: var(--red);
+            filter: blur(100px);
+            opacity: .15;
+        }
+
+        .hero-label {
+            display: inline-flex;
+            gap: 7px;
+            padding: 6px 10px;
+            margin-bottom: 13px;
+            border-radius: 100px;
+            border: 1px solid rgba(224,0,0,.2);
+            background: rgba(224,0,0,.1);
+            color: #ff6262;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .hero h2 {
+            margin-bottom: 8px;
+            font-size: 28px;
+        }
+
+        .hero p {
+            max-width: 700px;
+            color: #777;
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        /* GRID */
+
+        .grid {
+            display: grid;
+            grid-template-columns: 420px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .card {
+            padding: 24px;
+            border-radius: 17px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            backdrop-filter: blur(16px);
+            box-shadow: 0 15px 50px rgba(0,0,0,.2);
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 22px;
+            padding-bottom: 17px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-icon {
+            width: 39px;
+            height: 39px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            background: rgba(224,0,0,.10);
+            border: 1px solid rgba(224,0,0,.18);
+            font-size: 17px;
+        }
+
+        .card-title h3 {
+            font-size: 15px;
+        }
+
+        .card-title p {
+            margin-top: 4px;
+            color: #666;
+            font-size: 10px;
+        }
+
+        /* FORM */
+
+        .field {
+            margin-bottom: 17px;
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 8px;
+            color: #aaa;
+            font-size: 11px;
+        }
+
+        .field input,
+        .field textarea {
+            width: 100%;
+            padding: 12px 13px;
+            outline: none;
+            border-radius: 10px;
+            border: 1px solid #202020;
+            background: #0b0b0b;
+            color: white;
+            font-size: 12px;
+            transition: .25s;
+        }
+
+        .field textarea {
+            min-height: 105px;
+            resize: vertical;
+            line-height: 1.5;
+        }
+
+        .field input:focus,
+        .field textarea:focus {
+            border-color: rgba(224,0,0,.65);
+            box-shadow: 0 0 0 3px rgba(224,0,0,.08);
+        }
+
+        .field small {
+            display: block;
+            color: #555;
+            margin-top: 7px;
+            font-size: 9px;
+        }
+
+        /* SWITCH */
+
+        .switch-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 14px;
+            margin-bottom: 18px;
+            border-radius: 11px;
+            background: rgba(255,255,255,.025);
+            border: 1px solid rgba(255,255,255,.05);
+        }
+
+        .switch-info strong {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .switch-info span {
+            color: #666;
+            font-size: 10px;
+        }
+
+        .switch {
+            position: relative;
+            width: 48px;
+            height: 27px;
+            flex-shrink: 0;
+        }
+
+        .switch input {
+            display: none;
+        }
+
+        .slider {
+            position: absolute;
+            inset: 0;
+            cursor: pointer;
+            border-radius: 100px;
+            background: #222;
+            border: 1px solid #333;
+            transition: .25s;
+        }
+
+        .slider::before {
+            content: "";
+            position: absolute;
+            width: 19px;
+            height: 19px;
+            left: 3px;
+            top: 3px;
+            border-radius: 50%;
+            background: #777;
+            transition: .25s;
+        }
+
+        .switch input:checked + .slider {
+            background: rgba(224,0,0,.28);
+            border-color: rgba(224,0,0,.55);
+        }
+
+        .switch input:checked + .slider::before {
+            transform: translateX(21px);
+            background: var(--red);
+            box-shadow: 0 0 12px rgba(224,0,0,.5);
+        }
+
+        /* BUTTON */
+
+        .save {
+            width: 100%;
+            padding: 13px;
+            border: 0;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--red), var(--red-dark));
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: .25s;
+            box-shadow: 0 8px 25px rgba(224,0,0,.18);
+        }
+
+        .save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(224,0,0,.28);
+        }
+
+        /* PREVIEW */
+
+        .preview-wrapper {
+            position: sticky;
+            top: 105px;
+        }
+
+        .preview-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 13px;
+        }
+
+        .preview-title strong {
+            font-size: 13px;
+        }
+
+        .preview-title span {
+            color: #555;
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .banner-preview {
+            position: relative;
+            overflow: hidden;
+            min-height: 330px;
+            display: flex;
+            align-items: flex-end;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,.08);
+            background:
+                linear-gradient(
+                    to top,
+                    rgba(0,0,0,.95),
+                    rgba(0,0,0,.20)
+                ),
+                #111;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .banner-preview::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(
+                    circle at 85% 20%,
+                    rgba(224,0,0,.25),
+                    transparent 30%
+                );
+            pointer-events: none;
+        }
+
+        .preview-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            padding: 25px;
+        }
+
+        .preview-tag {
+            display: inline-block;
+            padding: 5px 8px;
+            margin-bottom: 9px;
+            border-radius: 100px;
+            background: rgba(224,0,0,.18);
+            border: 1px solid rgba(224,0,0,.30);
+            color: #ff6666;
+            font-size: 8px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .preview-content h2 {
+            font-size: 25px;
+            margin-bottom: 8px;
+            word-break: break-word;
+        }
+
+        .preview-content p {
+            max-width: 520px;
+            color: #aaa;
+            font-size: 11px;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+
+        .preview-link {
+            display: inline-block;
+            margin-top: 14px;
+            padding: 9px 13px;
+            border-radius: 8px;
+            background: var(--red);
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .disabled-preview {
+            position: absolute;
+            inset: 0;
+            z-index: 4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,.70);
+            backdrop-filter: blur(3px);
+            color: #888;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .preview-note {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,.05);
+            background: rgba(255,255,255,.025);
+            color: #555;
+            font-size: 9px;
+            line-height: 1.6;
+        }
+
+        .footer {
+            padding: 25px 0 10px;
+            text-align: center;
+            color: #3d3d3d;
+            font-size: 10px;
+        }
+
+        @media (max-width: 1000px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .preview-wrapper {
+                position: static;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .sidebar {
+                width: 220px;
+            }
+
+            .main {
+                margin-left: 220px;
+                width: calc(100% - 220px);
+            }
+        }
+
+        @media (max-width: 650px) {
+            .layout {
+                display: block;
+            }
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+                padding: 15px;
+            }
+
+            .brand {
+                margin-bottom: 12px;
+                padding-bottom: 15px;
+            }
+
+            .nav {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .sidebar-bottom {
+                position: static;
+                margin-top: 10px;
+            }
+
+            .main {
+                width: 100%;
+                margin-left: 0;
+            }
+
+            .topbar {
+                padding: 0 18px;
+            }
+
+            .content {
+                padding: 18px;
+            }
+
+            .top-actions .top-button:first-child {
+                display: none;
+            }
+
+            .banner-preview {
+                min-height: 280px;
+            }
+        }
+
+        @media (max-width: 430px) {
+            .nav {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                padding: 22px;
+            }
+
+            .hero h2 {
+                font-size: 23px;
+            }
+
+            .card {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                ▤
+            </div>
+
+            <div class="brand-text">
+                <strong>EXPURG</strong>
+                <span>ADMIN CONTROL</span>
+            </div>
+
+        </div>
+
+        <div class="menu-title">
+            Navegação
+        </div>
+
+        <nav class="nav">
+
+            <a href="/admin">
+                <span class="nav-icon">⌂</span>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/admin/config">
+                <span class="nav-icon">⚙</span>
+                <span>Configurações</span>
+            </a>
+
+            <a href="/admin/anuncios">
+                <span class="nav-icon">▣</span>
+                <span>Anúncios</span>
+            </a>
+
+            <a href="/admin/banner" class="active">
+                <span class="nav-icon">▤</span>
+                <span>Banner</span>
+            </a>
+
+            <a href="/chat">
+                <span class="nav-icon">◉</span>
+                <span>Chat</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <a href="/" class="logout">
+                <span>↩</span>
+                <span>Voltar ao site</span>
+            </a>
+
+            <a href="/logout" class="logout">
+                <span>⏻</span>
+                <span>Sair da conta</span>
+            </a>
+
+        </div>
+
+    </aside>
+
+    <!-- MAIN -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div>
+                <h1>Gerenciar banner</h1>
+                <p>Personalize o banner exibido aos membros</p>
+            </div>
+
+            <div class="top-actions">
+
+                <a href="/" class="top-button">
+                    Ver site
+                </a>
+
+                <a href="/admin" class="top-button red">
+                    Dashboard
+                </a>
+
+            </div>
+
+        </header>
+
+        <div class="content">
+
+            <!-- HERO -->
+
+            <section class="hero">
+
+                <div class="hero-label">
+                    ● Sistema de banner
+                </div>
+
+                <h2>Banner do EXPURG</h2>
+
+                <p>
+                    Configure a imagem, título, descrição e link do banner
+                    que será exibido na página inicial para usuários logados.
+                </p>
+
+            </section>
+
+            <!-- GRID -->
+
+            <div class="grid">
+
+                <!-- FORM -->
+
+                <section class="card">
+
+                    <div class="card-title">
+
+                        <div class="card-icon">
+                            ✦
+                        </div>
+
+                        <div>
+                            <h3>Configuração</h3>
+                            <p>Personalize o conteúdo do banner</p>
+                        </div>
+
+                    </div>
+
+                    <form method="POST" action="/admin/banner" id="bannerForm">
+
+                        <!-- ENABLE -->
+
+                        <div class="switch-box">
+
+                            <div class="switch-info">
+
+                                <strong>Exibir banner</strong>
+
+                                <span>
+                                    Mostrar o banner para usuários logados.
+                                </span>
+
+                            </div>
+
+                            <label class="switch">
+
+                                <input
+                                    type="hidden"
+                                    name="banner_enabled"
+                                    value="0"
+                                >
+
+                                <input
+                                    type="checkbox"
+                                    id="banner_enabled"
+                                    name="banner_enabled"
+                                    value="1"
+                                    {% if config.banner_enabled %}checked{% endif %}
+                                >
+
+                                <span class="slider"></span>
+
+                            </label>
+
+                        </div>
+
+                        <!-- IMAGE -->
+
+                        <div class="field">
+
+                            <label for="banner_image">
+                                URL da imagem
+                            </label>
+
+                            <input
+                                type="url"
+                                id="banner_image"
+                                name="banner_image"
+                                value="{{ config.banner_image or '' }}"
+                                placeholder="https://exemplo.com/banner.jpg"
+                            >
+
+                            <small>
+                                Use uma URL pública de uma imagem.
+                            </small>
+
+                        </div>
+
+                        <!-- TITLE -->
+
+                        <div class="field">
+
+                            <label for="banner_title">
+                                Título
+                            </label>
+
+                            <input
+                                type="text"
+                                id="banner_title"
+                                name="banner_title"
+                                value="{{ config.banner_title or '' }}"
+                                maxlength="120"
+                                placeholder="THE WORLD IS YOURS"
+                            >
+
+                        </div>
+
+                        <!-- TEXT -->
+
+                        <div class="field">
+
+                            <label for="banner_text">
+                                Texto
+                            </label>
+
+                            <textarea
+                                id="banner_text"
+                                name="banner_text"
+                                maxlength="500"
+                                placeholder="Digite uma mensagem para os membros..."
+                            >{{ config.banner_text or '' }}</textarea>
+
+                        </div>
+
+                        <!-- LINK -->
+
+                        <div class="field">
+
+                            <label for="banner_link">
+                                Link do banner
+                            </label>
+
+                            <input
+                                type="url"
+                                id="banner_link"
+                                name="banner_link"
+                                value="{{ config.banner_link or '' }}"
+                                placeholder="https://exemplo.com"
+                            >
+
+                            <small>
+                                Opcional. Ao clicar no banner, o usuário poderá ser enviado para esse endereço.
+                            </small>
+
+                        </div>
+
+                        <button type="submit" class="save" id="saveButton">
+                            ✓ Salvar banner
+                        </button>
+
+                    </form>
+
+                </section>
+
+                <!-- PREVIEW -->
+
+                <section class="card">
+
+                    <div class="preview-wrapper">
+
+                        <div class="preview-title">
+
+                            <strong>Pré-visualização</strong>
+
+                            <span>Como o banner ficará</span>
+
+                        </div>
+
+                        <div
+                            class="banner-preview"
+                            id="bannerPreview"
+                            {% if config.banner_image %}
+                            style="background-image:
+                                linear-gradient(
+                                    to top,
+                                    rgba(0,0,0,.95),
+                                    rgba(0,0,0,.20)
+                                ),
+                                url('{{ config.banner_image }}');"
+                            {% endif %}
+                        >
+
+                            <div class="preview-content">
+
+                                <span class="preview-tag">
+                                    EXPURG
+                                </span>
+
+                                <h2 id="previewTitle">
+                                    {{ config.banner_title or 'THE WORLD IS YOURS' }}
+                                </h2>
+
+                                <p id="previewText">
+                                    {{ config.banner_text or 'Seu banner aparecerá aqui.' }}
+                                </p>
+
+                                <span
+                                    class="preview-link"
+                                    id="previewLink"
+                                    {% if not config.banner_link %}
+                                    style="display:none;"
+                                    {% endif %}
+                                >
+                                    Acessar →
+                                </span>
+
+                            </div>
+
+                            <div
+                                class="disabled-preview"
+                                id="disabledPreview"
+                                {% if config.banner_enabled %}
+                                style="display:none;"
+                                {% endif %}
+                            >
+                                Banner desativado
+                            </div>
+
+                        </div>
+
+                        <div class="preview-note">
+                            A pré-visualização é atualizada automaticamente enquanto você
+                            altera os campos. O banner real será exibido conforme as
+                            configurações salvas no servidor.
+                        </div>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+            <div class="footer">
+                EXPURG • Gerenciamento de banner • Área administrativa
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script>
+    const imageInput = document.getElementById("banner_image");
+    const titleInput = document.getElementById("banner_title");
+    const textInput = document.getElementById("banner_text");
+    const linkInput = document.getElementById("banner_link");
+    const enabledInput = document.getElementById("banner_enabled");
+
+    const preview = document.getElementById("bannerPreview");
+    const previewTitle = document.getElementById("previewTitle");
+    const previewText = document.getElementById("previewText");
+    const previewLink = document.getElementById("previewLink");
+    const disabledPreview = document.getElementById("disabledPreview");
+
+    function updatePreview() {
+
+        const image = imageInput.value.trim();
+        const title = titleInput.value.trim();
+        const text = textInput.value.trim();
+        const link = linkInput.value.trim();
+
+        if (image) {
+
+            preview.style.backgroundImage =
+                "linear-gradient(to top, rgba(0,0,0,.95), rgba(0,0,0,.20)), url('" +
+                image.replace(/'/g, "\\'") +
+                "')";
+
+        } else {
+
+            preview.style.backgroundImage =
+                "linear-gradient(to top, rgba(0,0,0,.95), rgba(0,0,0,.20)), #111";
+
+        }
+
+        previewTitle.textContent =
+            title || "THE WORLD IS YOURS";
+
+        previewText.textContent =
+            text || "Seu banner aparecerá aqui.";
+
+        if (link) {
+            previewLink.style.display = "inline-block";
+        } else {
+            previewLink.style.display = "none";
+        }
+
+        if (enabledInput.checked) {
+            disabledPreview.style.display = "none";
+        } else {
+            disabledPreview.style.display = "flex";
+        }
+    }
+
+    imageInput.addEventListener("input", updatePreview);
+    titleInput.addEventListener("input", updatePreview);
+    textInput.addEventListener("input", updatePreview);
+    linkInput.addEventListener("input", updatePreview);
+    enabledInput.addEventListener("change", updatePreview);
+
+    document.getElementById("bannerForm").addEventListener("submit", function () {
+
+        const button = document.getElementById("saveButton");
+
+        button.textContent = "⏳ Salvando...";
+        button.style.pointerEvents = "none";
+        button.style.opacity = "0.7";
+
+    });
+
+    updatePreview();
+</script>
+
+</body>
+</html>

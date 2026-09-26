@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Editar membro | {{ config.site_name }}</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --red: {{ config.primary_color or '#e00000' }};
+            --red-dark: #720000;
+            --bg: #050505;
+            --card: rgba(15, 15, 15, .92);
+            --border: rgba(255,255,255,.08);
+            --text: #f5f5f5;
+            --muted: #777;
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 15% 10%, rgba(224,0,0,.13), transparent 30%),
+                radial-gradient(circle at 85% 85%, rgba(224,0,0,.07), transparent 30%),
+                var(--bg);
+            color: var(--text);
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background:
+                linear-gradient(rgba(255,255,255,.012) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.012) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button,
+        input,
+        select {
+            font-family: inherit;
+        }
+
+        .layout {
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* SIDEBAR */
+
+        .sidebar {
+            width: 260px;
+            position: fixed;
+            inset: 0 auto 0 0;
+            padding: 25px 16px;
+            background: rgba(7,7,7,.96);
+            border-right: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 10px 28px;
+            margin-bottom: 22px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .brand-icon {
+            width: 43px;
+            height: 43px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: linear-gradient(145deg, var(--red), #4c0000);
+            box-shadow: 0 0 25px rgba(224,0,0,.25);
+            font-size: 20px;
+        }
+
+        .brand-text strong {
+            display: block;
+            font-size: 17px;
+            letter-spacing: 2px;
+        }
+
+        .brand-text span {
+            display: block;
+            margin-top: 3px;
+            color: #666;
+            font-size: 9px;
+            letter-spacing: 1.5px;
+        }
+
+        .menu-title {
+            padding: 0 12px 10px;
+            color: #4d4d4d;
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .nav a {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 13px 14px;
+            border-radius: 11px;
+            border: 1px solid transparent;
+            color: #929292;
+            font-size: 13px;
+            transition: .25s;
+        }
+
+        .nav a:hover {
+            color: white;
+            background: rgba(255,255,255,.04);
+            border-color: var(--border);
+            transform: translateX(3px);
+        }
+
+        .nav a.active {
+            color: white;
+            background: linear-gradient(
+                90deg,
+                rgba(224,0,0,.18),
+                rgba(224,0,0,.03)
+            );
+            border-color: rgba(224,0,0,.25);
+            box-shadow: inset 3px 0 0 var(--red);
+        }
+
+        .nav-icon {
+            width: 25px;
+            text-align: center;
+            font-size: 17px;
+        }
+
+        .sidebar-bottom {
+            position: absolute;
+            left: 16px;
+            right: 16px;
+            bottom: 22px;
+        }
+
+        .logout {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            color: #777;
+            font-size: 13px;
+            transition: .25s;
+        }
+
+        .logout:hover {
+            background: rgba(224,0,0,.08);
+            color: #ff5b5b;
+        }
+
+        /* MAIN */
+
+        .main {
+            width: calc(100% - 260px);
+            margin-left: 260px;
+            min-height: 100vh;
+        }
+
+        .topbar {
+            height: 78px;
+            padding: 0 34px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(5,5,5,.78);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(18px);
+        }
+
+        .topbar h1 {
+            font-size: 19px;
+        }
+
+        .topbar p {
+            margin-top: 4px;
+            color: #666;
+            font-size: 11px;
+        }
+
+        .top-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .top-button {
+            padding: 10px 15px;
+            border-radius: 9px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,.035);
+            color: #ccc;
+            font-size: 12px;
+            transition: .25s;
+        }
+
+        .top-button:hover {
+            background: rgba(255,255,255,.07);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .top-button.red {
+            color: #ff6868;
+            border-color: rgba(224,0,0,.25);
+            background: rgba(224,0,0,.10);
+        }
+
+        /* CONTENT */
+
+        .content {
+            max-width: 1100px;
+            margin: auto;
+            padding: 35px;
+        }
+
+        .hero {
+            position: relative;
+            overflow: hidden;
+            padding: 30px;
+            margin-bottom: 22px;
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            background:
+                radial-gradient(circle at 90% 20%, rgba(224,0,0,.18), transparent 30%),
+                linear-gradient(135deg, rgba(20,20,20,.96), rgba(8,8,8,.96));
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            right: -70px;
+            bottom: -110px;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: var(--red);
+            filter: blur(100px);
+            opacity: .14;
+        }
+
+        .hero-label {
+            display: inline-flex;
+            padding: 6px 10px;
+            margin-bottom: 12px;
+            border-radius: 100px;
+            border: 1px solid rgba(224,0,0,.22);
+            background: rgba(224,0,0,.09);
+            color: #ff6464;
+            font-size: 9px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .hero h2 {
+            position: relative;
+            z-index: 2;
+            font-size: 27px;
+            margin-bottom: 8px;
+        }
+
+        .hero p {
+            position: relative;
+            z-index: 2;
+            max-width: 700px;
+            color: #777;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 330px;
+            gap: 20px;
+            align-items: start;
+        }
+
+        .card {
+            padding: 24px;
+            border-radius: 17px;
+            border: 1px solid var(--border);
+            background: var(--card);
+            backdrop-filter: blur(16px);
+            box-shadow: 0 15px 50px rgba(0,0,0,.22);
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 22px;
+            padding-bottom: 17px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 11px;
+            background: rgba(224,0,0,.10);
+            border: 1px solid rgba(224,0,0,.18);
+            font-size: 17px;
+        }
+
+        .card-title h3 {
+            font-size: 15px;
+        }
+
+        .card-title p {
+            margin-top: 4px;
+            color: #666;
+            font-size: 10px;
+        }
+
+        /* FORM */
+
+        .field {
+            margin-bottom: 17px;
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 8px;
+            color: #aaa;
+            font-size: 11px;
+        }
+
+        .field input,
+        .field select {
+            width: 100%;
+            height: 45px;
+            padding: 0 13px;
+            outline: none;
+            border-radius: 10px;
+            border: 1px solid #202020;
+            background: #0a0a0a;
+            color: white;
+            font-size: 12px;
+            transition: .25s;
+        }
+
+        .field input:focus,
+        .field select:focus {
+            border-color: rgba(224,0,0,.65);
+            box-shadow: 0 0 0 3px rgba(224,0,0,.08);
+        }
+
+        .field input[readonly] {
+            color: #666;
+            cursor: not-allowed;
+            background: #080808;
+        }
+
+        .field small {
+            display: block;
+            margin-top: 7px;
+            color: #4e4e4e;
+            font-size: 9px;
+        }
+
+        .field-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .save-button {
+            width: 100%;
+            height: 46px;
+            margin-top: 5px;
+            border: 0;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--red), var(--red-dark));
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: .25s;
+            box-shadow: 0 8px 25px rgba(224,0,0,.18);
+        }
+
+        .save-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(224,0,0,.28);
+        }
+
+        /* MEMBER CARD */
+
+        .member-card {
+            position: sticky;
+            top: 105px;
+        }
+
+        .member-head {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            margin-bottom: 20px;
+        }
+
+        .member-avatar {
+            width: 58px;
+            height: 58px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 16px;
+            background: linear-gradient(145deg, var(--red), #480000);
+            border: 1px solid rgba(224,0,0,.28);
+            box-shadow: 0 0 25px rgba(224,0,0,.13);
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .member-name {
+            min-width: 0;
+        }
+
+        .member-name strong {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 15px;
+        }
+
+        .member-name span {
+            display: block;
+            margin-top: 5px;
+            color: #666;
+            font-size: 9px;
+        }
+
+        .info-list {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 11px 12px;
+            border-radius: 9px;
+            background: rgba(255,255,255,.025);
+            border: 1px solid rgba(255,255,255,.045);
+        }
+
+        .info-item span:first-child {
+            color: #555;
+            font-size: 9px;
+        }
+
+        .info-item span:last-child {
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #bbb;
+            font-size: 10px;
+            text-align: right;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .status-online .status-dot {
+            background: #4be27b;
+            box-shadow: 0 0 8px rgba(75,226,123,.7);
+        }
+
+        .status-offline .status-dot {
+            background: #555;
+        }
+
+        .status-blocked .status-dot {
+            background: #e00000;
+            box-shadow: 0 0 8px rgba(224,0,0,.6);
+        }
+
+        .warning {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(224,0,0,.13);
+            background: rgba(224,0,0,.045);
+            color: #765252;
+            font-size: 9px;
+            line-height: 1.6;
+        }
+
+        .back-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 43px;
+            margin-top: 12px;
+            border-radius: 9px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,.025);
+            color: #999;
+            font-size: 11px;
+            transition: .25s;
+        }
+
+        .back-button:hover {
+            color: white;
+            background: rgba(255,255,255,.05);
+        }
+
+        .footer {
+            padding: 25px 0 5px;
+            text-align: center;
+            color: #3d3d3d;
+            font-size: 9px;
+        }
+
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .member-card {
+                position: static;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .sidebar {
+                width: 220px;
+            }
+
+            .main {
+                width: calc(100% - 220px);
+                margin-left: 220px;
+            }
+
+            .content {
+                padding: 22px;
+            }
+        }
+
+        @media (max-width: 650px) {
+            .layout {
+                display: block;
+            }
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+                padding: 15px;
+            }
+
+            .brand {
+                margin-bottom: 12px;
+                padding-bottom: 15px;
+            }
+
+            .nav {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .sidebar-bottom {
+                position: static;
+                margin-top: 10px;
+            }
+
+            .main {
+                width: 100%;
+                margin-left: 0;
+            }
+
+            .topbar {
+                padding: 0 15px;
+            }
+
+            .top-actions .top-button:first-child {
+                display: none;
+            }
+
+            .content {
+                padding: 15px;
+            }
+
+            .field-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+        }
+
+        @media (max-width: 430px) {
+            .nav {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                padding: 22px;
+            }
+
+            .hero h2 {
+                font-size: 23px;
+            }
+
+            .card {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                ⚙
+            </div>
+
+            <div class="brand-text">
+                <strong>EXPURG</strong>
+                <span>ADMIN CONTROL</span>
+            </div>
+
+        </div>
+
+        <div class="menu-title">
+            Navegação
+        </div>
+
+        <nav class="nav">
+
+            <a href="/admin">
+                <span class="nav-icon">⌂</span>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/admin/config">
+                <span class="nav-icon">⚙</span>
+                <span>Configurações</span>
+            </a>
+
+            <a href="/admin/anuncios">
+                <span class="nav-icon">▣</span>
+                <span>Anúncios</span>
+            </a>
+
+            <a href="/admin/banner">
+                <span class="nav-icon">▤</span>
+                <span>Banner</span>
+            </a>
+
+            <a href="/chat">
+                <span class="nav-icon">◉</span>
+                <span>Chat</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <a href="/admin" class="logout">
+                <span>↩</span>
+                <span>Voltar ao painel</span>
+            </a>
+
+            <a href="/logout" class="logout">
+                <span>⏻</span>
+                <span>Sair da conta</span>
+            </a>
+
+        </div>
+
+    </aside>
+
+    <!-- MAIN -->
+
+    <main class="main">
+
+        <header class="topbar">
+
+            <div>
+                <h1>Editar membro</h1>
+                <p>Gerencie as informações administrativas do usuário</p>
+            </div>
+
+            <div class="top-actions">
+
+                <a href="/admin" class="top-button">
+                    Dashboard
+                </a>
+
+                <a href="/" class="top-button red">
+                    Ver site
+                </a>
+
+            </div>
+
+        </header>
+
+        <div class="content">
+
+            <section class="hero">
+
+                <div class="hero-label">
+                    ● Controle administrativo
+                </div>
+
+                <h2>
+                    Editar {{ usuario.username }}
+                </h2>
+
+                <p>
+                    Altere nível, XP, status e tema deste membro.
+                    Dados de login como usuário, Gmail e senha permanecem protegidos.
+                </p>
+
+            </section>
+
+            <div class="grid">
+
+                <!-- FORM -->
+
+                <section class="card">
+
+                    <div class="card-title">
+
+                        <div class="card-icon">
+                            ✎
+                        </div>
+
+                        <div>
+                            <h3>Dados administrativos</h3>
+                            <p>Configurações que podem ser alteradas pelo administrador</p>
+                        </div>
+
+                    </div>
+
+                    <form
+                        method="POST"
+                        action="/admin/membro/{{ usuario.id }}/editar"
+                        id="editForm"
+                    >
+
+                        <!-- USERNAME -->
+
+                        <div class="field">
+
+                            <label for="username">
+                                Nome de usuário
+                            </label>
+
+                            <input
+                                type="text"
+                                id="username"
+                                value="{{ usuario.username }}"
+                                readonly
+                            >
+
+                            <small>
+                                O nome de usuário não pode ser alterado nesta área.
+                            </small>
+
+                        </div>
+
+                        <!-- EMAIL -->
+
+                        <div class="field">
+
+                            <label for="email">
+                                Gmail / E-mail
+                            </label>
+
+                            <input
+                                type="text"
+                                id="email"
+                                value="{{ usuario.email }}"
+                                readonly
+                            >
+
+                            <small>
+                                O e-mail da conta permanece protegido.
+                            </small>
+
+                        </div>
+
+                        <!-- LEVEL + XP -->
+
+                        <div class="field-row">
+
+                            <div class="field">
+
+                                <label for="level">
+                                    Nível
+                                </label>
+
+                                <input
+                                    type="number"
+                                    id="level"
+                                    name="level"
+                                    min="1"
+                                    max="9999"
+                                    value="{{ usuario.level }}"
+                                    required
+                                >
+
+                            </div>
+
+                            <div class="field">
+
+                                <label for="xp">
+                                    XP
+                                </label>
+
+                                <input
+                                    type="number"
+                                    id="xp"
+                                    name="xp"
+                                    min="0"
+                                    max="999999999"
+                                    value="{{ usuario.xp }}"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+                        <!-- STATUS -->
+
+                        <div class="field">
+
+                            <label for="status">
+                                Status da conta
+                            </label>
+
+                            <select
+                                id="status"
+                                name="status"
+                                required
+                            >
+
+                                <option
+                                    value="online"
+                                    {% if usuario.status == 'online' %}selected{% endif %}
+                                >
+                                    Online
+                                </option>
+
+                                <option
+                                    value="offline"
+                                    {% if usuario.status == 'offline' %}selected{% endif %}
+                                >
+                                    Offline
+                                </option>
+
+                                <option
+                                    value="bloqueado"
+                                    {% if usuario.status == 'bloqueado' %}selected{% endif %}
+                                >
+                                    Bloqueado
+                                </option>
+
+                            </select>
+
+                            <small>
+                                Usuários bloqueados não conseguem entrar na conta.
+                            </small>
+
+                        </div>
+
+                        <!-- THEME -->
+
+                        <div class="field">
+
+                            <label for="theme">
+                                Tema do usuário
+                            </label>
+
+                            <select
+                                id="theme"
+                                name="theme"
+                                required
+                            >
+
+                                <option
+                                    value="dark"
+                                    {% if usuario.theme == 'dark' %}selected{% endif %}
+                                >
+                                    Escuro
+                                </option>
+
+                                <option
+                                    value="light"
+                                    {% if usuario.theme == 'light' %}selected{% endif %}
+                                >
+                                    Claro
+                                </option>
+
+                            </select>
+
+                            <small>
+                                Define o tema salvo para este membro.
+                            </small>
+
+                        </div>
+
+                        <button
+                            type="submit"
+                            class="save-button"
+                            id="saveButton"
+                        >
+                            ✓ Salvar alterações
+                        </button>
+
+                    </form>
+
+                </section>
+
+                <!-- MEMBER INFO -->
+
+                <aside class="card member-card">
+
+                    <div class="card-title">
+
+                        <div class="card-icon">
+                            ♙
+                        </div>
+
+                        <div>
+                            <h3>Informações</h3>
+                            <p>Resumo da conta</p>
+                        </div>
+
+                    </div>
+
+                    <div class="member-head">
+
+                        <div class="member-avatar">
+                            {{ usuario.username[:1]|upper }}
+                        </div>
+
+                        <div class="member-name">
+
+                            <strong>
+                                {{ usuario.username }}
+                            </strong>
+
+                            <span>
+                                Membro #{{ usuario.id }}
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                    <div class="info-list">
+
+                        <div class="info-item">
+                            <span>ID</span>
+                            <span>#{{ usuario.id }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span>Usuário</span>
+                            <span>{{ usuario.username }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span>E-mail</span>
+                            <span>{{ usuario.email }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span>Nível</span>
+                            <span>{{ usuario.level }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span>XP</span>
+                            <span>{{ usuario.xp }}</span>
+                        </div>
+
+                        <div class="info-item">
+
+                            <span>Status</span>
+
+                            <span>
+
+                                {% if usuario.status == 'online' %}
+
+                                    <span class="status status-online">
+                                        <i class="status-dot"></i>
+                                        Online
+                                    </span>
+
+                                {% elif usuario.status == 'bloqueado' %}
+
+                                    <span class="status status-blocked">
+                                        <i class="status-dot"></i>
+                                        Bloqueado
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="status status-offline">
+                                        <i class="status-dot"></i>
+                                        Offline
+                                    </span>
+
+                                {% endif %}
+
+                            </span>
+
+                        </div>
+
+                        <div class="info-item">
+                            <span>Tema</span>
+                            <span>{{ usuario.theme|capitalize }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span>Criado em</span>
+                            <span>{{ usuario.created_at }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span>Último login</span>
+                            <span>{{ usuario.last_login or 'Nunca' }}</span>
+                        </div>
+
+                    </div>
+
+                    <div class="warning">
+                        ⚠ O administrador pode alterar apenas os dados
+                        administrativos desta conta. O nome de usuário,
+                        e-mail e senha não são modificados por esta página.
+                    </div>
+
+                    <a href="/admin" class="back-button">
+                        ← Voltar para membros
+                    </a>
+
+                </aside>
+
+            </div>
+
+            <div class="footer">
+                EXPURG • Área administrativa • Gerenciamento de membros
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<script>
+    const form = document.getElementById("editForm");
+    const button = document.getElementById("saveButton");
+
+    form.addEventListener("submit", function() {
+
+        button.textContent = "⏳ Salvando...";
+        button.style.pointerEvents = "none";
+        button.style.opacity = "0.7";
+
+    });
+</script>
+
+</body>
+</html>

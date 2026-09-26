@@ -1,8 +1,6 @@
 import os
 import json
-import re
 import sqlite3
-
 from datetime import datetime
 
 from flask import (
@@ -21,7 +19,7 @@ from werkzeug.security import (
 
 
 # =========================================================
-# APLICAÇÃO
+# APP
 # =========================================================
 
 app = Flask(__name__)
@@ -30,11 +28,6 @@ app.secret_key = os.environ.get(
     "SECRET_KEY",
     "chave-temporaria-local"
 )
-
-
-# =========================================================
-# ADMIN
-# =========================================================
 
 ADMIN_USERNAME = os.environ.get(
     "ADMIN_USERNAME",
@@ -46,142 +39,137 @@ ADMIN_PASSWORD = os.environ.get(
     "123456"
 )
 
+BASE_DIR = os.path.dirname(
+    os.path.abspath(__file__)
+)
 
-# =========================================================
-# ARQUIVOS
-# =========================================================
+DATABASE_FILE = os.path.join(
+    BASE_DIR,
+    "database.db"
+)
 
-LOG_FILE = "access_logs.json"
+LOG_FILE = os.path.join(
+    BASE_DIR,
+    "access_logs.json"
+)
 
-CONFIG_FILE = "config.json"
-
-DATABASE_FILE = "database.db"
+CONFIG_FILE = os.path.join(
+    BASE_DIR,
+    "config.json"
+)
 
 
 # =========================================================
 # CONFIGURAÇÃO PADRÃO
 # =========================================================
 
-DEFAULT_CONFIG = {
-
-    "site_name": "DEMON",
-
-    "admin_name": "RHUAN",
+CONFIG_PADRAO = {
+    "site_name": "EXPURG",
+    "admin_name": "ADMIN",
 
     "theme": "dark",
 
-    "primary_color": "#8b0000",
+    "primary_color": "#e00000",
 
     "logo": "",
 
-    "home_text": "WELCOME TO THE UNDERGROUND",
+    "home_text": (
+        "THE WORLD IS YOURS"
+    ),
 
     "register_ip": True,
-
     "register_browser": True,
 
-    "max_logs": 500,
-
+    "max_logs": 1000,
     "auto_clean_logs": False,
 
     "show_access_time": True,
-
     "show_access_route": True,
 
-    "google_login": False,
-
-    "google_client_id": "",
-
-    "google_client_secret": "",
-
-    "google_show_name": True,
-
-    "google_show_email": True,
-
-    "google_register_time": True,
-
     "session_time": 60,
-
     "auto_logout": True,
 
     "confirm_delete_logs": True,
 
     "show_cards": True,
-
     "show_ip": True,
-
     "show_users": True,
-
     "show_logs": True,
-
     "show_files": True,
-
     "show_server_status": True,
 
     "recent_accesses": 8,
 
     "admin_username": ADMIN_USERNAME,
+    "admin_password": ADMIN_PASSWORD,
 
-    "admin_password": ADMIN_PASSWORD
+    # Banner
+    "banner_enabled": True,
+    "banner_image": "",
+    "banner_title": "THE WORLD IS YOURS",
+    "banner_text": "",
+    "banner_link": "",
+
+    # Chat
+    "chat_enabled": True,
+
+    # Anúncios
+    "announcements_enabled": True
 }
 
 
 # =========================================================
-# CONFIGURAÇÃO
+# CONFIG
 # =========================================================
 
 def carregar_config():
-
     if not os.path.exists(CONFIG_FILE):
-
-        config = DEFAULT_CONFIG.copy()
-
-        salvar_config(config)
-
-        return config
+        salvar_config(CONFIG_PADRAO.copy())
+        return CONFIG_PADRAO.copy()
 
     try:
-
         with open(
             CONFIG_FILE,
             "r",
             encoding="utf-8"
         ) as arquivo:
+            config = json.load(arquivo)
 
-            dados = json.load(arquivo)
+        alterado = False
 
-            if isinstance(dados, dict):
+        for chave, valor in CONFIG_PADRAO.items():
+            if chave not in config:
+                config[chave] = valor
+                alterado = True
 
-                config = DEFAULT_CONFIG.copy()
+        if alterado:
+            salvar_config(config)
 
-                config.update(dados)
-
-                return config
+        return config
 
     except (
-        json.JSONDecodeError,
-        OSError
+        OSError,
+        json.JSONDecodeError
     ):
-
-        pass
-
-    return DEFAULT_CONFIG.copy()
+        salvar_config(CONFIG_PADRAO.copy())
+        return CONFIG_PADRAO.copy()
 
 
 def salvar_config(config):
-
-    with open(
-        CONFIG_FILE,
-        "w",
-        encoding="utf-8"
-    ) as arquivo:
-
-        json.dump(
-            config,
-            arquivo,
-            indent=4,
-            ensure_ascii=False
-        )
+    try:
+        with open(
+            CONFIG_FILE,
+            "w",
+            encoding="utf-8"
+        ) as arquivo:
+            json.dump(
+                config,
+                arquivo,
+                indent=4,
+                ensure_ascii=False
+            )
+    except OSError:
+        pass
 
 
 # =========================================================
@@ -189,7 +177,6 @@ def salvar_config(config):
 # =========================================================
 
 def conectar_banco():
-
     conexao = sqlite3.connect(
         DATABASE_FILE
     )
@@ -206,7 +193,6 @@ def inicializar_banco():
     conexao.execute(
         """
         CREATE TABLE IF NOT EXISTS users (
-
             id INTEGER PRIMARY KEY AUTOINCREMENT,
 
             email TEXT UNIQUE NOT NULL,
@@ -223,20 +209,115 @@ def inicializar_banco():
 
             created_at TEXT NOT NULL,
 
-            last_login TEXT
+            last_login TEXT,
 
+            theme TEXT DEFAULT 'dark'
         )
         """
     )
 
-    conexao.commit()
+    conexao.execute(
+        """
+        CREATE TABLE IF NOT EXISTS announcements (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
 
+            title TEXT NOT NULL,
+
+            content TEXT DEFAULT '',
+
+            image TEXT DEFAULT '',
+
+            link TEXT DEFAULT '',
+
+            active INTEGER DEFAULT 1,
+
+            created_at TEXT NOT NULL,
+
+            updated_at TEXT
+        )
+        """
+    )
+
+    conexao.execute(
+        """
+        CREATE TABLE IF NOT EXISTS chat_messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+            user_id INTEGER,
+
+            username TEXT NOT NULL,
+
+            message TEXT NOT NULL,
+
+            created_at TEXT NOT NULL
+        )
+        """
+    )
+
+    conexao.execute(
+        """
+        CREATE TABLE IF NOT EXISTS access_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+            username TEXT,
+
+            ip TEXT,
+
+            browser TEXT,
+
+            route TEXT,
+
+            created_at TEXT NOT NULL
+        )
+        """
+    )
+
+    # -----------------------------------------------------
+    # Compatibilidade com banco antigo
+    # -----------------------------------------------------
+
+    colunas = conexao.execute(
+        "PRAGMA table_info(users)"
+    ).fetchall()
+
+    nomes_colunas = [
+        coluna["name"]
+        for coluna in colunas
+    ]
+
+    if "theme" not in nomes_colunas:
+        conexao.execute(
+            """
+            ALTER TABLE users
+            ADD COLUMN theme TEXT DEFAULT 'dark'
+            """
+        )
+
+    conexao.commit()
     conexao.close()
 
 
 # =========================================================
 # USUÁRIOS
 # =========================================================
+
+def buscar_usuario_por_id(user_id):
+
+    conexao = conectar_banco()
+
+    usuario = conexao.execute(
+        """
+        SELECT *
+        FROM users
+        WHERE id = ?
+        """,
+        (user_id,)
+    ).fetchone()
+
+    conexao.close()
+
+    return usuario
+
 
 def buscar_usuario_por_login(login):
 
@@ -251,47 +332,7 @@ def buscar_usuario_por_login(login):
         """,
         (
             login,
-            login.lower()
-        )
-    ).fetchone()
-
-    conexao.close()
-
-    return usuario
-
-
-def buscar_usuario_por_username(username):
-
-    conexao = conectar_banco()
-
-    usuario = conexao.execute(
-        """
-        SELECT *
-        FROM users
-        WHERE username = ?
-        """,
-        (
-            username,
-        )
-    ).fetchone()
-
-    conexao.close()
-
-    return usuario
-
-
-def buscar_usuario_por_email(email):
-
-    conexao = conectar_banco()
-
-    usuario = conexao.execute(
-        """
-        SELECT *
-        FROM users
-        WHERE email = ?
-        """,
-        (
-            email.lower(),
+            login
         )
     ).fetchone()
 
@@ -318,42 +359,15 @@ def listar_usuarios():
 
 
 # =========================================================
-# VALIDAÇÃO
-# =========================================================
-
-def email_valido(email):
-
-    padrao = r"^[^@\s]+@[^@\s]+\.[^@\s]+$"
-
-    return re.match(
-        padrao,
-        email
-    ) is not None
-
-
-def username_valido(username):
-
-    if not 3 <= len(username) <= 30:
-
-        return False
-
-    return re.match(
-        r"^[a-zA-Z0-9_.]+$",
-        username
-    ) is not None
-
-
-# =========================================================
 # LOGS
 # =========================================================
 
 def carregar_logs():
 
-    if not os.path.exists(LOG_FILE):
-
-        return []
-
     try:
+
+        if not os.path.exists(LOG_FILE):
+            return []
 
         with open(
             LOG_FILE,
@@ -363,80 +377,149 @@ def carregar_logs():
 
             dados = json.load(arquivo)
 
-            if isinstance(dados, list):
+        if not isinstance(
+            dados,
+            list
+        ):
+            return []
 
-                return dados
+        return dados
 
     except (
-        json.JSONDecodeError,
-        OSError
+        OSError,
+        json.JSONDecodeError
     ):
-
-        pass
-
-    return []
+        return []
 
 
 def salvar_logs(logs):
 
-    with open(
-        LOG_FILE,
-        "w",
-        encoding="utf-8"
-    ) as arquivo:
+    config = carregar_config()
 
-        json.dump(
-            logs,
-            arquivo,
-            indent=4,
-            ensure_ascii=False
+    limite = int(
+        config.get(
+            "max_logs",
+            1000
         )
+    )
+
+    if limite > 0:
+        logs = logs[-limite:]
+
+    try:
+
+        with open(
+            LOG_FILE,
+            "w",
+            encoding="utf-8"
+        ) as arquivo:
+
+            json.dump(
+                logs,
+                arquivo,
+                indent=4,
+                ensure_ascii=False
+            )
+
+    except OSError:
+        pass
+
+
+def obter_ip_cliente():
+
+    forwarded = request.headers.get(
+        "X-Forwarded-For",
+        ""
+    )
+
+    if forwarded:
+
+        primeiro_ip = (
+            forwarded
+            .split(",")[0]
+            .strip()
+        )
+
+        if primeiro_ip:
+            return primeiro_ip
+
+    real_ip = request.headers.get(
+        "X-Real-IP",
+        ""
+    ).strip()
+
+    if real_ip:
+        return real_ip
+
+    return request.remote_addr or ""
 
 
 def registrar_log(
-    ip=None,
-    navegador=None,
-    rota=None
+    username=None,
+    ip=None
 ):
 
     config = carregar_config()
 
-    logs = carregar_logs()
+    if ip is None:
+        ip = obter_ip_cliente()
 
-    registro = {
-
-        "ip": ip,
-
-        "browser": navegador,
-
-        "navegador": navegador,
-
-        "route": rota,
-
-        "rota": rota,
-
-        "time": datetime.now().strftime(
-            "%d/%m/%Y %H:%M:%S"
-        ),
-
-        "data": datetime.now().strftime(
-            "%d/%m/%Y %H:%M:%S"
-        )
-
-    }
-
-    logs.append(registro)
-
-    max_logs = config.get(
-        "max_logs",
-        500
+    navegador = request.headers.get(
+        "User-Agent",
+        ""
     )
 
-    if len(logs) > max_logs:
+    rota = request.path
 
-        logs = logs[-max_logs:]
+    agora = datetime.now().strftime(
+        "%d/%m/%Y %H:%M:%S"
+    )
+
+    logs = carregar_logs()
+
+    logs.append(
+        {
+            "username": username or "",
+            "ip": ip,
+            "browser": navegador,
+            "route": rota,
+            "created_at": agora
+        }
+    )
 
     salvar_logs(logs)
+
+    # Também salva no banco
+    try:
+
+        conexao = conectar_banco()
+
+        conexao.execute(
+            """
+            INSERT INTO access_logs
+            (
+                username,
+                ip,
+                browser,
+                route,
+                created_at
+            )
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (
+                username or "",
+                ip,
+                navegador,
+                rota,
+                agora
+            )
+        )
+
+        conexao.commit()
+        conexao.close()
+
+    except sqlite3.Error:
+        pass
 
 
 # =========================================================
@@ -446,25 +529,40 @@ def registrar_log(
 @app.context_processor
 def contexto_global():
 
-    return {
+    config = carregar_config()
 
-        "usuario_logado":
-            session.get(
-                "member_authenticated",
-                False
-            ),
+    usuario_logado = bool(
+        session.get(
+            "member_authenticated",
+            False
+        )
+    )
 
-        "usuario_admin":
-            session.get(
-                "is_admin",
-                False
-            ),
+    usuario_admin = bool(
+        session.get(
+            "is_admin",
+            False
+        )
+    )
 
-        "usuario_nome":
-            session.get(
-                "member_username"
+    usuario = None
+
+    if usuario_logado:
+
+        member_id = session.get(
+            "member_id"
+        )
+
+        if member_id:
+            usuario = buscar_usuario_por_id(
+                member_id
             )
 
+    return {
+        "config": config,
+        "usuario_logado": usuario_logado,
+        "usuario_admin": usuario_admin,
+        "usuario": usuario
     }
 
 
@@ -473,13 +571,47 @@ def contexto_global():
 # =========================================================
 
 @app.route("/")
-def inicio():
+def index():
 
     config = carregar_config()
 
+    usuario_logado = session.get(
+        "member_authenticated",
+        False
+    )
+
+    announcements = []
+
+    if config.get(
+        "announcements_enabled",
+        True
+    ):
+
+        conexao = conectar_banco()
+
+        announcements = conexao.execute(
+            """
+            SELECT *
+            FROM announcements
+            WHERE active = 1
+            ORDER BY id DESC
+            """
+        ).fetchall()
+
+        conexao.close()
+
+    registrar_log(
+        username=session.get(
+            "member_username",
+            ""
+        )
+    )
+
     return render_template(
         "index.html",
-        config=config
+        config=config,
+        announcements=announcements,
+        usuario_logado=usuario_logado
     )
 
 
@@ -512,10 +644,6 @@ def login():
         ""
     )
 
-    # =====================================================
-    # ADMIN
-    # =====================================================
-
     admin_username = config.get(
         "admin_username",
         ADMIN_USERNAME
@@ -526,6 +654,10 @@ def login():
         ADMIN_PASSWORD
     )
 
+    # -----------------------------------------------------
+    # ADMIN
+    # -----------------------------------------------------
+
     if (
         login_digitado == admin_username
         and password == admin_password
@@ -534,20 +666,21 @@ def login():
         session.clear()
 
         session["member_authenticated"] = True
-
         session["member_username"] = admin_username
-
+        session["member_id"] = 0
         session["is_admin"] = True
-
         session["admin_authenticated"] = True
 
-        session["member_id"] = 0
+        registrar_log(
+            username=admin_username
+        )
 
         return redirect("/")
 
-    # =====================================================
-    # USUÁRIO NORMAL
-    # =====================================================
+
+    # -----------------------------------------------------
+    # MEMBRO
+    # -----------------------------------------------------
 
     usuario = buscar_usuario_por_login(
         login_digitado
@@ -558,7 +691,10 @@ def login():
         return render_template(
             "login.html",
             config=config,
-            erro="Usuário, Gmail ou senha incorretos."
+            erro=(
+                "Usuário, Gmail ou senha "
+                "incorretos."
+            )
         )
 
     if usuario["status"] == "bloqueado":
@@ -577,7 +713,10 @@ def login():
         return render_template(
             "login.html",
             config=config,
-            erro="Usuário, Gmail ou senha incorretos."
+            erro=(
+                "Usuário, Gmail ou senha "
+                "incorretos."
+            )
         )
 
     agora = datetime.now().strftime(
@@ -589,11 +728,9 @@ def login():
     conexao.execute(
         """
         UPDATE users
-
         SET
             last_login = ?,
             status = 'online'
-
         WHERE id = ?
         """,
         (
@@ -603,21 +740,22 @@ def login():
     )
 
     conexao.commit()
-
     conexao.close()
 
     session.clear()
 
     session["member_authenticated"] = True
-
     session["member_id"] = usuario["id"]
-
     session["member_username"] = usuario["username"]
-
     session["is_admin"] = False
-
     session["admin_authenticated"] = False
 
+    registrar_log(
+        username=usuario["username"]
+    )
+
+    # Depois do login o usuário volta
+    # para a página inicial.
     return redirect("/")
 
 
@@ -648,7 +786,7 @@ def cadastro():
     email = request.form.get(
         "email",
         ""
-    ).strip().lower()
+    ).strip()
 
     password = request.form.get(
         "password",
@@ -657,39 +795,34 @@ def cadastro():
 
     password_confirm = request.form.get(
         "password_confirm",
-        ""
+        request.form.get(
+            "confirm_password",
+            ""
+        )
     )
 
-    if not username or not email or not password:
+    if not username:
 
         return render_template(
             "cadastro.html",
             config=config,
-            erro="Preencha todos os campos."
+            erro="Digite um username."
         )
 
-    if not username_valido(username):
+    if not email:
 
         return render_template(
             "cadastro.html",
             config=config,
-            erro="Usuário inválido."
+            erro="Digite seu Gmail."
         )
 
-    if not email_valido(email):
+    if not password:
 
         return render_template(
             "cadastro.html",
             config=config,
-            erro="Digite um Gmail válido."
-        )
-
-    if len(password) < 6:
-
-        return render_template(
-            "cadastro.html",
-            config=config,
-            erro="A senha precisa ter pelo menos 6 caracteres."
+            erro="Digite uma senha."
         )
 
     if password != password_confirm:
@@ -700,15 +833,36 @@ def cadastro():
             erro="As senhas não são iguais."
         )
 
-    if buscar_usuario_por_username(username):
+    if username.lower() == (
+        config.get(
+            "admin_username",
+            ADMIN_USERNAME
+        ).lower()
+    ):
 
         return render_template(
             "cadastro.html",
             config=config,
-            erro="Esse usuário já existe."
+            erro="Esse username não está disponível."
         )
 
-    if buscar_usuario_por_email(email):
+    existente = buscar_usuario_por_login(
+        username
+    )
+
+    if existente:
+
+        return render_template(
+            "cadastro.html",
+            config=config,
+            erro="Esse username já está em uso."
+        )
+
+    existente_email = buscar_usuario_por_login(
+        email
+    )
+
+    if existente_email:
 
         return render_template(
             "cadastro.html",
@@ -716,52 +870,62 @@ def cadastro():
             erro="Esse Gmail já está cadastrado."
         )
 
-    password_hash = generate_password_hash(
-        password
-    )
-
     agora = datetime.now().strftime(
         "%d/%m/%Y %H:%M:%S"
     )
 
-    conexao = conectar_banco()
-
-    conexao.execute(
-        """
-        INSERT INTO users (
-
-            email,
-            username,
-            password_hash,
-            level,
-            xp,
-            status,
-            created_at
-
-        )
-
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-        """,
-        (
-            email,
-            username,
-            password_hash,
-            1,
-            0,
-            "offline",
-            agora
-        )
+    senha_hash = generate_password_hash(
+        password
     )
 
-    conexao.commit()
+    try:
 
-    conexao.close()
+        conexao = conectar_banco()
 
-    return render_template(
-        "login.html",
-        config=config,
-        cadastro_sucesso=True
-    )
+        conexao.execute(
+            """
+            INSERT INTO users
+            (
+                email,
+                username,
+                password_hash,
+                level,
+                xp,
+                status,
+                created_at,
+                last_login,
+                theme
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                email,
+                username,
+                senha_hash,
+                1,
+                0,
+                "offline",
+                agora,
+                None,
+                "dark"
+            )
+        )
+
+        conexao.commit()
+        conexao.close()
+
+    except sqlite3.IntegrityError:
+
+        return render_template(
+            "cadastro.html",
+            config=config,
+            erro=(
+                "Username ou Gmail "
+                "já cadastrado."
+            )
+        )
+
+    return redirect("/login")
 
 
 # =========================================================
@@ -775,36 +939,103 @@ def perfil():
         "member_authenticated",
         False
     ):
-
         return redirect("/login")
-
-    usuario = None
 
     member_id = session.get(
         "member_id"
     )
 
-    if member_id != 0:
+    # Admin não usa perfil de membro
+    if session.get(
+        "is_admin",
+        False
+    ):
+        return redirect("/")
 
-        conexao = conectar_banco()
+    usuario = buscar_usuario_por_id(
+        member_id
+    )
 
-        usuario = conexao.execute(
-            """
-            SELECT *
-            FROM users
-            WHERE id = ?
-            """,
-            (
-                member_id,
-            )
-        ).fetchone()
-
-        conexao.close()
+    if not usuario:
+        session.clear()
+        return redirect("/login")
 
     return render_template(
         "perfil.html",
-        config=carregar_config(),
-        usuario=usuario
+        usuario=usuario,
+        config=carregar_config()
+    )
+
+
+# =========================================================
+# CONFIGURAÇÕES DO MEMBRO
+# =========================================================
+
+@app.route(
+    "/configuracoes",
+    methods=["GET", "POST"]
+)
+def configuracoes():
+
+    if not session.get(
+        "member_authenticated",
+        False
+    ):
+        return redirect("/login")
+
+    if session.get(
+        "is_admin",
+        False
+    ):
+        return redirect("/admin/config")
+
+    member_id = session.get(
+        "member_id"
+    )
+
+    usuario = buscar_usuario_por_id(
+        member_id
+    )
+
+    if not usuario:
+        return redirect("/login")
+
+    if request.method == "POST":
+
+        theme = request.form.get(
+            "theme",
+            "dark"
+        ).strip().lower()
+
+        if theme not in [
+            "dark",
+            "light"
+        ]:
+            theme = "dark"
+
+        conexao = conectar_banco()
+
+        conexao.execute(
+            """
+            UPDATE users
+            SET theme = ?
+            WHERE id = ?
+            """,
+            (
+                theme,
+                member_id
+            )
+        )
+
+        conexao.commit()
+        conexao.close()
+
+        return redirect("/")
+
+    return render_template(
+        "configuracoes.html",
+        usuario=usuario,
+        config=carregar_config()
     )
 
 
@@ -815,32 +1046,75 @@ def perfil():
 @app.route("/logout")
 def logout():
 
-    member_id = session.get(
-        "member_id"
+    username = session.get(
+        "member_username",
+        ""
     )
 
-    if member_id and member_id != 0:
+    if username:
 
         conexao = conectar_banco()
 
-        conexao.execute(
-            """
-            UPDATE users
-            SET status = 'offline'
-            WHERE id = ?
-            """,
-            (
-                member_id,
-            )
-        )
+        if not session.get(
+            "is_admin",
+            False
+        ):
 
-        conexao.commit()
+            conexao.execute(
+                """
+                UPDATE users
+                SET status = 'offline'
+                WHERE username = ?
+                """,
+                (username,)
+            )
+
+            conexao.commit()
 
         conexao.close()
 
     session.clear()
 
     return redirect("/")
+
+
+# =========================================================
+# REGISTRO DE IP
+# =========================================================
+
+@app.route(
+    "/registrar-ip",
+    methods=["POST"]
+)
+def registrar_ip():
+
+    dados = request.get_json(
+        silent=True
+    ) or {}
+
+    ip = dados.get(
+        "ip",
+        ""
+    ).strip()
+
+    if not ip:
+        return jsonify({
+            "ok": False
+        })
+
+    # O IP é armazenado apenas no
+    # sistema administrativo.
+    registrar_log(
+        username=session.get(
+            "member_username",
+            ""
+        ),
+        ip=ip
+    )
+
+    return jsonify({
+        "ok": True
+    })
 
 
 # =========================================================
@@ -854,12 +1128,13 @@ def admin():
         "is_admin",
         False
     ):
-
         return redirect("/")
 
     logs = carregar_logs()
 
     usuarios = listar_usuarios()
+
+    config = carregar_config()
 
     ips_unicos = set()
 
@@ -868,19 +1143,40 @@ def admin():
         ip = log.get("ip")
 
         if ip:
-
             ips_unicos.add(ip)
 
     ultimo_acesso = None
 
     if logs:
-
         ultimo_acesso = logs[-1]
 
-    config = carregar_config()
+    conexao = conectar_banco()
+
+    total_mensagens = conexao.execute(
+        """
+        SELECT COUNT(*) AS total
+        FROM chat_messages
+        """
+    ).fetchone()["total"]
+
+    total_anuncios = conexao.execute(
+        """
+        SELECT COUNT(*) AS total
+        FROM announcements
+        """
+    ).fetchone()["total"]
+
+    usuarios_online = conexao.execute(
+        """
+        SELECT COUNT(*) AS total
+        FROM users
+        WHERE status = 'online'
+        """
+    ).fetchone()["total"]
+
+    conexao.close()
 
     return render_template(
-
         "admin.html",
 
         logs=logs,
@@ -897,46 +1193,153 @@ def admin():
 
         total_usuarios=len(usuarios),
 
-        config=config
+        usuarios_online=usuarios_online,
 
+        total_mensagens=total_mensagens,
+
+        total_anuncios=total_anuncios,
+
+        config=config
     )
 
 
 # =========================================================
-# LIMPAR LOGS
+# EDITAR MEMBRO
 # =========================================================
 
 @app.route(
-    "/admin/limpar-logs",
-    methods=["POST"]
+    "/admin/membro/<int:user_id>/editar",
+    methods=["GET", "POST"]
 )
-def limpar_logs():
+def editar_membro(user_id):
 
     if not session.get(
         "is_admin",
         False
     ):
-
         return redirect("/")
+
+    usuario = buscar_usuario_por_id(
+        user_id
+    )
+
+    if not usuario:
+        return redirect("/admin")
+
+    config = carregar_config()
+
+    if request.method == "GET":
+
+        return render_template(
+            "editar_membro.html",
+            usuario=usuario,
+            config=config
+        )
+
+    level_text = request.form.get(
+        "level",
+        "1"
+    ).strip()
+
+    xp_text = request.form.get(
+        "xp",
+        "0"
+    ).strip()
+
+    status = request.form.get(
+        "status",
+        "offline"
+    ).strip()
+
+    theme = request.form.get(
+        "theme",
+        usuario["theme"] or "dark"
+    ).strip().lower()
 
     try:
 
-        with open(
-            LOG_FILE,
-            "w",
-            encoding="utf-8"
-        ) as arquivo:
+        level = int(
+            level_text
+        )
 
-            json.dump(
-                [],
-                arquivo,
-                indent=4,
-                ensure_ascii=False
+    except ValueError:
+
+        return render_template(
+            "editar_membro.html",
+            usuario=usuario,
+            config=config,
+            erro=(
+                "O level precisa ser "
+                "um número."
             )
+        )
 
-    except OSError:
+    try:
 
-        pass
+        xp = int(
+            xp_text
+        )
+
+    except ValueError:
+
+        return render_template(
+            "editar_membro.html",
+            usuario=usuario,
+            config=config,
+            erro=(
+                "O XP precisa ser "
+                "um número."
+            )
+        )
+
+    if level < 1:
+        level = 1
+
+    if xp < 0:
+        xp = 0
+
+    status_permitidos = [
+        "online",
+        "offline",
+        "bloqueado"
+    ]
+
+    if status not in status_permitidos:
+        status = "offline"
+
+    if theme not in [
+        "dark",
+        "light"
+    ]:
+        theme = "dark"
+
+    conexao = conectar_banco()
+
+    # IMPORTANTE:
+    # username, email e password_hash
+    # nunca são alterados por esta rota.
+
+    conexao.execute(
+        """
+        UPDATE users
+        SET
+            level = ?,
+            xp = ?,
+            status = ?,
+            theme = ?
+        WHERE id = ?
+        """,
+        (
+            level,
+            xp,
+            status,
+            theme,
+            user_id
+        )
+    )
+
+    conexao.commit()
+    conexao.close()
 
     return redirect("/admin")
 
@@ -955,7 +1358,6 @@ def bloquear_membro(user_id):
         "is_admin",
         False
     ):
-
         return redirect("/")
 
     conexao = conectar_banco()
@@ -963,18 +1365,13 @@ def bloquear_membro(user_id):
     conexao.execute(
         """
         UPDATE users
-
         SET status = 'bloqueado'
-
         WHERE id = ?
         """,
-        (
-            user_id,
-        )
+        (user_id,)
     )
 
     conexao.commit()
-
     conexao.close()
 
     return redirect("/admin")
@@ -994,7 +1391,6 @@ def desbloquear_membro(user_id):
         "is_admin",
         False
     ):
-
         return redirect("/")
 
     conexao = conectar_banco()
@@ -1002,18 +1398,13 @@ def desbloquear_membro(user_id):
     conexao.execute(
         """
         UPDATE users
-
         SET status = 'offline'
-
         WHERE id = ?
         """,
-        (
-            user_id,
-        )
+        (user_id,)
     )
 
     conexao.commit()
-
     conexao.close()
 
     return redirect("/admin")
@@ -1033,7 +1424,6 @@ def excluir_membro(user_id):
         "is_admin",
         False
     ):
-
         return redirect("/")
 
     conexao = conectar_banco()
@@ -1041,95 +1431,363 @@ def excluir_membro(user_id):
     conexao.execute(
         """
         DELETE FROM users
-
         WHERE id = ?
         """,
-        (
-            user_id,
-        )
+        (user_id,)
+    )
+
+    conexao.execute(
+        """
+        DELETE FROM chat_messages
+        WHERE user_id = ?
+        """,
+        (user_id,)
     )
 
     conexao.commit()
-
     conexao.close()
 
     return redirect("/admin")
 
 
 # =========================================================
-# CONFIGURAÇÕES
+# ADMIN: ANÚNCIOS
 # =========================================================
 
 @app.route(
-    "/admin/config",
-    methods=["POST"]
+    "/admin/anuncios",
+    methods=["GET", "POST"]
 )
-def atualizar_config():
+def admin_anuncios():
 
     if not session.get(
         "is_admin",
         False
     ):
+        return redirect("/")
 
+    conexao = conectar_banco()
+
+    if request.method == "POST":
+
+        title = request.form.get(
+            "title",
+            ""
+        ).strip()
+
+        content = request.form.get(
+            "content",
+            ""
+        ).strip()
+
+        image = request.form.get(
+            "image",
+            ""
+        ).strip()
+
+        link = request.form.get(
+            "link",
+            ""
+        ).strip()
+
+        active = 1 if request.form.get(
+            "active"
+        ) else 0
+
+        agora = datetime.now().strftime(
+            "%d/%m/%Y %H:%M:%S"
+        )
+
+        if title:
+
+            conexao.execute(
+                """
+                INSERT INTO announcements
+                (
+                    title,
+                    content,
+                    image,
+                    link,
+                    active,
+                    created_at
+                )
+                VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    title,
+                    content,
+                    image,
+                    link,
+                    active,
+                    agora
+                )
+            )
+
+            conexao.commit()
+
+        conexao.close()
+
+        return redirect(
+            "/admin/anuncios"
+        )
+
+    anuncios = conexao.execute(
+        """
+        SELECT *
+        FROM announcements
+        ORDER BY id DESC
+        """
+    ).fetchall()
+
+    conexao.close()
+
+    return render_template(
+        "admin_anuncios.html",
+        anuncios=anuncios,
+        config=carregar_config()
+    )
+
+
+# =========================================================
+# ADMIN: EDITAR ANÚNCIO
+# =========================================================
+
+@app.route(
+    "/admin/anuncios/<int:announcement_id>/editar",
+    methods=["POST"]
+)
+def editar_anuncio(announcement_id):
+
+    if not session.get(
+        "is_admin",
+        False
+    ):
+        return redirect("/")
+
+    title = request.form.get(
+        "title",
+        ""
+    ).strip()
+
+    content = request.form.get(
+        "content",
+        ""
+    ).strip()
+
+    image = request.form.get(
+        "image",
+        ""
+    ).strip()
+
+    link = request.form.get(
+        "link",
+        ""
+    ).strip()
+
+    active = 1 if request.form.get(
+        "active"
+    ) else 0
+
+    agora = datetime.now().strftime(
+        "%d/%m/%Y %H:%M:%S"
+    )
+
+    conexao = conectar_banco()
+
+    conexao.execute(
+        """
+        UPDATE announcements
+        SET
+            title = ?,
+            content = ?,
+            image = ?,
+            link = ?,
+            active = ?,
+            updated_at = ?
+        WHERE id = ?
+        """,
+        (
+            title,
+            content,
+            image,
+            link,
+            active,
+            agora,
+            announcement_id
+        )
+    )
+
+    conexao.commit()
+    conexao.close()
+
+    return redirect(
+        "/admin/anuncios"
+    )
+
+
+# =========================================================
+# ADMIN: EXCLUIR ANÚNCIO
+# =========================================================
+
+@app.route(
+    "/admin/anuncios/<int:announcement_id>/excluir",
+    methods=["POST"]
+)
+def excluir_anuncio(
+    announcement_id
+):
+
+    if not session.get(
+        "is_admin",
+        False
+    ):
+        return redirect("/")
+
+    conexao = conectar_banco()
+
+    conexao.execute(
+        """
+        DELETE FROM announcements
+        WHERE id = ?
+        """,
+        (announcement_id,)
+    )
+
+    conexao.commit()
+    conexao.close()
+
+    return redirect(
+        "/admin/anuncios"
+    )
+
+
+# =========================================================
+# ADMIN: BANNER
+# =========================================================
+
+@app.route(
+    "/admin/banner",
+    methods=["GET", "POST"]
+)
+def admin_banner():
+
+    if not session.get(
+        "is_admin",
+        False
+    ):
         return redirect("/")
 
     config = carregar_config()
 
-    site_name = request.form.get(
-        "site_name"
+    if request.method == "POST":
+
+        config["banner_enabled"] = (
+            request.form.get(
+                "banner_enabled"
+            ) == "on"
+        )
+
+        config["banner_image"] = (
+            request.form.get(
+                "banner_image",
+                ""
+            ).strip()
+        )
+
+        config["banner_title"] = (
+            request.form.get(
+                "banner_title",
+                ""
+            ).strip()
+        )
+
+        config["banner_text"] = (
+            request.form.get(
+                "banner_text",
+                ""
+            ).strip()
+        )
+
+        config["banner_link"] = (
+            request.form.get(
+                "banner_link",
+                ""
+            ).strip()
+        )
+
+        salvar_config(config)
+
+        return redirect(
+            "/admin/banner"
+        )
+
+    return render_template(
+        "admin_banner.html",
+        config=config
     )
-
-    if site_name is not None:
-
-        config["site_name"] = site_name.strip()
-
-    admin_name = request.form.get(
-        "admin_name"
-    )
-
-    if admin_name is not None:
-
-        config["admin_name"] = admin_name.strip()
-
-    home_text = request.form.get(
-        "home_text"
-    )
-
-    if home_text is not None:
-
-        config["home_text"] = home_text.strip()
-
-    primary_color = request.form.get(
-        "primary_color"
-    )
-
-    if primary_color is not None:
-
-        config["primary_color"] = primary_color.strip()
-
-    admin_username = request.form.get(
-        "admin_username"
-    )
-
-    if admin_username:
-
-        config["admin_username"] = admin_username.strip()
-
-    admin_password = request.form.get(
-        "admin_password"
-    )
-
-    if admin_password:
-
-        config["admin_password"] = admin_password
-
-    salvar_config(config)
-
-    return redirect("/admin")
 
 
 # =========================================================
-# RESTAURAR CONFIG
+# ADMIN: CONFIGURAÇÕES
+# =========================================================
+
+@app.route(
+    "/admin/config",
+    methods=["GET", "POST"]
+)
+def admin_config():
+
+    if not session.get(
+        "is_admin",
+        False
+    ):
+        return redirect("/")
+
+    config = carregar_config()
+
+    if request.method == "POST":
+
+        config["site_name"] = request.form.get(
+            "site_name",
+            "EXPURG"
+        ).strip()
+
+        config["primary_color"] = request.form.get(
+            "primary_color",
+            "#e00000"
+        ).strip()
+
+        config["home_text"] = request.form.get(
+            "home_text",
+            ""
+        ).strip()
+
+        config["chat_enabled"] = (
+            request.form.get(
+                "chat_enabled"
+            ) == "on"
+        )
+
+        config["announcements_enabled"] = (
+            request.form.get(
+                "announcements_enabled"
+            ) == "on"
+        )
+
+        salvar_config(config)
+
+        return redirect(
+            "/admin/config"
+        )
+
+    return render_template(
+        "admin_config.html",
+        config=config
+    )
+
+
+# =========================================================
+# ADMIN: RESTAURAR CONFIGURAÇÕES
 # =========================================================
 
 @app.route(
@@ -1142,73 +1800,258 @@ def restaurar_config():
         "is_admin",
         False
     ):
-
         return redirect("/")
 
-    salvar_config(
-        DEFAULT_CONFIG.copy()
+    config = CONFIG_PADRAO.copy()
+
+    salvar_config(config)
+
+    return redirect(
+        "/admin/config"
     )
+
+
+# =========================================================
+# ADMIN: LIMPAR LOGS
+# =========================================================
+
+@app.route(
+    "/admin/limpar-logs",
+    methods=["POST"]
+)
+def limpar_logs():
+
+    if not session.get(
+        "is_admin",
+        False
+    ):
+        return redirect("/")
+
+    try:
+
+        with open(
+            LOG_FILE,
+            "w",
+            encoding="utf-8"
+        ) as arquivo:
+
+            json.dump(
+                [],
+                arquivo,
+                indent=4,
+                ensure_ascii=False
+            )
+
+    except OSError:
+        pass
+
+    try:
+
+        conexao = conectar_banco()
+
+        conexao.execute(
+            "DELETE FROM access_logs"
+        )
+
+        conexao.commit()
+        conexao.close()
+
+    except sqlite3.Error:
+        pass
 
     return redirect("/admin")
 
 
 # =========================================================
-# REGISTRAR IP
+# CHAT
 # =========================================================
 
 @app.route(
-    "/registrar-ip",
-    methods=["POST"]
+    "/chat",
+    methods=["GET", "POST"]
 )
-def registrar_ip():
+def chat():
+
+    if not session.get(
+        "member_authenticated",
+        False
+    ):
+        return redirect("/login")
 
     config = carregar_config()
 
     if not config.get(
-        "register_ip",
+        "chat_enabled",
         True
     ):
+        return redirect("/")
 
+    if request.method == "POST":
+
+        message = request.form.get(
+            "message",
+            ""
+        ).strip()
+
+        if message:
+
+            username = session.get(
+                "member_username",
+                "Usuário"
+            )
+
+            user_id = session.get(
+                "member_id"
+            )
+
+            agora = datetime.now().strftime(
+                "%d/%m/%Y %H:%M:%S"
+            )
+
+            conexao = conectar_banco()
+
+            conexao.execute(
+                """
+                INSERT INTO chat_messages
+                (
+                    user_id,
+                    username,
+                    message,
+                    created_at
+                )
+                VALUES (?, ?, ?, ?)
+                """,
+                (
+                    user_id,
+                    username,
+                    message,
+                    agora
+                )
+            )
+
+            conexao.commit()
+            conexao.close()
+
+        return redirect("/chat")
+
+    conexao = conectar_banco()
+
+    mensagens = conexao.execute(
+        """
+        SELECT *
+        FROM chat_messages
+        ORDER BY id ASC
+        LIMIT 200
+        """
+    ).fetchall()
+
+    conexao.close()
+
+    return render_template(
+        "chat.html",
+        mensagens=mensagens,
+        config=config
+    )
+
+
+# =========================================================
+# ADMIN: EXCLUIR MENSAGEM
+# =========================================================
+
+@app.route(
+    "/admin/chat/<int:message_id>/excluir",
+    methods=["POST"]
+)
+def excluir_mensagem(message_id):
+
+    if not session.get(
+        "is_admin",
+        False
+    ):
+        return redirect("/")
+
+    conexao = conectar_banco()
+
+    conexao.execute(
+        """
+        DELETE FROM chat_messages
+        WHERE id = ?
+        """,
+        (message_id,)
+    )
+
+    conexao.commit()
+    conexao.close()
+
+    return redirect("/chat")
+
+
+# =========================================================
+# STATUS
+# =========================================================
+
+@app.route("/api/status")
+def api_status():
+
+    if not session.get(
+        "is_admin",
+        False
+    ):
         return jsonify({
-            "success": True
-        })
+            "error": "Não autorizado"
+        }), 403
 
-    ip = request.form.get(
-        "ip"
-    )
+    conexao = conectar_banco()
 
-    if not ip:
+    usuarios = conexao.execute(
+        """
+        SELECT COUNT(*) AS total
+        FROM users
+        """
+    ).fetchone()["total"]
 
-        ip = request.remote_addr
+    online = conexao.execute(
+        """
+        SELECT COUNT(*) AS total
+        FROM users
+        WHERE status = 'online'
+        """
+    ).fetchone()["total"]
 
-    navegador = request.form.get(
-        "browser"
-    )
+    mensagens = conexao.execute(
+        """
+        SELECT COUNT(*) AS total
+        FROM chat_messages
+        """
+    ).fetchone()["total"]
 
-    rota = request.form.get(
-        "route"
-    )
+    anuncios = conexao.execute(
+        """
+        SELECT COUNT(*) AS total
+        FROM announcements
+        """
+    ).fetchone()["total"]
 
-    registrar_log(
-        ip=ip,
-        navegador=navegador,
-        rota=rota
-    )
+    conexao.close()
 
     return jsonify({
-        "success": True
+        "usuarios": usuarios,
+        "online": online,
+        "mensagens": mensagens,
+        "anuncios": anuncios
     })
 
 
 # =========================================================
-# INICIALIZAR
+# INICIALIZAÇÃO
 # =========================================================
 
 inicializar_banco()
+carregar_config()
 
 
 # =========================================================
-# EXECUTAR
+# EXECUÇÃO LOCAL
 # =========================================================
 
 if __name__ == "__main__":

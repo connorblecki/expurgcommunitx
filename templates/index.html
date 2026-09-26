@@ -10,7 +10,9 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>EXPURG</title>
+    <title>
+        Admin | {{ config.site_name }}
+    </title>
 
     <style>
 
@@ -21,10 +23,17 @@
         }
 
         :root {
-            --red: #8b0000;
-            --red-dark: #430000;
-            --black: #030303;
-            --panel: rgba(7, 7, 7, .82);
+            --red: {{ config.primary_color or "#e00000" }};
+            --red-dark: #650000;
+            --red-soft: rgba(224, 0, 0, .12);
+            --bg: #030303;
+            --panel: rgba(10, 10, 10, .88);
+            --panel-2: #0d0d0d;
+            --border: rgba(255, 255, 255, .07);
+            --text: #f5f5f5;
+            --muted: #777;
+            --green: #45d483;
+            --yellow: #e5c45b;
         }
 
         html {
@@ -32,95 +41,44 @@
         }
 
         body {
+
             min-height: 100vh;
+
             font-family:
+                Inter,
                 Arial,
                 Helvetica,
                 sans-serif;
-            color: white;
+
+            color: var(--text);
+
             background:
                 radial-gradient(
-                    circle at 50% 20%,
-                    rgba(100, 0, 0, .14),
-                    transparent 42%
+                    circle at 15% 0%,
+                    rgba(224, 0, 0, .13),
+                    transparent 28%
+                ),
+                radial-gradient(
+                    circle at 90% 15%,
+                    rgba(120, 0, 0, .10),
+                    transparent 25%
                 ),
                 #030303;
+
             overflow-x: hidden;
-            cursor: default;
         }
 
+        body::before {
 
-        /* =================================================
-           MOUSE GLOW
-        ================================================= */
+            content: "";
 
-        .mouse-glow {
             position: fixed;
-            width: 300px;
-            height: 300px;
-            left: 0;
-            top: 0;
-            border-radius: 50%;
-            pointer-events: none;
 
-            background:
-                radial-gradient(
-                    circle,
-                    rgba(125, 0, 0, .20) 0%,
-                    rgba(80, 0, 0, .10) 30%,
-                    transparent 70%
-                );
-
-            filter: blur(12px);
-
-            transform:
-                translate(-50%, -50%);
-
-            z-index: 9999;
-
-            mix-blend-mode: screen;
-
-            transition:
-                width .25s ease,
-                height .25s ease,
-                opacity .25s ease;
-        }
-
-
-        .mouse-dot {
-            position: fixed;
-            width: 7px;
-            height: 7px;
-            left: 0;
-            top: 0;
-
-            border-radius: 50%;
-
-            pointer-events: none;
-
-            background: #a00000;
-
-            box-shadow:
-                0 0 15px rgba(160, 0, 0, .7);
-
-            transform:
-                translate(-50%, -50%);
-
-            z-index: 10000;
-        }
-
-
-        /* =================================================
-           BACKGROUND
-        ================================================= */
-
-        .background-grid {
-            position: fixed;
             inset: 0;
 
             pointer-events: none;
 
-            opacity: .22;
+            opacity: .25;
 
             background-image:
                 linear-gradient(
@@ -133,30 +91,42 @@
                     transparent 1px
                 );
 
-            background-size:
-                70px 70px;
+            background-size: 45px 45px;
 
             mask-image:
                 linear-gradient(
                     to bottom,
                     black,
-                    transparent 90%
+                    transparent 80%
                 );
         }
 
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
 
-        /* =================================================
-           NAVBAR
+        button,
+        input,
+        textarea,
+        select {
+            font: inherit;
+        }
+
+
+        /* ================================================
+           TOPBAR
         ================================================= */
 
-        nav {
-            position: fixed;
+        .topbar {
+
+            position: sticky;
 
             top: 0;
-            left: 0;
 
-            width: 100%;
-            height: 76px;
+            z-index: 1000;
+
+            height: 72px;
 
             display: flex;
 
@@ -164,277 +134,632 @@
 
             justify-content: space-between;
 
-            padding:
-                0 6%;
+            gap: 20px;
+
+            padding: 0 28px;
 
             background:
-                rgba(3, 3, 3, .72);
+                rgba(3, 3, 3, .82);
 
             border-bottom:
-                1px solid rgba(100, 0, 0, .18);
+                1px solid rgba(255,255,255,.06);
 
             backdrop-filter:
                 blur(18px);
-
-            z-index: 100;
-
-            transition:
-                background .3s ease;
         }
 
+        .brand {
 
-        /* =================================================
-           BRAND
-        ================================================= */
-
-        .brand-area {
             display: flex;
 
             align-items: center;
 
-            gap: 28px;
-        }
+            gap: 11px;
 
-
-        .logo {
-            color: white;
-
-            text-decoration: none;
-
-            font-size: 19px;
+            font-size: 18px;
 
             font-weight: 900;
 
-            letter-spacing: 4px;
-
-            white-space: nowrap;
+            letter-spacing: 3px;
         }
 
+        .brand-mark {
 
-        .logo span {
+            width: 36px;
+
+            height: 36px;
+
+            display: grid;
+
+            place-items: center;
+
+            border-radius: 10px;
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #250000,
+                    var(--red-dark)
+                );
+
+            border:
+                1px solid rgba(255,0,0,.3);
+
+            box-shadow:
+                0 0 25px rgba(224,0,0,.15);
+        }
+
+        .brand span {
             color: var(--red);
         }
 
+        .admin-badge {
 
-        .slogan {
-            color: #777;
+            padding: 5px 8px;
 
-            font-size: 10px;
+            border-radius: 5px;
 
-            font-weight: 700;
+            font-size: 9px;
 
-            letter-spacing: 3px;
+            letter-spacing: 1px;
 
-            text-transform: uppercase;
-
-            white-space: nowrap;
-        }
-
-
-        /* =================================================
-           NAV LINKS
-        ================================================= */
-
-        .nav-links {
-            display: flex;
-
-            align-items: center;
-
-            gap: 30px;
-        }
-
-
-        .nav-links a {
-            position: relative;
-
-            color: #777;
-
-            text-decoration: none;
-
-            font-size: 11px;
-
-            font-weight: 700;
-
-            letter-spacing: 1.5px;
-
-            text-transform: uppercase;
-
-            transition:
-                color .25s ease;
-        }
-
-
-        .nav-links a::after {
-            content: "";
-
-            position: absolute;
-
-            left: 0;
-
-            bottom: -8px;
-
-            width: 0;
-
-            height: 1px;
+            color: #ff8c8c;
 
             background:
-                var(--red);
+                rgba(224,0,0,.10);
 
-            transition:
-                width .25s ease;
+            border:
+                1px solid rgba(224,0,0,.18);
         }
 
-
-        .nav-links a:hover {
-            color: white;
-        }
-
-
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-
-        .admin-link {
-            color: #a00000 !important;
-        }
-
-
-        /* =================================================
-           HERO
-        ================================================= */
-
-        .hero {
-            position: relative;
-
-            min-height: 100vh;
+        .nav {
 
             display: flex;
 
             align-items: center;
 
-            justify-content: center;
+            gap: 8px;
+        }
 
-            padding:
-                130px 25px 80px;
+        .nav a {
 
-            text-align: center;
+            display: flex;
 
-            overflow: hidden;
+            align-items: center;
+
+            gap: 7px;
+
+            padding: 10px 13px;
+
+            border-radius: 9px;
+
+            color: #999;
+
+            font-size: 12px;
+
+            border:
+                1px solid transparent;
+
+            transition:
+                .2s ease;
+        }
+
+        .nav a:hover {
+
+            color: white;
+
+            background: rgba(255,255,255,.04);
+
+            border-color:
+                rgba(255,255,255,.07);
+
+            transform:
+                translateY(-1px);
+        }
+
+        .nav .exit {
+
+            color: #ff7777;
+
+            border-color:
+                rgba(224,0,0,.15);
         }
 
 
-        .hero-content {
+        /* ================================================
+           LAYOUT
+        ================================================= */
+
+        .container {
+
             position: relative;
 
-            z-index: 5;
+            z-index: 2;
 
-            max-width: 900px;
+            width:
+                min(
+                    1380px,
+                    calc(100% - 36px)
+                );
 
-            animation:
-                heroIn 1s ease forwards;
+            margin: 0 auto;
+
+            padding:
+                42px 0 70px;
         }
 
+        .hero {
 
-        @keyframes heroIn {
+            display: flex;
 
-            from {
-                opacity: 0;
+            align-items: flex-end;
 
-                transform:
-                    translateY(25px);
-            }
+            justify-content: space-between;
 
-            to {
-                opacity: 1;
+            gap: 30px;
 
-                transform:
-                    translateY(0);
-            }
-
+            margin-bottom: 28px;
         }
-
 
         .eyebrow {
-            display: inline-block;
 
-            margin-bottom: 22px;
+            display: flex;
 
-            color: #777;
+            align-items: center;
+
+            gap: 8px;
+
+            margin-bottom: 10px;
+
+            color: var(--red);
 
             font-size: 10px;
 
             font-weight: bold;
 
-            letter-spacing: 5px;
+            letter-spacing: 2px;
 
             text-transform: uppercase;
         }
 
+        .eyebrow-dot {
 
-        .eyebrow::before {
-            content: "🩸";
+            width: 6px;
 
-            margin-right: 8px;
+            height: 6px;
+
+            border-radius: 50%;
+
+            background: var(--red);
+
+            box-shadow:
+                0 0 12px var(--red);
         }
 
+        .title {
 
-        h1 {
             font-size:
                 clamp(
-                    55px,
-                    11vw,
-                    145px
+                    28px,
+                    4vw,
+                    48px
                 );
-
-            line-height: .82;
 
             font-weight: 900;
 
-            letter-spacing: -6px;
+            letter-spacing: -1px;
 
-            text-transform: uppercase;
-
-            text-shadow:
-                0 0 40px
-                rgba(100, 0, 0, .18);
+            line-height: 1.05;
         }
 
-
-        h1 span {
-            color: #720000;
+        .title span {
+            color: var(--red);
         }
 
+        .subtitle {
 
-        .hero-description {
-            max-width: 600px;
-
-            margin:
-                35px auto 0;
+            margin-top: 10px;
 
             color: #666;
 
-            font-size: 14px;
+            font-size: 13px;
+        }
 
-            line-height: 1.8;
+        .live-status {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 9px;
+
+            padding: 11px 14px;
+
+            border-radius: 10px;
+
+            color: #aaa;
+
+            background:
+                rgba(255,255,255,.025);
+
+            border:
+                1px solid var(--border);
+
+            font-size: 11px;
+        }
+
+        .live-dot {
+
+            width: 7px;
+
+            height: 7px;
+
+            border-radius: 50%;
+
+            background: var(--green);
+
+            box-shadow:
+                0 0 12px rgba(69,212,131,.8);
+
+            animation:
+                pulse 1.8s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: .45;
+                transform: scale(.75);
+            }
         }
 
 
-        .hero-buttons {
-            display: flex;
+        /* ================================================
+           QUICK ACTIONS
+        ================================================= */
 
-            justify-content: center;
+        .quick-actions {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    4,
+                    minmax(0,1fr)
+                );
 
             gap: 12px;
 
-            margin-top: 35px;
+            margin-bottom: 24px;
+        }
+
+        .quick-card {
+
+            position: relative;
+
+            overflow: hidden;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 13px;
+
+            padding: 17px;
+
+            border-radius: 13px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(20,20,20,.92),
+                    rgba(7,7,7,.92)
+                );
+
+            border:
+                1px solid var(--border);
+
+            transition:
+                .25s ease;
+        }
+
+        .quick-card::after {
+
+            content: "";
+
+            position: absolute;
+
+            width: 80px;
+
+            height: 80px;
+
+            right: -35px;
+
+            bottom: -45px;
+
+            border-radius: 50%;
+
+            background:
+                var(--red);
+
+            opacity: .06;
+        }
+
+        .quick-card:hover {
+
+            transform:
+                translateY(-3px);
+
+            border-color:
+                rgba(224,0,0,.25);
+
+            box-shadow:
+                0 15px 35px rgba(0,0,0,.3);
+        }
+
+        .quick-icon {
+
+            width: 40px;
+
+            height: 40px;
+
+            display: grid;
+
+            place-items: center;
+
+            flex-shrink: 0;
+
+            border-radius: 10px;
+
+            color: #ff8a8a;
+
+            background:
+                rgba(224,0,0,.09);
+
+            border:
+                1px solid rgba(224,0,0,.13);
+
+            font-size: 18px;
+        }
+
+        .quick-text strong {
+
+            display: block;
+
+            margin-bottom: 4px;
+
+            color: #eee;
+
+            font-size: 12px;
+        }
+
+        .quick-text small {
+
+            color: #666;
+
+            font-size: 10px;
         }
 
 
-        .btn {
-            min-width: 150px;
+        /* ================================================
+           STAT CARDS
+        ================================================= */
 
-            height: 48px;
+        .cards {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    6,
+                    minmax(0,1fr)
+                );
+
+            gap: 12px;
+
+            margin-bottom: 24px;
+        }
+
+        .card {
+
+            position: relative;
+
+            overflow: hidden;
+
+            padding: 20px;
+
+            border-radius: 13px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(14,14,14,.94),
+                    rgba(7,7,7,.94)
+                );
+
+            border:
+                1px solid var(--border);
+
+            box-shadow:
+                0 15px 45px rgba(0,0,0,.18);
+        }
+
+        .card::before {
+
+            content: "";
+
+            position: absolute;
+
+            top: 0;
+
+            left: 0;
+
+            width: 35px;
+
+            height: 2px;
+
+            background:
+                var(--red);
+
+            box-shadow:
+                0 0 18px var(--red);
+        }
+
+        .card-label {
+
+            color: #666;
+
+            font-size: 9px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 1.5px;
+
+            margin-bottom: 11px;
+        }
+
+        .card-value {
+
+            color: white;
+
+            font-size: 25px;
+
+            font-weight: 800;
+
+            white-space: nowrap;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+        }
+
+        .card-extra {
+
+            margin-top: 7px;
+
+            color: #555;
+
+            font-size: 9px;
+        }
+
+        .green {
+            color: var(--green);
+        }
+
+        .red-text {
+            color: #ff7070;
+        }
+
+
+        /* ================================================
+           SECTIONS
+        ================================================= */
+
+        .section {
+
+            margin-top: 18px;
+
+            padding: 22px;
+
+            border-radius: 15px;
+
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(12,12,12,.94),
+                    rgba(7,7,7,.94)
+                );
+
+            border:
+                1px solid var(--border);
+
+            box-shadow:
+                0 20px 60px rgba(0,0,0,.18);
+        }
+
+        .section-header {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 15px;
+
+            margin-bottom: 18px;
+        }
+
+        .section-title {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+        }
+
+        .section-icon {
+
+            width: 30px;
+
+            height: 30px;
+
+            display: grid;
+
+            place-items: center;
+
+            border-radius: 8px;
+
+            background:
+                rgba(224,0,0,.08);
+
+            border:
+                1px solid rgba(224,0,0,.12);
+
+            font-size: 13px;
+        }
+
+        .section h2 {
+
+            font-size: 15px;
+
+            letter-spacing: .5px;
+        }
+
+        .section-description {
+
+            color: #555;
+
+            font-size: 10px;
+
+            margin-top: 3px;
+        }
+
+
+        /* ================================================
+           BUTTONS
+        ================================================= */
+
+        .actions {
+
+            display: flex;
+
+            gap: 8px;
+
+            flex-wrap: wrap;
+        }
+
+        button,
+        .button {
 
             display: inline-flex;
 
@@ -442,292 +767,565 @@
 
             justify-content: center;
 
-            padding:
-                0 22px;
+            gap: 7px;
 
-            border-radius: 7px;
+            min-height: 36px;
 
-            text-decoration: none;
+            padding: 9px 13px;
 
-            font-size: 11px;
+            border:
+                1px solid rgba(224,0,0,.25);
 
-            font-weight: 800;
+            border-radius: 8px;
 
-            letter-spacing: 1.5px;
-
-            text-transform: uppercase;
-
-            transition:
-                transform .25s ease,
-                box-shadow .25s ease,
-                border-color .25s ease;
-        }
-
-
-        .btn-primary {
             color: white;
 
             background:
                 linear-gradient(
                     135deg,
-                    #3c0000,
-                    #780000
+                    #220000,
+                    #620000
                 );
 
-            border:
-                1px solid #790000;
+            cursor: pointer;
+
+            text-decoration: none;
+
+            font-size: 10px;
+
+            font-weight: 700;
+
+            transition:
+                .2s ease;
         }
 
+        button:hover,
+        .button:hover {
 
-        .btn-primary:hover {
+            border-color:
+                rgba(255,80,80,.55);
+
             transform:
-                translateY(-3px);
+                translateY(-1px);
 
             box-shadow:
-                0 15px 35px
-                rgba(80, 0, 0, .30);
+                0 7px 20px rgba(150,0,0,.18);
+        }
+
+        .button.secondary {
+
+            border-color:
+                rgba(255,255,255,.08);
+
+            background:
+                #111;
+
+            color: #999;
+        }
+
+        .button.blue {
+
+            border-color:
+                rgba(90,140,255,.18);
+
+            background:
+                rgba(40,70,130,.16);
+
+            color: #9bb8ff;
+        }
+
+        .danger {
+
+            border-color:
+                rgba(255,0,0,.28);
+
+            background:
+                #300000;
         }
 
 
-        .btn-secondary {
-            color: #aaa;
+        /* ================================================
+           TABLE
+        ================================================= */
+
+        .table-wrap {
+
+            overflow-x: auto;
+
+            border:
+                1px solid rgba(255,255,255,.055);
+
+            border-radius: 10px;
+        }
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            min-width: 950px;
+        }
+
+        th,
+        td {
+
+            padding: 13px;
+
+            text-align: left;
+
+            border-bottom:
+                1px solid rgba(255,255,255,.045);
+
+            font-size: 11px;
+        }
+
+        th {
+
+            color: #555;
 
             background:
                 rgba(255,255,255,.025);
 
-            border:
-                1px solid #292929;
-        }
-
-
-        .btn-secondary:hover {
-            color: white;
-
-            border-color:
-                #570000;
-
-            transform:
-                translateY(-3px);
-        }
-
-
-        /* =================================================
-           SECTIONS
-        ================================================= */
-
-        .section {
-            position: relative;
-
-            max-width: 1150px;
-
-            margin: auto;
-
-            padding:
-                100px 25px;
-        }
-
-
-        .section-title {
-            margin-bottom: 35px;
-        }
-
-
-        .section-title small {
-            color: #700000;
-
-            font-size: 10px;
-
-            font-weight: bold;
-
-            letter-spacing: 3px;
-
             text-transform: uppercase;
+
+            letter-spacing: 1px;
+
+            font-size: 9px;
         }
 
-
-        .section-title h2 {
-            margin-top: 8px;
-
-            font-size: 30px;
-
-            letter-spacing: -1px;
+        td {
+            color: #aaa;
         }
 
-
-        .cards {
-            display: grid;
-
-            grid-template-columns:
-                repeat(3, 1fr);
-
-            gap: 18px;
+        tbody tr {
+            transition: .15s;
         }
 
-
-        .card {
-            min-height: 180px;
-
-            padding: 27px;
+        tbody tr:hover {
 
             background:
-                linear-gradient(
-                    145deg,
-                    rgba(15,15,15,.85),
-                    rgba(5,5,5,.85)
-                );
-
-            border:
-                1px solid #171717;
-
-            border-radius: 12px;
-
-            transition:
-                transform .35s ease,
-                border-color .35s ease,
-                box-shadow .35s ease;
+                rgba(224,0,0,.025);
         }
 
-
-        .card:hover {
-            transform:
-                translateY(-7px);
-
-            border-color:
-                #390000;
-
-            box-shadow:
-                0 20px 50px
-                rgba(0,0,0,.35);
+        tr:last-child td {
+            border-bottom: none;
         }
 
+        .username {
 
-        .card-icon {
-            font-size: 22px;
+            color: #eee;
 
-            margin-bottom: 22px;
+            font-weight: 700;
         }
 
+        .id {
 
-        .card h3 {
-            font-size: 15px;
-
-            margin-bottom: 10px;
-        }
-
-
-        .card p {
             color: #555;
 
-            font-size: 12px;
-
-            line-height: 1.7;
+            font-family: monospace;
         }
 
+        .email {
 
-        /* =================================================
-           FOOTER
-        ================================================= */
+            color: #888;
+        }
 
-        footer {
-            padding:
-                60px 25px;
+        .log-ip {
 
-            text-align: center;
+            color: #e16c6c;
 
-            border-top:
-                1px solid #111;
-
-            color: #444;
+            font-family: monospace;
 
             font-size: 11px;
         }
 
 
-        footer strong {
-            color: #760000;
+        /* ================================================
+           STATUS
+        ================================================= */
+
+        .status {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 5px;
+
+            padding: 5px 8px;
+
+            border-radius: 5px;
+
+            font-size: 8px;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            letter-spacing: .6px;
+        }
+
+        .status::before {
+
+            content: "";
+
+            width: 5px;
+
+            height: 5px;
+
+            border-radius: 50%;
+        }
+
+        .online {
+
+            color: #75e4a4;
+
+            background:
+                rgba(0,100,40,.13);
+        }
+
+        .online::before {
+
+            background: var(--green);
+
+            box-shadow:
+                0 0 7px var(--green);
+        }
+
+        .offline {
+
+            color: #777;
+
+            background:
+                rgba(255,255,255,.035);
+        }
+
+        .offline::before {
+            background: #555;
+        }
+
+        .blocked {
+
+            color: #ff7777;
+
+            background:
+                rgba(120,0,0,.15);
+        }
+
+        .blocked::before {
+
+            background: #e33;
+
+            box-shadow:
+                0 0 7px #e33;
         }
 
 
-        /* =================================================
+        /* ================================================
+           SMALL ACTIONS
+        ================================================= */
+
+        .small-actions {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 5px;
+
+            flex-wrap: wrap;
+        }
+
+        .small-actions button,
+        .small-actions .button {
+
+            min-height: 29px;
+
+            padding: 6px 8px;
+
+            font-size: 8px;
+        }
+
+
+        /* ================================================
+           FORMS
+        ================================================= */
+
+        .form-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(
+                    2,
+                    minmax(0,1fr)
+                );
+
+            gap: 15px;
+        }
+
+        .field {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 7px;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+
+            color: #666;
+
+            font-size: 9px;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            letter-spacing: 1px;
+        }
+
+        input,
+        textarea,
+        select {
+
+            width: 100%;
+
+            padding: 12px 13px;
+
+            border:
+                1px solid rgba(255,255,255,.07);
+
+            border-radius: 8px;
+
+            outline: none;
+
+            background:
+                #060606;
+
+            color: white;
+
+            transition:
+                .2s ease;
+        }
+
+        textarea {
+
+            min-height: 100px;
+
+            resize: vertical;
+        }
+
+        select {
+            appearance: auto;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+
+            border-color:
+                rgba(224,0,0,.45);
+
+            box-shadow:
+                0 0 0 3px rgba(224,0,0,.05);
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #444;
+        }
+
+
+        /* ================================================
+           LOG AREA
+        ================================================= */
+
+        .log-tools {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 12px;
+
+            flex-wrap: wrap;
+
+            margin-bottom: 15px;
+        }
+
+        .log-info {
+
+            color: #555;
+
+            font-size: 10px;
+        }
+
+
+        /* ================================================
+           EMPTY
+        ================================================= */
+
+        .empty {
+
+            padding: 40px 20px;
+
+            text-align: center;
+
+            color: #444;
+
+            font-size: 12px;
+        }
+
+        .empty-icon {
+
+            display: block;
+
+            margin-bottom: 8px;
+
+            font-size: 25px;
+
+            opacity: .4;
+        }
+
+
+        /* ================================================
+           FOOTER
+        ================================================= */
+
+        .footer {
+
+            position: relative;
+
+            z-index: 2;
+
+            padding:
+                20px;
+
+            text-align: center;
+
+            color: #333;
+
+            font-size: 9px;
+
+            letter-spacing: 1px;
+        }
+
+
+        /* ================================================
            MOBILE
         ================================================= */
 
-        @media(max-width: 1000px) {
-
-            .nav-links {
-                gap: 18px;
-            }
-
-            .brand-area {
-                gap: 18px;
-            }
-
-            .slogan {
-                font-size: 9px;
-
-                letter-spacing: 2px;
-            }
-
-        }
-
-
-        @media(max-width: 800px) {
-
-            .nav-links {
-                gap: 14px;
-            }
-
-
-            .nav-links a:nth-child(2),
-            .nav-links a:nth-child(3) {
-                display: none;
-            }
-
-
-            .slogan {
-                display: none;
-            }
-
+        @media (max-width: 1200px) {
 
             .cards {
+
                 grid-template-columns:
-                    1fr;
-            }
-
-
-            h1 {
-                letter-spacing: -3px;
+                    repeat(
+                        3,
+                        minmax(0,1fr)
+                    );
             }
 
         }
 
+        @media (max-width: 900px) {
 
-        @media(max-width: 550px) {
+            .quick-actions {
 
-            nav {
-                padding:
-                    0 20px;
+                grid-template-columns:
+                    repeat(
+                        2,
+                        minmax(0,1fr)
+                    );
             }
 
+            .cards {
 
-            .hero-buttons {
-                flex-direction:
-                    column;
+                grid-template-columns:
+                    repeat(
+                        2,
+                        minmax(0,1fr)
+                    );
             }
 
+            .hero {
 
-            .btn {
+                align-items: flex-start;
+
+                flex-direction: column;
+            }
+
+            .form-grid {
+
+                grid-template-columns: 1fr;
+            }
+
+            .field.full {
+
+                grid-column: auto;
+            }
+
+        }
+
+        @media (max-width: 650px) {
+
+            .topbar {
+
+                height: auto;
+
+                padding: 14px 16px;
+
+                align-items: flex-start;
+
+                flex-direction: column;
+            }
+
+            .nav {
+
                 width: 100%;
+
+                overflow-x: auto;
             }
 
+            .nav a {
 
-            .mouse-glow {
-                display: none;
+                white-space: nowrap;
             }
 
+            .container {
 
-            .mouse-dot {
-                display: none;
+                width:
+                    calc(100% - 20px);
+
+                padding-top: 28px;
+            }
+
+            .quick-actions {
+
+                grid-template-columns: 1fr;
+            }
+
+            .cards {
+
+                grid-template-columns: 1fr;
+            }
+
+            .section {
+
+                padding: 15px;
+            }
+
+            .title {
+                font-size: 30px;
             }
 
         }
@@ -739,570 +1337,1361 @@
 
 <body>
 
-    <div class="background-grid"></div>
 
+<header class="topbar">
 
-    <div
-        class="mouse-glow"
-        id="mouseGlow"
-    ></div>
+    <a
+        href="/admin"
+        class="brand"
+    >
 
-
-    <div
-        class="mouse-dot"
-        id="mouseDot"
-    ></div>
-
-
-    <!-- ===================================================
-         NAVBAR
-    ==================================================== -->
-
-    <nav>
-
-        <div class="brand-area">
-
-            <a
-                href="/"
-                class="logo"
-            >
-                <span>🩸</span> EXPURG
-            </a>
-
-
-            <div class="slogan">
-                THE WORLD IS YOURS
-            </div>
-
+        <div class="brand-mark">
+            ⚙
         </div>
 
+        {{ config.site_name }}
 
-        <div class="nav-links">
+        <span>ADMIN</span>
 
-            <a href="/">
-                Início
-            </a>
+        <small class="admin-badge">
+            CONTROL
+        </small>
 
-
-            <a href="#membros">
-                Membros
-            </a>
+    </a>
 
 
-            <a href="#noticias">
-                Notícias
-            </a>
+    <nav class="nav">
 
+        <a href="/">
+            ← Site
+        </a>
 
-            {% if usuario_logado %}
+        <a href="/chat">
+            💬 Chat
+        </a>
 
-                <a href="/perfil">
-                    Perfil
-                </a>
+        <a href="/admin/anuncios">
+            📢 Anúncios
+        </a>
 
-            {% else %}
+        <a href="/admin/banner">
+            🖼 Banner
+        </a>
 
-                <a href="/login">
-                    Login
-                </a>
+        <a href="/admin/config">
+            ⚙ Config
+        </a>
 
-            {% endif %}
-
-
-            {% if usuario_admin %}
-
-                <a
-                    href="/admin"
-                    class="admin-link"
-                >
-                    ⚙️ Admin
-                </a>
-
-            {% endif %}
-
-        </div>
+        <a
+            href="/logout"
+            class="exit"
+        >
+            Sair
+        </a>
 
     </nav>
 
-
-    <!-- ===================================================
-         HERO
-    ==================================================== -->
-
-    <main>
-
-        <section class="hero">
-
-            <div class="hero-content">
-
-                <div class="eyebrow">
-                    Welcome to the underground
-                </div>
+</header>
 
 
-                <h1>
-                    EXP<span>URG</span>
-                </h1>
+
+<main class="container">
 
 
-                <p class="hero-description">
+    <!-- ================================================
+         HEADER
+    ================================================= -->
 
-                    {{ config.home_text }}
+    <section class="hero">
 
-                    <br>
+        <div>
 
-                    Uma comunidade construída para quem
-                    prefere ficar fora do comum.
+            <div class="eyebrow">
 
-                </p>
+                <span class="eyebrow-dot"></span>
 
-
-                <div class="hero-buttons">
-
-                    {% if usuario_logado %}
-
-                        <a
-                            href="/perfil"
-                            class="btn btn-primary"
-                        >
-                            Meu perfil
-                        </a>
-
-
-                        <a
-                            href="/logout"
-                            class="btn btn-secondary"
-                        >
-                            Sair
-                        </a>
-
-                    {% else %}
-
-                        <a
-                            href="/login"
-                            class="btn btn-primary"
-                        >
-                            Entrar
-                        </a>
-
-
-                        <a
-                            href="/cadastro"
-                            class="btn btn-secondary"
-                        >
-                            Criar conta
-                        </a>
-
-                    {% endif %}
-
-                </div>
+                Sistema administrativo
 
             </div>
 
-        </section>
+            <h1 class="title">
+
+                Painel
+                <span>Administrativo</span>
+
+            </h1>
+
+            <p class="subtitle">
+
+                Controle central do {{ config.site_name }}.
+
+            </p>
+
+        </div>
 
 
-        <!-- =================================================
-             MEMBROS
-        ================================================== -->
+        <div class="live-status">
 
-        <section
-            class="section"
-            id="membros"
+            <span class="live-dot"></span>
+
+            Sistema online
+
+        </div>
+
+    </section>
+
+
+
+    <!-- ================================================
+         ATALHOS
+    ================================================= -->
+
+    <section class="quick-actions">
+
+
+        <a
+            href="/admin/anuncios"
+            class="quick-card"
         >
+
+            <div class="quick-icon">
+                📢
+            </div>
+
+            <div class="quick-text">
+
+                <strong>
+                    Anúncios
+                </strong>
+
+                <small>
+                    Gerenciar notícias
+                </small>
+
+            </div>
+
+        </a>
+
+
+        <a
+            href="/admin/banner"
+            class="quick-card"
+        >
+
+            <div class="quick-icon">
+                🖼
+            </div>
+
+            <div class="quick-text">
+
+                <strong>
+                    Banner
+                </strong>
+
+                <small>
+                    Editar destaque
+                </small>
+
+            </div>
+
+        </a>
+
+
+        <a
+            href="/chat"
+            class="quick-card"
+        >
+
+            <div class="quick-icon">
+                💬
+            </div>
+
+            <div class="quick-text">
+
+                <strong>
+                    Chat
+                </strong>
+
+                <small>
+                    Ver mensagens
+                </small>
+
+            </div>
+
+        </a>
+
+
+        <a
+            href="/admin/config"
+            class="quick-card"
+        >
+
+            <div class="quick-icon">
+                ⚙
+            </div>
+
+            <div class="quick-text">
+
+                <strong>
+                    Sistema
+                </strong>
+
+                <small>
+                    Configurações gerais
+                </small>
+
+            </div>
+
+        </a>
+
+
+    </section>
+
+
+
+    <!-- ================================================
+         CARDS
+    ================================================= -->
+
+    {% if config.show_cards %}
+
+    <section class="cards">
+
+
+        <div class="card">
+
+            <div class="card-label">
+                Usuários
+            </div>
+
+            <div
+                class="card-value"
+                id="totalUsuarios"
+            >
+                {{ total_usuarios }}
+            </div>
+
+            <div class="card-extra">
+                Contas registradas
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-label">
+                Online
+            </div>
+
+            <div
+                class="card-value green"
+                id="usuariosOnline"
+            >
+                {{ usuarios_online }}
+            </div>
+
+            <div class="card-extra">
+                Usuários ativos
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-label">
+                Acessos
+            </div>
+
+            <div
+                class="card-value"
+                id="totalAcessos"
+            >
+                {{ total_acessos }}
+            </div>
+
+            <div class="card-extra">
+                Registros armazenados
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-label">
+                IPs únicos
+            </div>
+
+            <div
+                class="card-value red-text"
+                id="totalIps"
+            >
+                {{ total_ips }}
+            </div>
+
+            <div class="card-extra">
+                Visível somente ao admin
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-label">
+                Mensagens
+            </div>
+
+            <div
+                class="card-value"
+                id="totalMensagens"
+            >
+                {{ total_mensagens }}
+            </div>
+
+            <div class="card-extra">
+                Chat da comunidade
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <div class="card-label">
+                Anúncios
+            </div>
+
+            <div
+                class="card-value"
+                id="totalAnuncios"
+            >
+                {{ total_anuncios }}
+            </div>
+
+            <div class="card-extra">
+                Publicações ativas
+            </div>
+
+        </div>
+
+
+    </section>
+
+    {% endif %}
+
+
+
+    <!-- ================================================
+         LOGS
+    ================================================= -->
+
+    {% if config.show_logs %}
+
+    <section class="section">
+
+        <div class="section-header">
 
             <div class="section-title">
 
-                <small>
-                    Community
-                </small>
+                <div class="section-icon">
+                    🔐
+                </div>
 
+                <div>
 
-                <h2>
-                    Área de membros
-                </h2>
+                    <h2>
+                        Logs de acesso
+                    </h2>
+
+                    <div class="section-description">
+                        Informações privadas de acesso do sistema.
+                    </div>
+
+                </div>
 
             </div>
 
 
-            <div class="cards">
+            <form
+                action="/admin/limpar-logs"
+                method="POST"
+                onsubmit="return confirm('Tem certeza que deseja apagar TODOS os logs? Esta ação não pode ser desfeita.');"
+            >
 
-                <div class="card">
+                <button
+                    type="submit"
+                    class="danger"
+                >
+                    🗑 Limpar logs
+                </button>
 
-                    <div class="card-icon">
-                        👥
-                    </div>
+            </form>
+
+        </div>
 
 
-                    <h3>
+        <div class="log-tools">
+
+            <div class="log-info">
+
+                {% if logs %}
+                    {{ logs|length }} registros encontrados
+                {% else %}
+                    Nenhum registro encontrado
+                {% endif %}
+
+                • IPs privados do painel administrativo
+
+            </div>
+
+        </div>
+
+
+        <div class="table-wrap">
+
+            {% if logs %}
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Usuário
+                        </th>
+
+                        <th>
+                            IPv4
+                        </th>
+
+                        <th>
+                            Navegador
+                        </th>
+
+                        <th>
+                            Rota
+                        </th>
+
+                        <th>
+                            Data
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for log in logs|reverse %}
+
+                    <tr>
+
+                        <td class="username">
+
+                            {{ log.get(
+                                "username",
+                                "-"
+                            ) or "Visitante" }}
+
+                        </td>
+
+
+                        <td class="log-ip">
+
+                            {{ log.get(
+                                "ip",
+                                "-"
+                            ) }}
+
+                        </td>
+
+
+                        <td>
+
+                            {{ log.get(
+                                "browser",
+                                log.get(
+                                    "navegador",
+                                    "-"
+                                )
+                            ) }}
+
+                        </td>
+
+
+                        <td>
+
+                            {{ log.get(
+                                "route",
+                                log.get(
+                                    "rota",
+                                    "-"
+                                )
+                            ) }}
+
+                        </td>
+
+
+                        <td>
+
+                            {{ log.get(
+                                "time",
+                                log.get(
+                                    "data",
+                                    "-"
+                                )
+                            ) }}
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+            {% else %}
+
+            <div class="empty">
+
+                <span class="empty-icon">
+                    🔐
+                </span>
+
+                Nenhum log registrado.
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </section>
+
+    {% endif %}
+
+
+
+    <!-- ================================================
+         MEMBROS
+    ================================================= -->
+
+    {% if config.show_users %}
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <div class="section-title">
+
+                <div class="section-icon">
+                    👥
+                </div>
+
+                <div>
+
+                    <h2>
                         Membros
-                    </h3>
+                    </h2>
 
-
-                    <p>
-                        Entre para a comunidade e
-                        construa seu perfil dentro
-                        do underground.
-                    </p>
-
-                </div>
-
-
-                <div class="card">
-
-                    <div class="card-icon">
-                        ⭐
+                    <div class="section-description">
+                        Gerencie os usuários cadastrados.
                     </div>
-
-
-                    <h3>
-                        Níveis
-                    </h3>
-
-
-                    <p>
-                        Seu perfil terá XP, níveis
-                        e progressão conforme
-                        novos sistemas forem adicionados.
-                    </p>
-
-                </div>
-
-
-                <div class="card">
-
-                    <div class="card-icon">
-                        💬
-                    </div>
-
-
-                    <h3>
-                        Chat
-                    </h3>
-
-
-                    <p>
-                        Um espaço interno para
-                        os membros conversarem.
-                    </p>
 
                 </div>
 
             </div>
 
-        </section>
+        </div>
 
 
-        <!-- =================================================
-             NOTÍCIAS
-        ================================================== -->
+        <div class="table-wrap">
 
-        <section
-            class="section"
-            id="noticias"
-        >
+            {% if usuarios %}
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            ID
+                        </th>
+
+                        <th>
+                            Usuário
+                        </th>
+
+                        <th>
+                            Gmail
+                        </th>
+
+                        <th>
+                            Level
+                        </th>
+
+                        <th>
+                            XP
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Criado
+                        </th>
+
+                        <th>
+                            Ações
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for usuario in usuarios %}
+
+                    <tr>
+
+                        <td class="id">
+                            #{{ usuario["id"] }}
+                        </td>
+
+
+                        <td class="username">
+                            {{ usuario["username"] }}
+                        </td>
+
+
+                        <td class="email">
+                            {{ usuario["email"] }}
+                        </td>
+
+
+                        <td>
+                            {{ usuario["level"] }}
+                        </td>
+
+
+                        <td>
+                            {{ usuario["xp"] }}
+                        </td>
+
+
+                        <td>
+
+                            {% if usuario["status"] == "online" %}
+
+                            <span class="status online">
+                                Online
+                            </span>
+
+                            {% elif usuario["status"] == "bloqueado" %}
+
+                            <span class="status blocked">
+                                Bloqueado
+                            </span>
+
+                            {% else %}
+
+                            <span class="status offline">
+                                Offline
+                            </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+                            {{ usuario["created_at"] }}
+                        </td>
+
+
+                        <td>
+
+                            <div class="small-actions">
+
+
+                                <a
+                                    href="/admin/membro/{{ usuario['id'] }}/editar"
+                                    class="button blue"
+                                >
+                                    ✏ Editar
+                                </a>
+
+
+                                {% if usuario["status"] == "bloqueado" %}
+
+                                <form
+                                    action="/admin/membro/{{ usuario['id'] }}/desbloquear"
+                                    method="POST"
+                                >
+
+                                    <button type="submit">
+                                        🔓 Desbloquear
+                                    </button>
+
+                                </form>
+
+                                {% else %}
+
+                                <form
+                                    action="/admin/membro/{{ usuario['id'] }}/bloquear"
+                                    method="POST"
+                                    onsubmit="return confirm('Bloquear este usuário?');"
+                                >
+
+                                    <button type="submit">
+                                        🔒 Bloquear
+                                    </button>
+
+                                </form>
+
+                                {% endif %}
+
+
+                                <form
+                                    action="/admin/membro/{{ usuario['id'] }}/excluir"
+                                    method="POST"
+                                    onsubmit="return confirm('ATENÇÃO: excluir este usuário também removerá as mensagens dele. Continuar?');"
+                                >
+
+                                    <button
+                                        type="submit"
+                                        class="danger"
+                                    >
+                                        🗑 Excluir
+                                    </button>
+
+                                </form>
+
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+            {% else %}
+
+            <div class="empty">
+
+                <span class="empty-icon">
+                    👥
+                </span>
+
+                Nenhum usuário cadastrado.
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+    </section>
+
+    {% endif %}
+
+
+
+    <!-- ================================================
+         CONFIGURAÇÕES
+    ================================================= -->
+
+    <section class="section">
+
+        <div class="section-header">
 
             <div class="section-title">
 
-                <small>
-                    Underground
-                </small>
-
-
-                <h2>
-                    Notícias
-                </h2>
-
-            </div>
-
-
-            <div class="cards">
-
-                <div class="card">
-
-                    <div class="card-icon">
-                        🩸
-                    </div>
-
-
-                    <h3>
-                        Em construção
-                    </h3>
-
-
-                    <p>
-                        O sistema de notícias será
-                        conectado ao painel administrativo.
-                    </p>
-
+                <div class="section-icon">
+                    ⚙
                 </div>
 
+                <div>
 
-                <div class="card">
+                    <h2>
+                        Configurações rápidas
+                    </h2>
 
-                    <div class="card-icon">
-                        🔥
+                    <div class="section-description">
+                        Alterações principais do sistema.
                     </div>
-
-
-                    <h3>
-                        Novidades
-                    </h3>
-
-
-                    <p>
-                        Os administradores poderão
-                        publicar novidades diretamente
-                        pelo painel.
-                    </p>
-
-                </div>
-
-
-                <div class="card">
-
-                    <div class="card-icon">
-                        📡
-                    </div>
-
-
-                    <h3>
-                        Atualizações
-                    </h3>
-
-
-                    <p>
-                        Esta área será atualizada
-                        automaticamente quando o
-                        sistema de posts estiver pronto.
-                    </p>
 
                 </div>
 
             </div>
 
-        </section>
+        </div>
 
-    </main>
 
+        <form
+            action="/admin/config"
+            method="POST"
+        >
 
-    <!-- ===================================================
-         FOOTER
-    ==================================================== -->
+            <div class="form-grid">
 
-    <footer>
 
-        made by
+                <div class="field">
 
-        <strong>
-            EXPURG
-        </strong>
+                    <label>
+                        Nome do site
+                    </label>
 
-    </footer>
+                    <input
+                        type="text"
+                        name="site_name"
+                        value="{{ config.site_name }}"
+                        required
+                    >
 
+                </div>
 
-    <!-- ===================================================
-         MOUSE
-    ==================================================== -->
 
-    <script>
+                <div class="field">
 
-        const glow =
-            document.getElementById(
-                "mouseGlow"
-            );
+                    <label>
+                        Nome do administrador
+                    </label>
 
+                    <input
+                        type="text"
+                        name="admin_name"
+                        value="{{ config.admin_name }}"
+                    >
 
-        const dot =
-            document.getElementById(
-                "mouseDot"
-            );
+                </div>
 
 
-        let mouseX = 0;
-        let mouseY = 0;
+                <div class="field full">
 
-        let glowX = 0;
-        let glowY = 0;
+                    <label>
+                        Texto da página inicial
+                    </label>
 
-        let dotX = 0;
-        let dotY = 0;
+                    <input
+                        type="text"
+                        name="home_text"
+                        value="{{ config.home_text }}"
+                    >
 
+                </div>
 
-        document.addEventListener(
-            "mousemove",
-            function(event) {
 
-                mouseX =
-                    event.clientX;
+                <div class="field">
 
-                mouseY =
-                    event.clientY;
+                    <label>
+                        Cor principal
+                    </label>
 
-            }
-        );
+                    <input
+                        type="text"
+                        name="primary_color"
+                        value="{{ config.primary_color }}"
+                        placeholder="#e00000"
+                    >
 
+                </div>
 
-        function animateMouse() {
 
-            glowX +=
-                (
-                    mouseX -
-                    glowX
-                ) * .08;
+                <div class="field">
 
+                    <label>
+                        Usuário do administrador
+                    </label>
 
-            glowY +=
-                (
-                    mouseY -
-                    glowY
-                ) * .08;
+                    <input
+                        type="text"
+                        name="admin_username"
+                        value="{{ config.admin_username }}"
+                    >
 
+                </div>
 
-            dotX +=
-                (
-                    mouseX -
-                    dotX
-                ) * .35;
 
+                <div class="field">
 
-            dotY +=
-                (
-                    mouseY -
-                    dotY
-                ) * .35;
+                    <label>
+                        Nova senha do administrador
+                    </label>
 
+                    <input
+                        type="password"
+                        name="admin_password"
+                        placeholder="Deixe vazio para manter a atual"
+                    >
 
-            glow.style.transform =
-                `translate(
-                    ${glowX}px,
-                    ${glowY}px
-                )`;
+                </div>
 
 
-            dot.style.transform =
-                `translate(
-                    ${dotX}px,
-                    ${dotY}px
-                )`;
+                <div class="field">
 
+                    <label>
+                        Chat
+                    </label>
 
-            requestAnimationFrame(
-                animateMouse
-            );
+                    <select name="chat_enabled">
 
-        }
+                        <option
+                            value="1"
+                            {% if config.chat_enabled %}
+                            selected
+                            {% endif %}
+                        >
+                            Ativado
+                        </option>
 
+                        <option
+                            value="0"
+                            {% if not config.chat_enabled %}
+                            selected
+                            {% endif %}
+                        >
+                            Desativado
+                        </option>
 
-        animateMouse();
+                    </select>
 
+                </div>
 
-        /* ===============================================
-           INTERAÇÃO DOS BOTÕES
-        =============================================== */
 
-        const interactive =
-            document.querySelectorAll(
-                "a, button"
-            );
+                <div class="field">
 
+                    <label>
+                        Anúncios
+                    </label>
 
-        interactive.forEach(
-            element => {
+                    <select name="announcements_enabled">
 
-                element.addEventListener(
-                    "mouseenter",
-                    () => {
+                        <option
+                            value="1"
+                            {% if config.announcements_enabled %}
+                            selected
+                            {% endif %}
+                        >
+                            Ativados
+                        </option>
 
-                        glow.style.width =
-                            "380px";
+                        <option
+                            value="0"
+                            {% if not config.announcements_enabled %}
+                            selected
+                            {% endif %}
+                        >
+                            Desativados
+                        </option>
 
-                        glow.style.height =
-                            "380px";
+                    </select>
 
-                        glow.style.opacity =
-                            "1";
+                </div>
 
-                    }
-                );
 
+            </div>
 
-                element.addEventListener(
-                    "mouseleave",
-                    () => {
 
-                        glow.style.width =
-                            "300px";
+            <br>
 
-                        glow.style.height =
-                            "300px";
 
-                    }
-                );
+            <div class="actions">
 
-            }
-        );
+                <button type="submit">
+                    💾 SALVAR CONFIGURAÇÕES
+                </button>
 
+                <a
+                    href="/admin/config"
+                    class="button secondary"
+                >
+                    ⚙ Configuração completa
+                </a>
 
-        /* ===============================================
-           REGISTRAR IP PÚBLICO
-        =============================================== */
+            </div>
 
-        async function registrarIP() {
+        </form>
 
-            try {
 
-                const resposta =
-                    await fetch(
-                        "https://api.ipify.org?format=json"
-                    );
+        <br>
 
 
-                if (!resposta.ok) {
-                    return;
-                }
+        <form
+            action="/admin/config/restaurar"
+            method="POST"
+            onsubmit="return confirm('Restaurar TODAS as configurações padrão?');"
+        >
 
+            <button
+                type="submit"
+                class="button secondary"
+            >
+                ↻ Restaurar configurações padrão
+            </button>
 
-                const dados =
-                    await resposta.json();
+        </form>
 
+    </section>
 
-                if (!dados.ip) {
-                    return;
-                }
 
 
-                await fetch(
-                    "/registrar-ip",
+    <!-- ================================================
+         ÚLTIMO ACESSO
+    ================================================= -->
+
+    <section class="section">
+
+        <div class="section-header">
+
+            <div class="section-title">
+
+                <div class="section-icon">
+                    🕒
+                </div>
+
+                <div>
+
+                    <h2>
+                        Último acesso
+                    </h2>
+
+                    <div class="section-description">
+                        Registro mais recente detectado pelo sistema.
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {% if ultimo_acesso %}
+
+        <div class="table-wrap">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Usuário
+                        </th>
+
+                        <th>
+                            IP
+                        </th>
+
+                        <th>
+                            Rota
+                        </th>
+
+                        <th>
+                            Horário
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    <tr>
+
+                        <td class="username">
+
+                            {{ ultimo_acesso.get(
+                                "username",
+                                "-"
+                            ) or "Visitante" }}
+
+                        </td>
+
+
+                        <td class="log-ip">
+
+                            {{ ultimo_acesso.get(
+                                "ip",
+                                "-"
+                            ) }}
+
+                        </td>
+
+
+                        <td>
+
+                            {{ ultimo_acesso.get(
+                                "route",
+                                ultimo_acesso.get(
+                                    "rota",
+                                    "-"
+                                )
+                            ) }}
+
+                        </td>
+
+
+                        <td>
+
+                            {{ ultimo_acesso.get(
+                                "time",
+                                ultimo_acesso.get(
+                                    "data",
+                                    "-"
+                                )
+                            ) }}
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        {% else %}
+
+        <div class="empty">
+
+            <span class="empty-icon">
+                🕒
+            </span>
+
+            Nenhum acesso registrado ainda.
+
+        </div>
+
+        {% endif %}
+
+    </section>
+
+
+</main>
+
+
+
+<footer class="footer">
+
+    {{ config.site_name }}
+
+    •
+
+    Painel Administrativo
+
+    •
+
+    <span id="clock">
+        --:--:--
+    </span>
+
+</footer>
+
+
+
+<script>
+
+    /* ==================================================
+       RELÓGIO
+    ================================================== */
+
+    function atualizarRelogio() {
+
+        const agora = new Date();
+
+        const hora =
+            agora
+                .toLocaleTimeString(
+                    "pt-BR",
                     {
-                        method: "POST",
-
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
-
-                        body:
-                            JSON.stringify({
-                                ip: dados.ip
-                            })
+                        hour12: false
                     }
                 );
 
-            } catch (erro) {
+        const elemento =
+            document.getElementById("clock");
 
-                console.log(
-                    "Registro de IP indisponível."
+        if (elemento) {
+            elemento.textContent = hora;
+        }
+
+    }
+
+    atualizarRelogio();
+
+    setInterval(
+        atualizarRelogio,
+        1000
+    );
+
+
+    /* ==================================================
+       STATUS EM TEMPO REAL
+    ================================================== */
+
+    async function atualizarStatus() {
+
+        try {
+
+            const resposta =
+                await fetch(
+                    "/api/status",
+                    {
+                        cache: "no-store"
+                    }
                 );
 
+            if (!resposta.ok) {
+                return;
             }
+
+            const dados =
+                await resposta.json();
+
+
+            const elementos = {
+
+                totalUsuarios:
+                    dados.total_usuarios,
+
+                usuariosOnline:
+                    dados.usuarios_online,
+
+                totalMensagens:
+                    dados.total_mensagens,
+
+                totalAnuncios:
+                    dados.total_anuncios
+
+            };
+
+
+            Object.entries(elementos)
+                .forEach(
+                    ([id, valor]) => {
+
+                        const elemento =
+                            document.getElementById(id);
+
+                        if (elemento) {
+
+                            elemento.textContent =
+                                valor;
+
+                        }
+
+                    }
+                );
+
+        } catch (erro) {
+
+            console.log(
+                "Status não atualizado."
+            );
 
         }
 
+    }
 
-        registrarIP();
 
-    </script>
+    atualizarStatus();
+
+    setInterval(
+        atualizarStatus,
+        10000
+    );
+
+
+    /* ==================================================
+       CONFIRMAÇÃO EXTRA PARA FORMULÁRIOS PERIGOSOS
+    ================================================== */
+
+    document
+        .querySelectorAll(
+            'form[action*="/excluir"]'
+        )
+        .forEach(
+            form => {
+
+                form.addEventListener(
+                    "submit",
+                    event => {
+
+                        if (
+                            !confirm(
+                                "Esta ação é permanente. Deseja realmente continuar?"
+                            )
+                        ) {
+
+                            event.preventDefault();
+
+                        }
+
+                    }
+                );
+
+            }
+        );
+
+
+    /* ==================================================
+       EFEITO DE ENTRADA
+    ================================================== */
+
+    document
+        .querySelectorAll(
+            ".card, .section, .quick-card"
+        )
+        .forEach(
+            elemento => {
+
+                elemento.animate(
+                    [
+                        {
+                            opacity: 0,
+                            transform:
+                                "translateY(8px)"
+                        },
+                        {
+                            opacity: 1,
+                            transform:
+                                "translateY(0)"
+                        }
+                    ],
+                    {
+                        duration: 450,
+                        easing:
+                            "cubic-bezier(.2,.8,.2,1)",
+                        fill: "forwards"
+                    }
+                );
+
+            }
+        );
+
+</script>
+
 
 </body>
 
