@@ -1,4 +1,3 @@
-
 import os
 import json
 import sqlite3
@@ -16,6 +15,11 @@ from flask import (
     jsonify
 )
 
+
+# =========================================================
+# FLASK
+# =========================================================
+
 app = Flask(__name__)
 
 app.secret_key = os.environ.get(
@@ -27,7 +31,14 @@ app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
 app.config["SESSION_COOKIE_SECURE"] = False
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# =========================================================
+# CAMINHOS
+# =========================================================
+
+BASE_DIR = os.path.dirname(
+    os.path.abspath(__file__)
+)
 
 DATABASE = os.path.join(
     BASE_DIR,
@@ -44,6 +55,10 @@ LOG_FILE = os.path.join(
     "access_logs.json"
 )
 
+
+# =========================================================
+# CONFIGURAÇÃO PADRÃO
+# =========================================================
 
 CONFIG_PADRAO = {
     "site_name": "EXPURG",
@@ -97,12 +112,30 @@ CONFIG_PADRAO = {
 }
 
 
+# =========================================================
+# CONFIGURAÇÕES
+# =========================================================
+
 def carregar_config():
+    """
+    Carrega o config.json.
+    Se alguma configuração estiver faltando,
+    utiliza o valor padrão.
+    """
+
     if not os.path.exists(CONFIG_FILE):
-        salvar_config(CONFIG_PADRAO.copy())
-        return CONFIG_PADRAO.copy()
+
+        config_nova = CONFIG_PADRAO.copy()
+
+        try:
+            salvar_config(config_nova)
+        except Exception:
+            pass
+
+        return config_nova
 
     try:
+
         with open(
             CONFIG_FILE,
             "r",
@@ -111,33 +144,59 @@ def carregar_config():
 
             config = json.load(arquivo)
 
+        if not isinstance(config, dict):
+            config = {}
+
         resultado = CONFIG_PADRAO.copy()
         resultado.update(config)
 
         return resultado
 
     except Exception:
+
         return CONFIG_PADRAO.copy()
 
 
 def salvar_config(config):
+    """
+    Salva todas as configurações no config.json.
+    """
+
+    config_final = CONFIG_PADRAO.copy()
+
+    if isinstance(config, dict):
+        config_final.update(config)
+
+    arquivo_temporario = CONFIG_FILE + ".tmp"
+
     with open(
-        CONFIG_FILE,
+        arquivo_temporario,
         "w",
         encoding="utf-8"
     ) as arquivo:
 
         json.dump(
-            config,
+            config_final,
             arquivo,
             indent=4,
             ensure_ascii=False
         )
 
+    os.replace(
+        arquivo_temporario,
+        CONFIG_FILE
+    )
+
+
+# =========================================================
+# BANCO
+# =========================================================
 
 def conectar_banco():
+
     conexao = sqlite3.connect(
-        DATABASE
+        DATABASE,
+        timeout=10
     )
 
     conexao.row_factory = sqlite3.Row
@@ -145,7 +204,12 @@ def conectar_banco():
     return conexao
 
 
-def coluna_existe(cursor, tabela, coluna):
+def coluna_existe(
+    cursor,
+    tabela,
+    coluna
+):
+
     cursor.execute(
         f"PRAGMA table_info({tabela})"
     )
@@ -165,6 +229,7 @@ def adicionar_coluna_se_faltar(
     tipo,
     padrao=None
 ):
+
     if coluna_existe(
         cursor,
         tabela,
@@ -184,8 +249,13 @@ def adicionar_coluna_se_faltar(
 
 
 def criar_banco():
+
     conexao = conectar_banco()
     cursor = conexao.cursor()
+
+    # -----------------------------------------------------
+    # USUÁRIOS
+    # -----------------------------------------------------
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (
@@ -200,6 +270,10 @@ def criar_banco():
         )
     """)
 
+    # -----------------------------------------------------
+    # LOGS
+    # -----------------------------------------------------
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS access_logs (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -210,14 +284,25 @@ def criar_banco():
         )
     """)
 
+    # -----------------------------------------------------
+    # ANÚNCIOS
+    # -----------------------------------------------------
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS announcements (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT,
             content TEXT,
+            image TEXT,
+            link TEXT,
+            active INTEGER DEFAULT 1,
             created_at TEXT
         )
     """)
+
+    # -----------------------------------------------------
+    # CHAT
+    # -----------------------------------------------------
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS chat_messages (
@@ -228,6 +313,10 @@ def criar_banco():
         )
     """)
 
+    # -----------------------------------------------------
+    # CONFIGURAÇÕES
+    # -----------------------------------------------------
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS site_settings (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -236,7 +325,10 @@ def criar_banco():
         )
     """)
 
-    # Corrige bancos antigos automaticamente
+    # =====================================================
+    # MIGRAÇÃO
+    # =====================================================
+
     adicionar_coluna_se_faltar(
         cursor,
         "users",
@@ -282,12 +374,68 @@ def criar_banco():
         "TEXT"
     )
 
+    adicionar_coluna_se_faltar(
+        cursor,
+        "announcements",
+        "image",
+        "TEXT"
+    )
+
+    adicionar_coluna_se_faltar(
+        cursor,
+        "announcements",
+        "link",
+        "TEXT"
+    )
+
+    adicionar_coluna_se_faltar(
+        cursor,
+        "announcements",
+        "active",
+        "INTEGER",
+        "1"
+    )
+
+    adicionar_coluna_se_faltar(
+        cursor,
+        "announcements",
+        "created_at",
+        "TEXT"
+    )
+
+    # =====================================================
+    # ADMIN PRINCIPAL
+    # =====================================================
+
+    config = carregar_config()
+
+    admin_username = str(
+        config.get(
+            "admin_username",
+            "admin"
+        )
+    ).strip()
+
+    admin_password = str(
+        config.get(
+            "admin_password",
+            "123456"
+        )
+    )
+
+    if not admin_username:
+        admin_username = "admin"
+
+    if not admin_password:
+        admin_password = "123456"
+
     cursor.execute("""
         SELECT *
         FROM users
         WHERE username = ?
+        LIMIT 1
     """, (
-        "admin",
+        admin_username,
     ))
 
     admin = cursor.fetchone()
@@ -307,9 +455,9 @@ def criar_banco():
             )
             VALUES (?, ?, ?, ?, ?, ?, ?)
         """, (
-            "admin",
+            admin_username,
             "admin@expurg.local",
-            "123456",
+            admin_password,
             "admin",
             0,
             "ativo",
@@ -320,24 +468,24 @@ def criar_banco():
 
     else:
 
-        # Garante que o administrador continue
-        # com os dados corretos.
         cursor.execute("""
             UPDATE users
             SET password = ?,
-                level = ?,
-                status = ?
+                level = 'admin',
+                status = 'ativo'
             WHERE username = ?
         """, (
-            "123456",
-            "admin",
-            "ativo",
-            "admin"
+            admin_password,
+            admin_username
         ))
 
     conexao.commit()
     conexao.close()
 
+
+# =========================================================
+# IP DO CLIENTE
+# =========================================================
 
 def obter_ip_cliente():
 
@@ -357,6 +505,7 @@ def obter_ip_cliente():
         for ip in ips:
 
             try:
+
                 endereco = ipaddress.ip_address(ip)
 
                 if endereco.version == 4:
@@ -373,6 +522,7 @@ def obter_ip_cliente():
     if real_ip:
 
         try:
+
             endereco = ipaddress.ip_address(real_ip)
 
             if endereco.version == 4:
@@ -388,6 +538,7 @@ def obter_ip_cliente():
     if ip_local:
 
         try:
+
             endereco = ipaddress.ip_address(ip_local)
 
             if endereco.version == 4:
@@ -398,6 +549,10 @@ def obter_ip_cliente():
 
     return "Desconhecido"
 
+
+# =========================================================
+# LOG DE ACESSO
+# =========================================================
 
 def registrar_acesso():
 
@@ -415,6 +570,13 @@ def registrar_acesso():
         "User-Agent",
         "Desconhecido"
     )
+
+    if not config.get(
+        "register_browser",
+        True
+    ):
+        browser = "Oculto"
+
 
     rota = request.path
 
@@ -442,6 +604,27 @@ def registrar_acesso():
             data
         ))
 
+        max_logs = int(
+            config.get(
+                "max_logs",
+                1000
+            ) or 1000
+        )
+
+        if max_logs > 0:
+
+            conexao.execute("""
+                DELETE FROM access_logs
+                WHERE id NOT IN (
+                    SELECT id
+                    FROM access_logs
+                    ORDER BY id DESC
+                    LIMIT ?
+                )
+            """, (
+                max_logs,
+            ))
+
         conexao.commit()
         conexao.close()
 
@@ -457,8 +640,15 @@ def antes_da_requisicao():
     ):
         return
 
+    if request.method == "OPTIONS":
+        return
+
     registrar_acesso()
 
+
+# =========================================================
+# VARIÁVEIS GLOBAIS
+# =========================================================
 
 @app.context_processor
 def dados_globais():
@@ -468,30 +658,50 @@ def dados_globais():
     }
 
 
+# =========================================================
+# SESSÃO
+# =========================================================
+
 def usuario_logado():
+
     return session.get(
         "usuario"
     )
 
 
 def admin_logado():
+
     return session.get(
         "admin",
         False
     ) is True
 
 
+# =========================================================
+# PÁGINA INICIAL
+# =========================================================
+
 @app.route("/")
 def index():
 
     conexao = conectar_banco()
 
-    anuncios = conexao.execute("""
-        SELECT *
-        FROM announcements
-        ORDER BY id DESC
-        LIMIT 10
-    """).fetchall()
+    config = carregar_config()
+
+    anuncios = []
+
+    if config.get(
+        "announcements_enabled",
+        True
+    ):
+
+        anuncios = conexao.execute("""
+            SELECT *
+            FROM announcements
+            WHERE active = 1
+            ORDER BY id DESC
+            LIMIT 10
+        """).fetchall()
 
     conexao.close()
 
@@ -502,11 +712,31 @@ def index():
     )
 
 
+# =========================================================
+# LOGIN
+# =========================================================
+
 @app.route(
     "/login",
     methods=["GET", "POST"]
 )
 def login():
+
+    config = carregar_config()
+
+    admin_username = str(
+        config.get(
+            "admin_username",
+            "admin"
+        )
+    ).strip()
+
+    admin_password = str(
+        config.get(
+            "admin_password",
+            "123456"
+        )
+    )
 
     if request.method == "POST":
 
@@ -531,17 +761,37 @@ def login():
                 "login.html"
             )
 
-        # LOGIN DO ADMIN
+        # -------------------------------------------------
+        # ADMIN
+        # -------------------------------------------------
+
         if (
-            username == "admin"
-            and password == "123456"
+            username == admin_username
+            and password == admin_password
         ):
+
+            conexao = conectar_banco()
+
+            usuario_admin = conexao.execute("""
+                SELECT *
+                FROM users
+                WHERE username = ?
+                LIMIT 1
+            """, (
+                admin_username,
+            )).fetchone()
+
+            conexao.close()
 
             session.clear()
 
-            session["usuario"] = "admin"
+            session["usuario"] = admin_username
             session["admin"] = True
-            session["user_id"] = 1
+
+            if usuario_admin:
+                session["user_id"] = usuario_admin["id"]
+            else:
+                session["user_id"] = 1
 
             session.modified = True
 
@@ -549,7 +799,10 @@ def login():
                 url_for("index")
             )
 
-        # LOGIN DE USUÁRIO NORMAL
+        # -------------------------------------------------
+        # USUÁRIO NORMAL
+        # -------------------------------------------------
+
         conexao = conectar_banco()
 
         usuario = conexao.execute("""
@@ -606,6 +859,10 @@ def login():
     )
 
 
+# =========================================================
+# CADASTRO
+# =========================================================
+
 @app.route(
     "/cadastro",
     methods=["GET", "POST"]
@@ -643,7 +900,16 @@ def cadastro():
                 url_for("cadastro")
             )
 
-        if username.lower() == "admin":
+        config = carregar_config()
+
+        admin_username = str(
+            config.get(
+                "admin_username",
+                "admin"
+            )
+        ).strip().lower()
+
+        if username.lower() == admin_username:
 
             flash(
                 "Esse nome de usuário não está disponível.",
@@ -686,7 +952,7 @@ def cadastro():
             conexao.close()
 
             flash(
-                "Conta criada com sucesso!",
+                "SEJA BEM VINDO !",
                 "success"
             )
 
@@ -707,10 +973,27 @@ def cadastro():
                 url_for("cadastro")
             )
 
+        except Exception:
+
+            conexao.close()
+
+            flash(
+                "Não foi possível criar a conta.",
+                "error"
+            )
+
+            return redirect(
+                url_for("cadastro")
+            )
+
     return render_template(
         "cadastro.html"
     )
 
+
+# =========================================================
+# PERFIL
+# =========================================================
 
 @app.route("/perfil")
 def perfil():
@@ -733,11 +1016,23 @@ def perfil():
 
     conexao.close()
 
+    if not usuario:
+
+        session.clear()
+
+        return redirect(
+            url_for("login")
+        )
+
     return render_template(
         "perfil.html",
         usuario=usuario
     )
 
+
+# =========================================================
+# CONFIGURAÇÕES DO USUÁRIO
+# =========================================================
 
 @app.route("/configuracoes")
 def configuracoes():
@@ -753,6 +1048,10 @@ def configuracoes():
     )
 
 
+# =========================================================
+# LOGOUT
+# =========================================================
+
 @app.route("/logout")
 def logout():
 
@@ -762,6 +1061,10 @@ def logout():
         url_for("index")
     )
 
+
+# =========================================================
+# IPV4
+# =========================================================
 
 @app.route("/registrar-ip")
 def registrar_ip():
@@ -776,6 +1079,10 @@ def registrar_ip():
         "ipv4": obter_ip_cliente()
     })
 
+
+# =========================================================
+# ADMIN DASHBOARD
+# =========================================================
 
 @app.route("/admin")
 def admin():
@@ -838,6 +1145,10 @@ def admin():
     )
 
 
+# =========================================================
+# CONFIGURAÇÕES ADMIN
+# =========================================================
+
 @app.route(
     "/admin/config",
     methods=["GET", "POST"]
@@ -854,67 +1165,439 @@ def admin_config():
 
     if request.method == "POST":
 
+        # -------------------------------------------------
+        # TEXTOS
+        # -------------------------------------------------
+
         config["site_name"] = request.form.get(
             "site_name",
-            config["site_name"]
-        )
+            config.get("site_name", "EXPURG")
+        ).strip()
 
         config["admin_name"] = request.form.get(
             "admin_name",
-            config["admin_name"]
-        )
-
-        config["primary_color"] = request.form.get(
-            "primary_color",
-            config["primary_color"]
-        )
+            config.get("admin_name", "ADMIN")
+        ).strip()
 
         config["home_text"] = request.form.get(
             "home_text",
-            config["home_text"]
-        )
+            config.get(
+                "home_text",
+                "THE BEST COMMUNITY"
+            )
+        ).strip()
+
+        config["logo"] = request.form.get(
+            "logo",
+            config.get("logo", "")
+        ).strip()
+
+        # -------------------------------------------------
+        # COR
+        # -------------------------------------------------
+
+        primary_color = request.form.get(
+            "primary_color",
+            config.get(
+                "primary_color",
+                "#e00000"
+            )
+        ).strip()
+
+        if not primary_color:
+            primary_color = "#e00000"
+
+        config["primary_color"] = primary_color
+
+        # -------------------------------------------------
+        # TEMA
+        # -------------------------------------------------
 
         config["theme"] = request.form.get(
             "theme",
-            config["theme"]
+            config.get("theme", "dark")
+        ).strip()
+
+        # -------------------------------------------------
+        # ADMIN
+        # -------------------------------------------------
+
+        novo_admin_username = request.form.get(
+            "admin_username",
+            config.get(
+                "admin_username",
+                "admin"
+            )
+        ).strip()
+
+        novo_admin_password = request.form.get(
+            "admin_password",
+            config.get(
+                "admin_password",
+                "123456"
+            )
         )
 
+        if not novo_admin_username:
+            novo_admin_username = "admin"
+
+        if not novo_admin_password:
+            flash(
+                "A senha do administrador não pode ficar vazia.",
+                "error"
+            )
+
+            return redirect(
+                url_for("admin_config")
+            )
+
+        antigo_admin_username = str(
+            config.get(
+                "admin_username",
+                "admin"
+            )
+        )
+
+        config["admin_username"] = novo_admin_username
+        config["admin_password"] = novo_admin_password
+
+        # -------------------------------------------------
+        # TOGGLES
+        # -------------------------------------------------
+
         config["show_ip"] = (
-            request.form.get(
-                "show_ip"
-            ) == "on"
+            request.form.get("show_ip")
+            in ("on", "1", "true")
         )
 
         config["register_ip"] = (
-            request.form.get(
-                "register_ip"
-            ) == "on"
+            request.form.get("register_ip")
+            in ("on", "1", "true")
+        )
+
+        config["register_browser"] = (
+            request.form.get("register_browser")
+            in ("on", "1", "true")
+        )
+
+        config["auto_clean_logs"] = (
+            request.form.get("auto_clean_logs")
+            in ("on", "1", "true")
+        )
+
+        config["show_access_time"] = (
+            request.form.get("show_access_time")
+            in ("on", "1", "true")
+        )
+
+        config["show_access_route"] = (
+            request.form.get("show_access_route")
+            in ("on", "1", "true")
+        )
+
+        config["google_login"] = (
+            request.form.get("google_login")
+            in ("on", "1", "true")
+        )
+
+        config["google_show_name"] = (
+            request.form.get("google_show_name")
+            in ("on", "1", "true")
+        )
+
+        config["google_show_email"] = (
+            request.form.get("google_show_email")
+            in ("on", "1", "true")
+        )
+
+        config["google_register_time"] = (
+            request.form.get("google_register_time")
+            in ("on", "1", "true")
+        )
+
+        config["auto_logout"] = (
+            request.form.get("auto_logout")
+            in ("on", "1", "true")
+        )
+
+        config["confirm_delete_logs"] = (
+            request.form.get("confirm_delete_logs")
+            in ("on", "1", "true")
+        )
+
+        config["show_cards"] = (
+            request.form.get("show_cards")
+            in ("on", "1", "true")
+        )
+
+        config["show_users"] = (
+            request.form.get("show_users")
+            in ("on", "1", "true")
+        )
+
+        config["show_logs"] = (
+            request.form.get("show_logs")
+            in ("on", "1", "true")
+        )
+
+        config["show_files"] = (
+            request.form.get("show_files")
+            in ("on", "1", "true")
+        )
+
+        config["show_server_status"] = (
+            request.form.get("show_server_status")
+            in ("on", "1", "true")
         )
 
         config["banner_enabled"] = (
-            request.form.get(
-                "banner_enabled"
-            ) == "on"
+            request.form.get("banner_enabled")
+            in ("on", "1", "true")
         )
 
         config["chat_enabled"] = (
-            request.form.get(
-                "chat_enabled"
-            ) == "on"
+            request.form.get("chat_enabled")
+            in ("on", "1", "true")
         )
 
         config["announcements_enabled"] = (
-            request.form.get(
-                "announcements_enabled"
-            ) == "on"
+            request.form.get("announcements_enabled")
+            in ("on", "1", "true")
         )
 
-        salvar_config(config)
+        # -------------------------------------------------
+        # GOOGLE
+        # -------------------------------------------------
 
-        flash(
-            "Configurações salvas.",
-            "success"
-        )
+        config["google_client_id"] = request.form.get(
+            "google_client_id",
+            config.get(
+                "google_client_id",
+                ""
+            )
+        ).strip()
+
+        config["google_client_secret"] = request.form.get(
+            "google_client_secret",
+            config.get(
+                "google_client_secret",
+                ""
+            )
+        ).strip()
+
+        # -------------------------------------------------
+        # NÚMEROS
+        # -------------------------------------------------
+
+        try:
+
+            max_logs = int(
+                request.form.get(
+                    "max_logs",
+                    config.get(
+                        "max_logs",
+                        1000
+                    )
+                )
+            )
+
+            if max_logs < 0:
+                max_logs = 0
+
+        except (
+            TypeError,
+            ValueError
+        ):
+
+            max_logs = 1000
+
+        config["max_logs"] = max_logs
+
+        try:
+
+            recent_accesses = int(
+                request.form.get(
+                    "recent_accesses",
+                    config.get(
+                        "recent_accesses",
+                        8
+                    )
+                )
+            )
+
+            if recent_accesses < 1:
+                recent_accesses = 1
+
+        except (
+            TypeError,
+            ValueError
+        ):
+
+            recent_accesses = 8
+
+        config["recent_accesses"] = recent_accesses
+
+        try:
+
+            session_time = int(
+                request.form.get(
+                    "session_time",
+                    config.get(
+                        "session_time",
+                        60
+                    )
+                )
+            )
+
+            if session_time < 1:
+                session_time = 60
+
+        except (
+            TypeError,
+            ValueError
+        ):
+
+            session_time = 60
+
+        config["session_time"] = session_time
+
+        # -------------------------------------------------
+        # SALVAR
+        # -------------------------------------------------
+
+        try:
+
+            salvar_config(config)
+
+            # ---------------------------------------------
+            # Atualiza o administrador no banco
+            # ---------------------------------------------
+
+            conexao = conectar_banco()
+
+            admin_existente = conexao.execute("""
+                SELECT *
+                FROM users
+                WHERE username = ?
+                LIMIT 1
+            """, (
+                antigo_admin_username,
+            )).fetchone()
+
+            if admin_existente:
+
+                conflito = conexao.execute("""
+                    SELECT id
+                    FROM users
+                    WHERE username = ?
+                    AND id != ?
+                    LIMIT 1
+                """, (
+                    novo_admin_username,
+                    admin_existente["id"]
+                )).fetchone()
+
+                if conflito:
+
+                    conexao.rollback()
+                    conexao.close()
+
+                    config["admin_username"] = antigo_admin_username
+                    salvar_config(config)
+
+                    flash(
+                        "Esse nome de administrador já está sendo usado por outro membro.",
+                        "error"
+                    )
+
+                    return redirect(
+                        url_for("admin_config")
+                    )
+
+                conexao.execute("""
+                    UPDATE users
+                    SET username = ?,
+                        password = ?,
+                        level = 'admin',
+                        status = 'ativo'
+                    WHERE id = ?
+                """, (
+                    novo_admin_username,
+                    novo_admin_password,
+                    admin_existente["id"]
+                ))
+
+            else:
+
+                conflito = conexao.execute("""
+                    SELECT id
+                    FROM users
+                    WHERE username = ?
+                    LIMIT 1
+                """, (
+                    novo_admin_username,
+                )).fetchone()
+
+                if conflito:
+
+                    conexao.rollback()
+                    conexao.close()
+
+                    config["admin_username"] = antigo_admin_username
+                    salvar_config(config)
+
+                    flash(
+                        "Esse nome de administrador já está sendo usado.",
+                        "error"
+                    )
+
+                    return redirect(
+                        url_for("admin_config")
+                    )
+
+                conexao.execute("""
+                    INSERT INTO users
+                    (
+                        username,
+                        email,
+                        password,
+                        level,
+                        xp,
+                        status,
+                        created_at
+                    )
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    novo_admin_username,
+                    "admin@expurg.local",
+                    novo_admin_password,
+                    "admin",
+                    0,
+                    "ativo",
+                    datetime.now().strftime(
+                        "%Y-%m-%d %H:%M:%S"
+                    )
+                ))
+
+            conexao.commit()
+            conexao.close()
+
+            # Atualiza a sessão para não deslogar o admin
+            session["usuario"] = novo_admin_username
+            session["admin"] = True
+            session.modified = True
+
+            flash(
+                "Todas as configurações foram salvas com sucesso.",
+                "success"
+            )
+
+        except Exception as erro:
+
+            flash(
+                f"Erro ao salvar configurações: {erro}",
+                "error"
+            )
 
         return redirect(
             url_for("admin_config")
@@ -924,6 +1607,10 @@ def admin_config():
         "admin_config.html"
     )
 
+
+# =========================================================
+# ANÚNCIOS
+# =========================================================
 
 @app.route(
     "/admin/anuncios",
@@ -951,25 +1638,88 @@ def admin_anuncios():
             ""
         ).strip()
 
-        if titulo and conteudo:
+        imagem = request.form.get(
+            "image",
+            ""
+        ).strip()
+
+        link = request.form.get(
+            "link",
+            ""
+        ).strip()
+
+        ativo = (
+            1
+            if request.form.get("active")
+            in ("1", "on", "true")
+            else 0
+        )
+
+        if not titulo:
+
+            conexao.close()
+
+            flash(
+                "Digite um título para o anúncio.",
+                "error"
+            )
+
+            return redirect(
+                url_for("admin_anuncios")
+            )
+
+        if not conteudo:
+
+            conexao.close()
+
+            flash(
+                "Digite o conteúdo do anúncio.",
+                "error"
+            )
+
+            return redirect(
+                url_for("admin_anuncios")
+            )
+
+        try:
 
             conexao.execute("""
                 INSERT INTO announcements
                 (
                     title,
                     content,
+                    image,
+                    link,
+                    active,
                     created_at
                 )
-                VALUES (?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?)
             """, (
                 titulo,
                 conteudo,
+                imagem,
+                link,
+                ativo,
                 datetime.now().strftime(
                     "%Y-%m-%d %H:%M:%S"
                 )
             ))
 
             conexao.commit()
+
+            flash(
+                "Anúncio criado com sucesso.",
+                "success"
+            )
+
+        except Exception as erro:
+
+            conexao.rollback()
+
+            flash(
+                f"Erro ao criar anúncio: {erro}",
+                "error"
+            )
 
     anuncios = conexao.execute("""
         SELECT *
@@ -985,13 +1735,15 @@ def admin_anuncios():
     )
 
 
+# =========================================================
+# EDITAR ANÚNCIO
+# =========================================================
+
 @app.route(
-    "/admin/anuncios/<int:announcement_id>/excluir",
-    methods=["POST"]
+    "/admin/anuncios/<int:announcement_id>/editar",
+    methods=["GET", "POST"]
 )
-def excluir_anuncio(
-    announcement_id
-):
+def editar_anuncio(announcement_id):
 
     if not admin_logado():
 
@@ -1001,20 +1753,179 @@ def excluir_anuncio(
 
     conexao = conectar_banco()
 
-    conexao.execute("""
-        DELETE FROM announcements
+    anuncio = conexao.execute("""
+        SELECT *
+        FROM announcements
         WHERE id = ?
+        LIMIT 1
     """, (
         announcement_id,
-    ))
+    )).fetchone()
 
-    conexao.commit()
+    if not anuncio:
+
+        conexao.close()
+
+        flash(
+            "Anúncio não encontrado.",
+            "error"
+        )
+
+        return redirect(
+            url_for("admin_anuncios")
+        )
+
+    if request.method == "POST":
+
+        titulo = request.form.get(
+            "title",
+            ""
+        ).strip()
+
+        conteudo = request.form.get(
+            "content",
+            ""
+        ).strip()
+
+        imagem = request.form.get(
+            "image",
+            ""
+        ).strip()
+
+        link = request.form.get(
+            "link",
+            ""
+        ).strip()
+
+        ativo = (
+            1
+            if request.form.get("active")
+            in ("1", "on", "true")
+            else 0
+        )
+
+        if not titulo or not conteudo:
+
+            conexao.close()
+
+            flash(
+                "Título e conteúdo são obrigatórios.",
+                "error"
+            )
+
+            return redirect(
+                url_for(
+                    "editar_anuncio",
+                    announcement_id=announcement_id
+                )
+            )
+
+        try:
+
+            conexao.execute("""
+                UPDATE announcements
+                SET title = ?,
+                    content = ?,
+                    image = ?,
+                    link = ?,
+                    active = ?
+                WHERE id = ?
+            """, (
+                titulo,
+                conteudo,
+                imagem,
+                link,
+                ativo,
+                announcement_id
+            ))
+
+            conexao.commit()
+            conexao.close()
+
+            flash(
+                "Anúncio atualizado com sucesso.",
+                "success"
+            )
+
+            return redirect(
+                url_for("admin_anuncios")
+            )
+
+        except Exception as erro:
+
+            conexao.rollback()
+            conexao.close()
+
+            flash(
+                f"Erro ao atualizar anúncio: {erro}",
+                "error"
+            )
+
+            return redirect(
+                url_for("admin_anuncios")
+            )
+
+    conexao.close()
+
+    return render_template(
+        "editar_anuncio.html",
+        anuncio=anuncio
+    )
+
+
+# =========================================================
+# EXCLUIR ANÚNCIO
+# =========================================================
+
+@app.route(
+    "/admin/anuncios/<int:announcement_id>/excluir",
+    methods=["POST"]
+)
+def excluir_anuncio(announcement_id):
+
+    if not admin_logado():
+
+        return redirect(
+            url_for("login")
+        )
+
+    conexao = conectar_banco()
+
+    try:
+
+        conexao.execute("""
+            DELETE FROM announcements
+            WHERE id = ?
+        """, (
+            announcement_id,
+        ))
+
+        conexao.commit()
+
+        flash(
+            "Anúncio excluído.",
+            "success"
+        )
+
+    except Exception as erro:
+
+        conexao.rollback()
+
+        flash(
+            f"Erro ao excluir anúncio: {erro}",
+            "error"
+        )
+
     conexao.close()
 
     return redirect(
         url_for("admin_anuncios")
     )
 
+
+# =========================================================
+# BANNER
+# =========================================================
 
 @app.route(
     "/admin/banner",
@@ -1032,38 +1943,54 @@ def admin_banner():
 
     if request.method == "POST":
 
+        banner_enabled = request.form.get(
+            "banner_enabled",
+            "0"
+        )
+
         config["banner_enabled"] = (
-            request.form.get(
-                "banner_enabled"
-            ) == "on"
+            banner_enabled in (
+                "1",
+                "on",
+                "true"
+            )
         )
 
         config["banner_title"] = request.form.get(
             "banner_title",
             ""
-        )
+        ).strip()
 
         config["banner_text"] = request.form.get(
             "banner_text",
             ""
-        )
+        ).strip()
 
         config["banner_image"] = request.form.get(
             "banner_image",
             ""
-        )
+        ).strip()
 
         config["banner_link"] = request.form.get(
             "banner_link",
             ""
-        )
+        ).strip()
 
-        salvar_config(config)
+        try:
 
-        flash(
-            "Banner atualizado.",
-            "success"
-        )
+            salvar_config(config)
+
+            flash(
+                "Banner atualizado com sucesso.",
+                "success"
+            )
+
+        except Exception as erro:
+
+            flash(
+                f"Erro ao salvar o banner: {erro}",
+                "error"
+            )
 
         return redirect(
             url_for("admin_banner")
@@ -1073,6 +2000,10 @@ def admin_banner():
         "admin_banner.html"
     )
 
+
+# =========================================================
+# CHAT
+# =========================================================
 
 @app.route(
     "/chat",
@@ -1108,6 +2039,8 @@ def chat():
 
         if mensagem:
 
+            mensagem = mensagem[:2000]
+
             conexao.execute("""
                 INSERT INTO chat_messages
                 (
@@ -1141,6 +2074,10 @@ def chat():
     )
 
 
+# =========================================================
+# EXCLUIR MENSAGEM DO CHAT
+# =========================================================
+
 @app.route(
     "/admin/chat/<int:message_id>/excluir",
     methods=["POST"]
@@ -1165,10 +2102,19 @@ def excluir_mensagem(message_id):
     conexao.commit()
     conexao.close()
 
+    flash(
+        "Mensagem excluída.",
+        "success"
+    )
+
     return redirect(
         url_for("chat")
     )
 
+
+# =========================================================
+# EDITAR MEMBRO
+# =========================================================
 
 @app.route(
     "/admin/membro/<int:user_id>/editar",
@@ -1237,57 +2183,123 @@ def editar_membro(user_id):
             usuario["status"]
         )
 
-        if password:
+        try:
+            xp = int(xp)
+        except (
+            TypeError,
+            ValueError
+        ):
+            xp = 0
 
-            conexao.execute("""
-                UPDATE users
-                SET username = ?,
-                    email = ?,
-                    password = ?,
-                    level = ?,
-                    xp = ?,
-                    status = ?
-                WHERE id = ?
-            """, (
-                username,
-                email,
-                password,
-                level,
-                xp,
-                status,
-                user_id
-            ))
+        if not username:
 
-        else:
+            conexao.close()
 
-            conexao.execute("""
-                UPDATE users
-                SET username = ?,
-                    email = ?,
-                    level = ?,
-                    xp = ?,
-                    status = ?
-                WHERE id = ?
-            """, (
-                username,
-                email,
-                level,
-                xp,
-                status,
-                user_id
-            ))
+            flash(
+                "O nome de usuário não pode ficar vazio.",
+                "error"
+            )
 
-        conexao.commit()
-        conexao.close()
+            return redirect(
+                url_for(
+                    "editar_membro",
+                    user_id=user_id
+                )
+            )
 
-        flash(
-            "Membro atualizado.",
-            "success"
-        )
+        if usuario["username"] == "admin":
 
-        return redirect(
-            url_for("admin")
-        )
+            username = "admin"
+            level = "admin"
+            status = "ativo"
+
+        try:
+
+            if password:
+
+                conexao.execute("""
+                    UPDATE users
+                    SET username = ?,
+                        email = ?,
+                        password = ?,
+                        level = ?,
+                        xp = ?,
+                        status = ?
+                    WHERE id = ?
+                """, (
+                    username,
+                    email,
+                    password,
+                    level,
+                    xp,
+                    status,
+                    user_id
+                ))
+
+            else:
+
+                conexao.execute("""
+                    UPDATE users
+                    SET username = ?,
+                        email = ?,
+                        level = ?,
+                        xp = ?,
+                        status = ?
+                    WHERE id = ?
+                """, (
+                    username,
+                    email,
+                    level,
+                    xp,
+                    status,
+                    user_id
+                ))
+
+            conexao.commit()
+            conexao.close()
+
+            flash(
+                "Membro atualizado.",
+                "success"
+            )
+
+            return redirect(
+                url_for("admin")
+            )
+
+        except sqlite3.IntegrityError:
+
+            conexao.rollback()
+            conexao.close()
+
+            flash(
+                "Esse nome de usuário já está em uso.",
+                "error"
+            )
+
+            return redirect(
+                url_for(
+                    "editar_membro",
+                    user_id=user_id
+                )
+            )
+
+        except Exception as erro:
+
+            conexao.rollback()
+            conexao.close()
+
+            flash(
+                f"Erro ao atualizar membro: {erro}",
+                "error"
+            )
+
+            return redirect(
+                url_for(
+                    "editar_membro",
+                    user_id=user_id
+                )
+            )
 
     conexao.close()
 
@@ -1296,6 +2308,10 @@ def editar_membro(user_id):
         usuario=usuario
     )
 
+
+# =========================================================
+# BLOQUEAR MEMBRO
+# =========================================================
 
 @app.route(
     "/admin/membro/<int:user_id>/bloquear",
@@ -1311,6 +2327,34 @@ def bloquear_membro(user_id):
 
     conexao = conectar_banco()
 
+    usuario = conexao.execute("""
+        SELECT username
+        FROM users
+        WHERE id = ?
+    """, (
+        user_id,
+    )).fetchone()
+
+    config = carregar_config()
+
+    admin_username = config.get(
+        "admin_username",
+        "admin"
+    )
+
+    if usuario and usuario["username"] == admin_username:
+
+        conexao.close()
+
+        flash(
+            "O administrador principal não pode ser bloqueado.",
+            "error"
+        )
+
+        return redirect(
+            url_for("admin")
+        )
+
     conexao.execute("""
         UPDATE users
         SET status = 'bloqueado'
@@ -1322,10 +2366,19 @@ def bloquear_membro(user_id):
     conexao.commit()
     conexao.close()
 
+    flash(
+        "Membro bloqueado.",
+        "success"
+    )
+
     return redirect(
         url_for("admin")
     )
 
+
+# =========================================================
+# DESBLOQUEAR MEMBRO
+# =========================================================
 
 @app.route(
     "/admin/membro/<int:user_id>/desbloquear",
@@ -1352,10 +2405,19 @@ def desbloquear_membro(user_id):
     conexao.commit()
     conexao.close()
 
+    flash(
+        "Membro desbloqueado.",
+        "success"
+    )
+
     return redirect(
         url_for("admin")
     )
 
+
+# =========================================================
+# EXCLUIR MEMBRO
+# =========================================================
 
 @app.route(
     "/admin/membro/<int:user_id>/excluir",
@@ -1379,26 +2441,62 @@ def excluir_membro(user_id):
         user_id,
     )).fetchone()
 
-    if (
-        usuario
-        and usuario["username"] != "admin"
-    ):
+    if usuario is None:
 
-        conexao.execute("""
-            DELETE FROM users
-            WHERE id = ?
-        """, (
-            user_id,
-        ))
+        conexao.close()
 
-        conexao.commit()
+        flash(
+            "Usuário não encontrado.",
+            "error"
+        )
 
+        return redirect(
+            url_for("admin")
+        )
+
+    config = carregar_config()
+
+    admin_username = config.get(
+        "admin_username",
+        "admin"
+    )
+
+    if usuario["username"] == admin_username:
+
+        conexao.close()
+
+        flash(
+            "O administrador principal não pode ser excluído.",
+            "error"
+        )
+
+        return redirect(
+            url_for("admin")
+        )
+
+    conexao.execute("""
+        DELETE FROM users
+        WHERE id = ?
+    """, (
+        user_id,
+    ))
+
+    conexao.commit()
     conexao.close()
+
+    flash(
+        "Membro excluído.",
+        "success"
+    )
 
     return redirect(
         url_for("admin")
     )
 
+
+# =========================================================
+# LIMPAR LOGS
+# =========================================================
 
 @app.route(
     "/admin/logs/limpar",
@@ -1432,24 +2530,38 @@ def limpar_logs():
             json.dump(
                 [],
                 arquivo,
-                indent=4
+                indent=4,
+                ensure_ascii=False
             )
 
     except Exception:
         pass
+
+    flash(
+        "Logs limpos.",
+        "success"
+    )
 
     return redirect(
         url_for("admin")
     )
 
 
-if __name__ == "__main__":
+# =========================================================
+# CRIAR BANCO
+# =========================================================
 
-    criar_banco()
+criar_banco()
+
+
+# =========================================================
+# EXECUÇÃO LOCAL
+# =========================================================
+
+if __name__ == "__main__":
 
     app.run(
         host="127.0.0.1",
         port=5000,
         debug=True
     )
-
