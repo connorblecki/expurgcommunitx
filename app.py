@@ -36,9 +36,7 @@ app.config["SESSION_COOKIE_SECURE"] = False
 # CAMINHOS
 # =========================================================
 
-BASE_DIR = os.path.dirname(
-    os.path.abspath(__file__)
-)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 DATABASE = os.path.join(
     BASE_DIR,
@@ -79,7 +77,6 @@ CONFIG_PADRAO = {
     "google_login": False,
     "google_client_id": "",
     "google_client_secret": "",
-
     "google_show_name": True,
     "google_show_email": True,
     "google_register_time": True,
@@ -117,22 +114,16 @@ CONFIG_PADRAO = {
 # =========================================================
 
 def carregar_config():
-    """
-    Carrega o config.json.
-    Se alguma configuração estiver faltando,
-    utiliza o valor padrão.
-    """
-
     if not os.path.exists(CONFIG_FILE):
 
-        config_nova = CONFIG_PADRAO.copy()
+        config = CONFIG_PADRAO.copy()
 
         try:
-            salvar_config(config_nova)
+            salvar_config(config)
         except Exception:
             pass
 
-        return config_nova
+        return config
 
     try:
 
@@ -142,15 +133,15 @@ def carregar_config():
             encoding="utf-8"
         ) as arquivo:
 
-            config = json.load(arquivo)
+            dados = json.load(arquivo)
 
-        if not isinstance(config, dict):
-            config = {}
+        if not isinstance(dados, dict):
+            dados = {}
 
-        resultado = CONFIG_PADRAO.copy()
-        resultado.update(config)
+        config = CONFIG_PADRAO.copy()
+        config.update(dados)
 
-        return resultado
+        return config
 
     except Exception:
 
@@ -158,9 +149,6 @@ def carregar_config():
 
 
 def salvar_config(config):
-    """
-    Salva todas as configurações no config.json.
-    """
 
     config_final = CONFIG_PADRAO.copy()
 
@@ -186,6 +174,41 @@ def salvar_config(config):
         arquivo_temporario,
         CONFIG_FILE
     )
+
+
+# =========================================================
+# CHECKBOX
+# =========================================================
+
+def checkbox_ativo(nome, padrao=False):
+    """
+    Lê checkbox corretamente mesmo quando o HTML
+    possui um hidden com valor 0 antes do checkbox.
+
+    Exemplo:
+        hidden: 0
+        checkbox: 1
+
+    Se o checkbox estiver marcado, retorna True.
+    Se estiver desmarcado, retorna False.
+    """
+
+    valores = request.form.getlist(nome)
+
+    if not valores:
+        return padrao
+
+    for valor in valores:
+
+        if str(valor).lower() in (
+            "1",
+            "on",
+            "true",
+            "yes"
+        ):
+            return True
+
+    return False
 
 
 # =========================================================
@@ -254,7 +277,7 @@ def criar_banco():
     cursor = conexao.cursor()
 
     # -----------------------------------------------------
-    # USUÁRIOS
+    # USERS
     # -----------------------------------------------------
 
     cursor.execute("""
@@ -314,7 +337,7 @@ def criar_banco():
     """)
 
     # -----------------------------------------------------
-    # CONFIGURAÇÕES
+    # SITE SETTINGS
     # -----------------------------------------------------
 
     cursor.execute("""
@@ -325,9 +348,9 @@ def criar_banco():
         )
     """)
 
-    # =====================================================
-    # MIGRAÇÃO
-    # =====================================================
+    # -----------------------------------------------------
+    # MIGRAÇÕES
+    # -----------------------------------------------------
 
     adicionar_coluna_se_faltar(
         cursor,
@@ -403,9 +426,9 @@ def criar_banco():
         "TEXT"
     )
 
-    # =====================================================
+    # -----------------------------------------------------
     # ADMIN PRINCIPAL
-    # =====================================================
+    # -----------------------------------------------------
 
     config = carregar_config()
 
@@ -484,7 +507,7 @@ def criar_banco():
 
 
 # =========================================================
-# IP DO CLIENTE
+# IP
 # =========================================================
 
 def obter_ip_cliente():
@@ -496,13 +519,12 @@ def obter_ip_cliente():
 
     if forwarded_for:
 
-        ips = [
-            ip.strip()
-            for ip in forwarded_for.split(",")
-            if ip.strip()
-        ]
+        for ip in forwarded_for.split(","):
 
-        for ip in ips:
+            ip = ip.strip()
+
+            if not ip:
+                continue
 
             try:
 
@@ -566,17 +588,19 @@ def registrar_acesso():
 
     ip = obter_ip_cliente()
 
-    browser = request.headers.get(
-        "User-Agent",
-        "Desconhecido"
-    )
-
-    if not config.get(
+    if config.get(
         "register_browser",
         True
     ):
-        browser = "Oculto"
 
+        browser = request.headers.get(
+            "User-Agent",
+            "Desconhecido"
+        )
+
+    else:
+
+        browser = "Oculto"
 
     rota = request.path
 
@@ -635,9 +659,7 @@ def registrar_acesso():
 @app.before_request
 def antes_da_requisicao():
 
-    if request.path.startswith(
-        "/static"
-    ):
+    if request.path.startswith("/static"):
         return
 
     if request.method == "OPTIONS":
@@ -664,9 +686,7 @@ def dados_globais():
 
 def usuario_logado():
 
-    return session.get(
-        "usuario"
-    )
+    return session.get("usuario")
 
 
 def admin_logado():
@@ -678,7 +698,7 @@ def admin_logado():
 
 
 # =========================================================
-# PÁGINA INICIAL
+# HOME
 # =========================================================
 
 @app.route("/")
@@ -761,10 +781,7 @@ def login():
                 "login.html"
             )
 
-        # -------------------------------------------------
         # ADMIN
-        # -------------------------------------------------
-
         if (
             username == admin_username
             and password == admin_password
@@ -799,10 +816,7 @@ def login():
                 url_for("index")
             )
 
-        # -------------------------------------------------
         # USUÁRIO NORMAL
-        # -------------------------------------------------
-
         conexao = conectar_banco()
 
         usuario = conexao.execute("""
@@ -886,10 +900,7 @@ def cadastro():
             ""
         )
 
-        if (
-            not username
-            or not password
-        ):
+        if not username or not password:
 
             flash(
                 "Preencha os campos obrigatórios.",
@@ -1081,7 +1092,7 @@ def registrar_ip():
 
 
 # =========================================================
-# ADMIN DASHBOARD
+# ADMIN
 # =========================================================
 
 @app.route("/admin")
@@ -1171,43 +1182,35 @@ def admin_config():
 
         config["site_name"] = request.form.get(
             "site_name",
-            config.get("site_name", "EXPURG")
+            config["site_name"]
         ).strip()
 
         config["admin_name"] = request.form.get(
             "admin_name",
-            config.get("admin_name", "ADMIN")
+            config["admin_name"]
         ).strip()
 
         config["home_text"] = request.form.get(
             "home_text",
-            config.get(
-                "home_text",
-                "THE BEST COMMUNITY"
-            )
+            config["home_text"]
         ).strip()
 
         config["logo"] = request.form.get(
             "logo",
-            config.get("logo", "")
+            config["logo"]
         ).strip()
 
         # -------------------------------------------------
         # COR
         # -------------------------------------------------
 
-        primary_color = request.form.get(
+        config["primary_color"] = request.form.get(
             "primary_color",
-            config.get(
-                "primary_color",
-                "#e00000"
-            )
+            config["primary_color"]
         ).strip()
 
-        if not primary_color:
-            primary_color = "#e00000"
-
-        config["primary_color"] = primary_color
+        if not config["primary_color"]:
+            config["primary_color"] = "#e00000"
 
         # -------------------------------------------------
         # TEMA
@@ -1215,33 +1218,218 @@ def admin_config():
 
         config["theme"] = request.form.get(
             "theme",
-            config.get("theme", "dark")
+            config["theme"]
         ).strip()
 
         # -------------------------------------------------
-        # ADMIN
+        # CHECKBOXES
+        # -------------------------------------------------
+
+        config["show_ip"] = checkbox_ativo(
+            "show_ip",
+            config.get("show_ip", True)
+        )
+
+        config["register_ip"] = checkbox_ativo(
+            "register_ip",
+            config.get("register_ip", True)
+        )
+
+        config["register_browser"] = checkbox_ativo(
+            "register_browser",
+            config.get("register_browser", True)
+        )
+
+        config["auto_clean_logs"] = checkbox_ativo(
+            "auto_clean_logs",
+            config.get("auto_clean_logs", False)
+        )
+
+        config["show_access_time"] = checkbox_ativo(
+            "show_access_time",
+            config.get("show_access_time", True)
+        )
+
+        config["show_access_route"] = checkbox_ativo(
+            "show_access_route",
+            config.get("show_access_route", True)
+        )
+
+        config["google_login"] = checkbox_ativo(
+            "google_login",
+            config.get("google_login", False)
+        )
+
+        config["google_show_name"] = checkbox_ativo(
+            "google_show_name",
+            config.get("google_show_name", True)
+        )
+
+        config["google_show_email"] = checkbox_ativo(
+            "google_show_email",
+            config.get("google_show_email", True)
+        )
+
+        config["google_register_time"] = checkbox_ativo(
+            "google_register_time",
+            config.get("google_register_time", True)
+        )
+
+        config["auto_logout"] = checkbox_ativo(
+            "auto_logout",
+            config.get("auto_logout", False)
+        )
+
+        config["confirm_delete_logs"] = checkbox_ativo(
+            "confirm_delete_logs",
+            config.get("confirm_delete_logs", True)
+        )
+
+        config["show_cards"] = checkbox_ativo(
+            "show_cards",
+            config.get("show_cards", True)
+        )
+
+        config["show_users"] = checkbox_ativo(
+            "show_users",
+            config.get("show_users", True)
+        )
+
+        config["show_logs"] = checkbox_ativo(
+            "show_logs",
+            config.get("show_logs", True)
+        )
+
+        config["show_files"] = checkbox_ativo(
+            "show_files",
+            config.get("show_files", True)
+        )
+
+        config["show_server_status"] = checkbox_ativo(
+            "show_server_status",
+            config.get("show_server_status", True)
+        )
+
+        config["banner_enabled"] = checkbox_ativo(
+            "banner_enabled",
+            config.get("banner_enabled", True)
+        )
+
+        config["chat_enabled"] = checkbox_ativo(
+            "chat_enabled",
+            config.get("chat_enabled", True)
+        )
+
+        config["announcements_enabled"] = checkbox_ativo(
+            "announcements_enabled",
+            config.get(
+                "announcements_enabled",
+                True
+            )
+        )
+
+        # -------------------------------------------------
+        # GOOGLE
+        # -------------------------------------------------
+
+        config["google_client_id"] = request.form.get(
+            "google_client_id",
+            config["google_client_id"]
+        ).strip()
+
+        config["google_client_secret"] = request.form.get(
+            "google_client_secret",
+            config["google_client_secret"]
+        ).strip()
+
+        # -------------------------------------------------
+        # NÚMEROS
+        # -------------------------------------------------
+
+        try:
+
+            config["max_logs"] = max(
+                0,
+                int(
+                    request.form.get(
+                        "max_logs",
+                        config["max_logs"]
+                    )
+                )
+            )
+
+        except (
+            TypeError,
+            ValueError
+        ):
+
+            config["max_logs"] = 1000
+
+        try:
+
+            config["recent_accesses"] = max(
+                1,
+                int(
+                    request.form.get(
+                        "recent_accesses",
+                        config["recent_accesses"]
+                    )
+                )
+            )
+
+        except (
+            TypeError,
+            ValueError
+        ):
+
+            config["recent_accesses"] = 8
+
+        try:
+
+            config["session_time"] = max(
+                1,
+                int(
+                    request.form.get(
+                        "session_time",
+                        config["session_time"]
+                    )
+                )
+            )
+
+        except (
+            TypeError,
+            ValueError
+        ):
+
+            config["session_time"] = 60
+
+        # -------------------------------------------------
+        # ADMIN LOGIN
         # -------------------------------------------------
 
         novo_admin_username = request.form.get(
             "admin_username",
-            config.get(
-                "admin_username",
-                "admin"
-            )
+            config["admin_username"]
         ).strip()
 
         novo_admin_password = request.form.get(
             "admin_password",
-            config.get(
-                "admin_password",
-                "123456"
-            )
+            config["admin_password"]
         )
 
         if not novo_admin_username:
-            novo_admin_username = "admin"
+
+            flash(
+                "O usuário do administrador não pode ficar vazio.",
+                "error"
+            )
+
+            return redirect(
+                url_for("admin_config")
+            )
 
         if not novo_admin_password:
+
             flash(
                 "A senha do administrador não pode ficar vazia.",
                 "error"
@@ -1251,231 +1439,39 @@ def admin_config():
                 url_for("admin_config")
             )
 
-        antigo_admin_username = str(
-            config.get(
-                "admin_username",
-                "admin"
-            )
-        )
+        antigo_admin_username = config["admin_username"]
+
+        # -------------------------------------------------
+        # SALVA CONFIG.JSON
+        # -------------------------------------------------
 
         config["admin_username"] = novo_admin_username
         config["admin_password"] = novo_admin_password
-
-        # -------------------------------------------------
-        # TOGGLES
-        # -------------------------------------------------
-
-        config["show_ip"] = (
-            request.form.get("show_ip")
-            in ("on", "1", "true")
-        )
-
-        config["register_ip"] = (
-            request.form.get("register_ip")
-            in ("on", "1", "true")
-        )
-
-        config["register_browser"] = (
-            request.form.get("register_browser")
-            in ("on", "1", "true")
-        )
-
-        config["auto_clean_logs"] = (
-            request.form.get("auto_clean_logs")
-            in ("on", "1", "true")
-        )
-
-        config["show_access_time"] = (
-            request.form.get("show_access_time")
-            in ("on", "1", "true")
-        )
-
-        config["show_access_route"] = (
-            request.form.get("show_access_route")
-            in ("on", "1", "true")
-        )
-
-        config["google_login"] = (
-            request.form.get("google_login")
-            in ("on", "1", "true")
-        )
-
-        config["google_show_name"] = (
-            request.form.get("google_show_name")
-            in ("on", "1", "true")
-        )
-
-        config["google_show_email"] = (
-            request.form.get("google_show_email")
-            in ("on", "1", "true")
-        )
-
-        config["google_register_time"] = (
-            request.form.get("google_register_time")
-            in ("on", "1", "true")
-        )
-
-        config["auto_logout"] = (
-            request.form.get("auto_logout")
-            in ("on", "1", "true")
-        )
-
-        config["confirm_delete_logs"] = (
-            request.form.get("confirm_delete_logs")
-            in ("on", "1", "true")
-        )
-
-        config["show_cards"] = (
-            request.form.get("show_cards")
-            in ("on", "1", "true")
-        )
-
-        config["show_users"] = (
-            request.form.get("show_users")
-            in ("on", "1", "true")
-        )
-
-        config["show_logs"] = (
-            request.form.get("show_logs")
-            in ("on", "1", "true")
-        )
-
-        config["show_files"] = (
-            request.form.get("show_files")
-            in ("on", "1", "true")
-        )
-
-        config["show_server_status"] = (
-            request.form.get("show_server_status")
-            in ("on", "1", "true")
-        )
-
-        config["banner_enabled"] = (
-            request.form.get("banner_enabled")
-            in ("on", "1", "true")
-        )
-
-        config["chat_enabled"] = (
-            request.form.get("chat_enabled")
-            in ("on", "1", "true")
-        )
-
-        config["announcements_enabled"] = (
-            request.form.get("announcements_enabled")
-            in ("on", "1", "true")
-        )
-
-        # -------------------------------------------------
-        # GOOGLE
-        # -------------------------------------------------
-
-        config["google_client_id"] = request.form.get(
-            "google_client_id",
-            config.get(
-                "google_client_id",
-                ""
-            )
-        ).strip()
-
-        config["google_client_secret"] = request.form.get(
-            "google_client_secret",
-            config.get(
-                "google_client_secret",
-                ""
-            )
-        ).strip()
-
-        # -------------------------------------------------
-        # NÚMEROS
-        # -------------------------------------------------
-
-        try:
-
-            max_logs = int(
-                request.form.get(
-                    "max_logs",
-                    config.get(
-                        "max_logs",
-                        1000
-                    )
-                )
-            )
-
-            if max_logs < 0:
-                max_logs = 0
-
-        except (
-            TypeError,
-            ValueError
-        ):
-
-            max_logs = 1000
-
-        config["max_logs"] = max_logs
-
-        try:
-
-            recent_accesses = int(
-                request.form.get(
-                    "recent_accesses",
-                    config.get(
-                        "recent_accesses",
-                        8
-                    )
-                )
-            )
-
-            if recent_accesses < 1:
-                recent_accesses = 1
-
-        except (
-            TypeError,
-            ValueError
-        ):
-
-            recent_accesses = 8
-
-        config["recent_accesses"] = recent_accesses
-
-        try:
-
-            session_time = int(
-                request.form.get(
-                    "session_time",
-                    config.get(
-                        "session_time",
-                        60
-                    )
-                )
-            )
-
-            if session_time < 1:
-                session_time = 60
-
-        except (
-            TypeError,
-            ValueError
-        ):
-
-            session_time = 60
-
-        config["session_time"] = session_time
-
-        # -------------------------------------------------
-        # SALVAR
-        # -------------------------------------------------
 
         try:
 
             salvar_config(config)
 
-            # ---------------------------------------------
-            # Atualiza o administrador no banco
-            # ---------------------------------------------
+        except Exception as erro:
 
-            conexao = conectar_banco()
+            flash(
+                f"Erro ao salvar configurações: {erro}",
+                "error"
+            )
 
-            admin_existente = conexao.execute("""
+            return redirect(
+                url_for("admin_config")
+            )
+
+        # -------------------------------------------------
+        # ATUALIZA ADMIN NO BANCO
+        # -------------------------------------------------
+
+        conexao = conectar_banco()
+
+        try:
+
+            admin_usuario = conexao.execute("""
                 SELECT *
                 FROM users
                 WHERE username = ?
@@ -1484,9 +1480,9 @@ def admin_config():
                 antigo_admin_username,
             )).fetchone()
 
-            if admin_existente:
+            if admin_usuario:
 
-                conflito = conexao.execute("""
+                outro_usuario = conexao.execute("""
                     SELECT id
                     FROM users
                     WHERE username = ?
@@ -1494,19 +1490,24 @@ def admin_config():
                     LIMIT 1
                 """, (
                     novo_admin_username,
-                    admin_existente["id"]
+                    admin_usuario["id"]
                 )).fetchone()
 
-                if conflito:
+                if outro_usuario:
 
                     conexao.rollback()
                     conexao.close()
 
                     config["admin_username"] = antigo_admin_username
+                    config["admin_password"] = request.form.get(
+                        "admin_password",
+                        config["admin_password"]
+                    )
+
                     salvar_config(config)
 
                     flash(
-                        "Esse nome de administrador já está sendo usado por outro membro.",
+                        "Esse nome de usuário já está sendo usado.",
                         "error"
                     )
 
@@ -1524,36 +1525,10 @@ def admin_config():
                 """, (
                     novo_admin_username,
                     novo_admin_password,
-                    admin_existente["id"]
+                    admin_usuario["id"]
                 ))
 
             else:
-
-                conflito = conexao.execute("""
-                    SELECT id
-                    FROM users
-                    WHERE username = ?
-                    LIMIT 1
-                """, (
-                    novo_admin_username,
-                )).fetchone()
-
-                if conflito:
-
-                    conexao.rollback()
-                    conexao.close()
-
-                    config["admin_username"] = antigo_admin_username
-                    salvar_config(config)
-
-                    flash(
-                        "Esse nome de administrador já está sendo usado.",
-                        "error"
-                    )
-
-                    return redirect(
-                        url_for("admin_config")
-                    )
 
                 conexao.execute("""
                     INSERT INTO users
@@ -1582,22 +1557,50 @@ def admin_config():
             conexao.commit()
             conexao.close()
 
-            # Atualiza a sessão para não deslogar o admin
-            session["usuario"] = novo_admin_username
-            session["admin"] = True
-            session.modified = True
+        except sqlite3.IntegrityError:
+
+            conexao.rollback()
+            conexao.close()
 
             flash(
-                "Todas as configurações foram salvas com sucesso.",
-                "success"
+                "Esse nome de usuário já está sendo usado.",
+                "error"
+            )
+
+            return redirect(
+                url_for("admin_config")
             )
 
         except Exception as erro:
 
+            conexao.rollback()
+            conexao.close()
+
             flash(
-                f"Erro ao salvar configurações: {erro}",
+                f"Erro ao atualizar administrador: {erro}",
                 "error"
             )
+
+            return redirect(
+                url_for("admin_config")
+            )
+
+        # -------------------------------------------------
+        # MANTÉM LOGIN DO ADMIN
+        # -------------------------------------------------
+
+        session["usuario"] = novo_admin_username
+        session["admin"] = True
+
+        if admin_usuario:
+            session["user_id"] = admin_usuario["id"]
+
+        session.modified = True
+
+        flash(
+            "Configurações salvas com sucesso.",
+            "success"
+        )
 
         return redirect(
             url_for("admin_config")
@@ -1650,8 +1653,10 @@ def admin_anuncios():
 
         ativo = (
             1
-            if request.form.get("active")
-            in ("1", "on", "true")
+            if checkbox_ativo(
+                "active",
+                True
+            )
             else 0
         )
 
@@ -1799,8 +1804,10 @@ def editar_anuncio(announcement_id):
 
         ativo = (
             1
-            if request.form.get("active")
-            in ("1", "on", "true")
+            if checkbox_ativo(
+                "active",
+                True
+            )
             else 0
         )
 
@@ -1943,37 +1950,44 @@ def admin_banner():
 
     if request.method == "POST":
 
-        banner_enabled = request.form.get(
+        config["banner_enabled"] = checkbox_ativo(
             "banner_enabled",
-            "0"
-        )
-
-        config["banner_enabled"] = (
-            banner_enabled in (
-                "1",
-                "on",
-                "true"
+            config.get(
+                "banner_enabled",
+                True
             )
         )
 
         config["banner_title"] = request.form.get(
             "banner_title",
-            ""
+            config.get(
+                "banner_title",
+                ""
+            )
         ).strip()
 
         config["banner_text"] = request.form.get(
             "banner_text",
-            ""
+            config.get(
+                "banner_text",
+                ""
+            )
         ).strip()
 
         config["banner_image"] = request.form.get(
             "banner_image",
-            ""
+            config.get(
+                "banner_image",
+                ""
+            )
         ).strip()
 
         config["banner_link"] = request.form.get(
             "banner_link",
-            ""
+            config.get(
+                "banner_link",
+                ""
+            )
         ).strip()
 
         try:
@@ -2075,7 +2089,7 @@ def chat():
 
 
 # =========================================================
-# EXCLUIR MENSAGEM DO CHAT
+# EXCLUIR MENSAGEM
 # =========================================================
 
 @app.route(
@@ -2184,11 +2198,14 @@ def editar_membro(user_id):
         )
 
         try:
+
             xp = int(xp)
+
         except (
             TypeError,
             ValueError
         ):
+
             xp = 0
 
         if not username:
@@ -2207,9 +2224,16 @@ def editar_membro(user_id):
                 )
             )
 
-        if usuario["username"] == "admin":
+        config = carregar_config()
 
-            username = "admin"
+        admin_username = config.get(
+            "admin_username",
+            "admin"
+        )
+
+        if usuario["username"] == admin_username:
+
+            username = admin_username
             level = "admin"
             status = "ativo"
 
@@ -2548,14 +2572,14 @@ def limpar_logs():
 
 
 # =========================================================
-# CRIAR BANCO
+# INICIALIZAÇÃO
 # =========================================================
 
 criar_banco()
 
 
 # =========================================================
-# EXECUÇÃO LOCAL
+# EXECUÇÃO
 # =========================================================
 
 if __name__ == "__main__":
