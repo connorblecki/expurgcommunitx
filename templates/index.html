@@ -49,6 +49,7 @@
             cursor: default;
         }
 
+
         /* =================================================
            MOUSE GLOW
         ================================================= */
@@ -61,6 +62,7 @@
             top: 0;
             border-radius: 50%;
             pointer-events: none;
+
             background:
                 radial-gradient(
                     circle,
@@ -68,16 +70,22 @@
                     rgba(80, 0, 0, .10) 30%,
                     transparent 70%
                 );
+
             filter: blur(12px);
+
             transform:
                 translate(-50%, -50%);
+
             z-index: 9999;
+
             mix-blend-mode: screen;
+
             transition:
                 width .25s ease,
                 height .25s ease,
                 opacity .25s ease;
         }
+
 
         .mouse-dot {
             position: fixed;
@@ -85,15 +93,22 @@
             height: 7px;
             left: 0;
             top: 0;
+
             border-radius: 50%;
+
             pointer-events: none;
+
             background: #a00000;
+
             box-shadow:
                 0 0 15px rgba(160, 0, 0, .7);
+
             transform:
                 translate(-50%, -50%);
+
             z-index: 10000;
         }
+
 
         /* =================================================
            BACKGROUND
@@ -102,8 +117,11 @@
         .background-grid {
             position: fixed;
             inset: 0;
+
             pointer-events: none;
+
             opacity: .22;
+
             background-image:
                 linear-gradient(
                     rgba(255,255,255,.025) 1px,
@@ -114,8 +132,10 @@
                     rgba(255,255,255,.025) 1px,
                     transparent 1px
                 );
+
             background-size:
                 70px 70px;
+
             mask-image:
                 linear-gradient(
                     to bottom,
@@ -124,99 +144,161 @@
                 );
         }
 
+
         /* =================================================
            NAVBAR
         ================================================= */
 
         nav {
             position: fixed;
+
             top: 0;
             left: 0;
+
             width: 100%;
             height: 76px;
+
             display: flex;
+
             align-items: center;
+
             justify-content: space-between;
+
             padding:
                 0 6%;
+
             background:
                 rgba(3, 3, 3, .72);
+
             border-bottom:
                 1px solid rgba(100, 0, 0, .18);
+
             backdrop-filter:
                 blur(18px);
+
             z-index: 100;
+
             transition:
                 background .3s ease;
         }
 
+
+        /* =================================================
+           BRAND
+        ================================================= */
+
+        .brand-area {
+            display: flex;
+
+            align-items: center;
+
+            gap: 28px;
+        }
+
+
         .logo {
             color: white;
+
             text-decoration: none;
+
             font-size: 19px;
+
             font-weight: 900;
+
             letter-spacing: 4px;
+
+            white-space: nowrap;
         }
+
 
         .logo span {
             color: var(--red);
         }
 
+
         .slogan {
-            position: absolute;
-            right: 6%;
-            top: 50%;
-            transform: translateY(-50%);
             color: #777;
+
             font-size: 10px;
+
             font-weight: 700;
+
             letter-spacing: 3px;
+
             text-transform: uppercase;
-            pointer-events: none;
+
+            white-space: nowrap;
         }
+
+
+        /* =================================================
+           NAV LINKS
+        ================================================= */
 
         .nav-links {
             display: flex;
+
             align-items: center;
+
             gap: 30px;
         }
 
+
         .nav-links a {
             position: relative;
+
             color: #777;
+
             text-decoration: none;
+
             font-size: 11px;
+
             font-weight: 700;
+
             letter-spacing: 1.5px;
+
             text-transform: uppercase;
+
             transition:
                 color .25s ease;
         }
 
+
         .nav-links a::after {
             content: "";
+
             position: absolute;
+
             left: 0;
+
             bottom: -8px;
+
             width: 0;
+
             height: 1px;
+
             background:
                 var(--red);
+
             transition:
                 width .25s ease;
         }
+
 
         .nav-links a:hover {
             color: white;
         }
 
+
         .nav-links a:hover::after {
             width: 100%;
         }
 
+
         .admin-link {
             color: #a00000 !important;
         }
+
 
         /* =================================================
            HERO
@@ -224,54 +306,78 @@
 
         .hero {
             position: relative;
+
             min-height: 100vh;
+
             display: flex;
+
             align-items: center;
+
             justify-content: center;
+
             padding:
                 130px 25px 80px;
+
             text-align: center;
+
             overflow: hidden;
         }
 
+
         .hero-content {
             position: relative;
+
             z-index: 5;
+
             max-width: 900px;
+
             animation:
                 heroIn 1s ease forwards;
         }
+
 
         @keyframes heroIn {
 
             from {
                 opacity: 0;
+
                 transform:
                     translateY(25px);
             }
 
             to {
                 opacity: 1;
+
                 transform:
                     translateY(0);
             }
 
         }
 
+
         .eyebrow {
             display: inline-block;
+
             margin-bottom: 22px;
+
             color: #777;
+
             font-size: 10px;
+
             font-weight: bold;
+
             letter-spacing: 5px;
+
             text-transform: uppercase;
         }
 
+
         .eyebrow::before {
             content: "🩸";
+
             margin-right: 8px;
         }
+
 
         h1 {
             font-size:
@@ -280,90 +386,130 @@
                     11vw,
                     145px
                 );
+
             line-height: .82;
+
             font-weight: 900;
+
             letter-spacing: -6px;
+
             text-transform: uppercase;
+
             text-shadow:
                 0 0 40px
                 rgba(100, 0, 0, .18);
         }
 
+
         h1 span {
             color: #720000;
         }
 
+
         .hero-description {
             max-width: 600px;
+
             margin:
                 35px auto 0;
+
             color: #666;
+
             font-size: 14px;
+
             line-height: 1.8;
         }
 
+
         .hero-buttons {
             display: flex;
+
             justify-content: center;
+
             gap: 12px;
+
             margin-top: 35px;
         }
 
+
         .btn {
             min-width: 150px;
+
             height: 48px;
+
             display: inline-flex;
+
             align-items: center;
+
             justify-content: center;
+
             padding:
                 0 22px;
+
             border-radius: 7px;
+
             text-decoration: none;
+
             font-size: 11px;
+
             font-weight: 800;
+
             letter-spacing: 1.5px;
+
             text-transform: uppercase;
+
             transition:
                 transform .25s ease,
                 box-shadow .25s ease,
                 border-color .25s ease;
         }
 
+
         .btn-primary {
             color: white;
+
             background:
                 linear-gradient(
                     135deg,
                     #3c0000,
                     #780000
                 );
+
             border:
                 1px solid #790000;
         }
 
+
         .btn-primary:hover {
             transform:
                 translateY(-3px);
+
             box-shadow:
                 0 15px 35px
                 rgba(80, 0, 0, .30);
         }
 
+
         .btn-secondary {
             color: #aaa;
+
             background:
                 rgba(255,255,255,.025);
+
             border:
                 1px solid #292929;
         }
 
+
         .btn-secondary:hover {
             color: white;
+
             border-color:
                 #570000;
+
             transform:
                 translateY(-3px);
         }
+
 
         /* =================================================
            SECTIONS
@@ -371,80 +517,112 @@
 
         .section {
             position: relative;
+
             max-width: 1150px;
+
             margin: auto;
+
             padding:
                 100px 25px;
         }
+
 
         .section-title {
             margin-bottom: 35px;
         }
 
+
         .section-title small {
             color: #700000;
+
             font-size: 10px;
+
             font-weight: bold;
+
             letter-spacing: 3px;
+
             text-transform: uppercase;
         }
 
+
         .section-title h2 {
             margin-top: 8px;
+
             font-size: 30px;
+
             letter-spacing: -1px;
         }
 
+
         .cards {
             display: grid;
+
             grid-template-columns:
                 repeat(3, 1fr);
+
             gap: 18px;
         }
 
+
         .card {
             min-height: 180px;
+
             padding: 27px;
+
             background:
                 linear-gradient(
                     145deg,
                     rgba(15,15,15,.85),
                     rgba(5,5,5,.85)
                 );
+
             border:
                 1px solid #171717;
+
             border-radius: 12px;
+
             transition:
                 transform .35s ease,
                 border-color .35s ease,
                 box-shadow .35s ease;
         }
 
+
         .card:hover {
             transform:
                 translateY(-7px);
+
             border-color:
                 #390000;
+
             box-shadow:
                 0 20px 50px
                 rgba(0,0,0,.35);
         }
 
+
         .card-icon {
             font-size: 22px;
+
             margin-bottom: 22px;
         }
 
+
         .card h3 {
             font-size: 15px;
+
             margin-bottom: 10px;
         }
 
+
         .card p {
             color: #555;
+
             font-size: 12px;
+
             line-height: 1.7;
         }
+
 
         /* =================================================
            FOOTER
@@ -453,20 +631,45 @@
         footer {
             padding:
                 60px 25px;
+
             text-align: center;
+
             border-top:
                 1px solid #111;
+
             color: #444;
+
             font-size: 11px;
         }
+
 
         footer strong {
             color: #760000;
         }
 
+
         /* =================================================
            MOBILE
         ================================================= */
+
+        @media(max-width: 1000px) {
+
+            .nav-links {
+                gap: 18px;
+            }
+
+            .brand-area {
+                gap: 18px;
+            }
+
+            .slogan {
+                font-size: 9px;
+
+                letter-spacing: 2px;
+            }
+
+        }
+
 
         @media(max-width: 800px) {
 
@@ -474,25 +677,30 @@
                 gap: 14px;
             }
 
+
             .nav-links a:nth-child(2),
             .nav-links a:nth-child(3) {
                 display: none;
             }
 
+
             .slogan {
                 display: none;
             }
+
 
             .cards {
                 grid-template-columns:
                     1fr;
             }
 
+
             h1 {
                 letter-spacing: -3px;
             }
 
         }
+
 
         @media(max-width: 550px) {
 
@@ -501,18 +709,22 @@
                     0 20px;
             }
 
+
             .hero-buttons {
                 flex-direction:
                     column;
             }
 
+
             .btn {
                 width: 100%;
             }
 
+
             .mouse-glow {
                 display: none;
             }
+
 
             .mouse-dot {
                 display: none;
@@ -524,14 +736,17 @@
 
 </head>
 
+
 <body>
 
     <div class="background-grid"></div>
+
 
     <div
         class="mouse-glow"
         id="mouseGlow"
     ></div>
+
 
     <div
         class="mouse-dot"
@@ -545,16 +760,22 @@
 
     <nav>
 
-        <a
-            href="/"
-            class="logo"
-        >
-            <span>🩸</span> EXPURG
-        </a>
+        <div class="brand-area">
 
-        <div class="slogan">
-            THE WORLD IS YOURS
+            <a
+                href="/"
+                class="logo"
+            >
+                <span>🩸</span> EXPURG
+            </a>
+
+
+            <div class="slogan">
+                THE WORLD IS YOURS
+            </div>
+
         </div>
+
 
         <div class="nav-links">
 
@@ -562,13 +783,16 @@
                 Início
             </a>
 
+
             <a href="#membros">
                 Membros
             </a>
 
+
             <a href="#noticias">
                 Notícias
             </a>
+
 
             {% if usuario_logado %}
 
@@ -583,6 +807,7 @@
                 </a>
 
             {% endif %}
+
 
             {% if usuario_admin %}
 
@@ -614,9 +839,11 @@
                     Welcome to the underground
                 </div>
 
+
                 <h1>
                     EXP<span>URG</span>
                 </h1>
+
 
                 <p class="hero-description">
 
@@ -629,6 +856,7 @@
 
                 </p>
 
+
                 <div class="hero-buttons">
 
                     {% if usuario_logado %}
@@ -639,6 +867,7 @@
                         >
                             Meu perfil
                         </a>
+
 
                         <a
                             href="/logout"
@@ -655,6 +884,7 @@
                         >
                             Entrar
                         </a>
+
 
                         <a
                             href="/cadastro"
@@ -687,6 +917,7 @@
                     Community
                 </small>
 
+
                 <h2>
                     Área de membros
                 </h2>
@@ -702,9 +933,11 @@
                         👥
                     </div>
 
+
                     <h3>
                         Membros
                     </h3>
+
 
                     <p>
                         Entre para a comunidade e
@@ -721,9 +954,11 @@
                         ⭐
                     </div>
 
+
                     <h3>
                         Níveis
                     </h3>
+
 
                     <p>
                         Seu perfil terá XP, níveis
@@ -740,9 +975,11 @@
                         💬
                     </div>
 
+
                     <h3>
                         Chat
                     </h3>
+
 
                     <p>
                         Um espaço interno para
@@ -771,6 +1008,7 @@
                     Underground
                 </small>
 
+
                 <h2>
                     Notícias
                 </h2>
@@ -786,9 +1024,11 @@
                         🩸
                     </div>
 
+
                     <h3>
                         Em construção
                     </h3>
+
 
                     <p>
                         O sistema de notícias será
@@ -804,9 +1044,11 @@
                         🔥
                     </div>
 
+
                     <h3>
                         Novidades
                     </h3>
+
 
                     <p>
                         Os administradores poderão
@@ -823,9 +1065,11 @@
                         📡
                     </div>
 
+
                     <h3>
                         Atualizações
                     </h3>
+
 
                     <p>
                         Esta área será atualizada
@@ -868,6 +1112,7 @@
                 "mouseGlow"
             );
 
+
         const dot =
             document.getElementById(
                 "mouseDot"
@@ -906,6 +1151,7 @@
                     glowX
                 ) * .08;
 
+
             glowY +=
                 (
                     mouseY -
@@ -918,6 +1164,7 @@
                     mouseX -
                     dotX
                 ) * .35;
+
 
             dotY +=
                 (
