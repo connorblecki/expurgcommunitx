@@ -1,910 +1,789 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
 
+<html lang="pt-BR">
+
+<head>
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+```
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-    <title>{{ config.site_name }}</title>
+<title>{{ config.site_name }}</title>
 
-    <style>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    :root {
+        --red: {{ config.primary_color or "#e00000" }};
+        --bg: #030303;
+        --panel: rgba(12, 12, 12, .78);
+        --border: rgba(255, 255, 255, .08);
+        --text: #f5f5f5;
+        --muted: #777;
+    }
 
-        :root {
-            --red: {{ config.primary_color or "#e00000" }};
-            --bg: #030303;
-            --panel: rgba(12,12,12,.78);
-            --border: rgba(255,255,255,.08);
-            --text: #f5f5f5;
-            --muted: #777;
-        }
+    html {
+        scroll-behavior: smooth;
+    }
 
-        html {
-            scroll-behavior: smooth;
-        }
+    body {
+        min-height: 100vh;
+        color: var(--text);
+        background:
+            radial-gradient(
+                circle at 15% 5%,
+                rgba(224, 0, 0, .16),
+                transparent 30%
+            ),
+            radial-gradient(
+                circle at 85% 75%,
+                rgba(120, 0, 0, .09),
+                transparent 30%
+            ),
+            #030303;
+        font-family: Arial, Helvetica, sans-serif;
+        overflow-x: hidden;
+    }
 
-        body {
-            min-height: 100vh;
-            color: var(--text);
-            background:
-                radial-gradient(
-                    circle at 15% 5%,
-                    rgba(224,0,0,.16),
-                    transparent 30%
-                ),
-                radial-gradient(
-                    circle at 85% 75%,
-                    rgba(120,0,0,.09),
-                    transparent 30%
-                ),
-                #030303;
-            font-family: Arial, Helvetica, sans-serif;
-            overflow-x: hidden;
-        }
+    body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        opacity: .22;
+        background-image:
+            linear-gradient(
+                rgba(255, 255, 255, .025) 1px,
+                transparent 1px
+            ),
+            linear-gradient(
+                90deg,
+                rgba(255, 255, 255, .025) 1px,
+                transparent 1px
+            );
+        background-size: 45px 45px;
+    }
 
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            opacity: .22;
-            background-image:
-                linear-gradient(
-                    rgba(255,255,255,.025) 1px,
-                    transparent 1px
-                ),
-                linear-gradient(
-                    90deg,
-                    rgba(255,255,255,.025) 1px,
-                    transparent 1px
-                );
-            background-size: 45px 45px;
-        }
+    a {
+        color: inherit;
+        text-decoration: none;
+    }
 
-        a {
-            color: inherit;
-            text-decoration: none;
-        }
+    button,
+    input,
+    textarea {
+        font-family: inherit;
+    }
 
-        button,
-        input,
-        textarea {
-            font-family: inherit;
-        }
+    /* =========================
+       TOPBAR
+    ========================= */
 
-        .topbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
+    .topbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        height: 72px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 30px;
+        background: rgba(3, 3, 3, .72);
+        border-bottom: 1px solid rgba(255, 255, 255, .06);
+        backdrop-filter: blur(18px);
+    }
 
-            height: 72px;
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        font-size: 17px;
+        font-weight: 900;
+        letter-spacing: 3px;
+    }
 
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+    .logo-icon {
+        width: 38px;
+        height: 38px;
+        display: grid;
+        place-items: center;
+        border-radius: 11px;
+        background:
+            linear-gradient(
+                145deg,
+                #280000,
+                #650000
+            );
+        border: 1px solid rgba(255, 0, 0, .28);
+        box-shadow:
+            0 0 25px rgba(224, 0, 0, .18);
+    }
 
-            padding: 0 30px;
+    .logo span {
+        color: var(--red);
+    }
 
-            background: rgba(3,3,3,.72);
-            border-bottom: 1px solid rgba(255,255,255,.06);
+    /* =========================
+       SETTINGS
+    ========================= */
 
-            backdrop-filter: blur(18px);
-        }
+    .settings {
+        position: relative;
+    }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 11px;
+    .gear {
+        width: 43px;
+        height: 43px;
+        display: grid;
+        place-items: center;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, .08);
+        background: rgba(255, 255, 255, .035);
+        color: #aaa;
+        font-size: 21px;
+        cursor: pointer;
+        transition:
+            transform .5s ease,
+            color .25s ease,
+            background .25s ease,
+            border-color .25s ease;
+    }
 
-            font-size: 17px;
-            font-weight: 900;
-            letter-spacing: 3px;
-        }
+    .gear:hover {
+        transform: rotate(180deg);
+        color: white;
+        background: rgba(224, 0, 0, .10);
+        border-color: rgba(224, 0, 0, .28);
+    }
 
-        .logo-icon {
-            width: 38px;
-            height: 38px;
+    .settings-menu {
+        position: absolute;
+        top: 54px;
+        right: 0;
+        width: 225px;
+        padding: 8px;
+        border-radius: 14px;
+        background: rgba(9, 9, 9, .97);
+        border: 1px solid rgba(255, 255, 255, .09);
+        box-shadow: 0 25px 70px rgba(0, 0, 0, .55);
+        backdrop-filter: blur(20px);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-8px) scale(.97);
+        transition: .22s ease;
+    }
 
-            display: grid;
-            place-items: center;
+    .settings:hover .settings-menu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0) scale(1);
+    }
 
-            border-radius: 11px;
+    .menu-title {
+        padding: 9px 11px 7px;
+        color: #444;
+        font-size: 8px;
+        letter-spacing: 1.7px;
+        text-transform: uppercase;
+    }
 
-            background:
-                linear-gradient(
-                    145deg,
-                    #280000,
-                    #650000
-                );
+    .settings-menu a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 11px;
+        border-radius: 9px;
+        color: #999;
+        font-size: 11px;
+        transition: .2s;
+    }
 
-            border: 1px solid rgba(255,0,0,.28);
+    .settings-menu a:hover {
+        color: white;
+        background: rgba(255, 255, 255, .05);
+    }
 
-            box-shadow:
-                0 0 25px rgba(224,0,0,.18);
-        }
+    .settings-menu .admin-link {
+        color: #ff6666;
+        background: rgba(224, 0, 0, .035);
+        border: 1px solid rgba(224, 0, 0, .08);
+    }
 
-        .logo span {
-            color: var(--red);
-        }
+    .settings-menu .admin-link:hover {
+        color: white;
+        background: rgba(224, 0, 0, .12);
+        border-color: rgba(224, 0, 0, .25);
+    }
 
-        .settings {
-            position: relative;
-        }
+    .admin-badge {
+        margin-left: auto;
+        padding: 3px 6px;
+        border-radius: 5px;
+        color: #ff7777;
+        background: rgba(224, 0, 0, .10);
+        font-size: 7px;
+        font-weight: 900;
+        letter-spacing: .7px;
+    }
 
-        .gear {
-            width: 43px;
-            height: 43px;
+    .menu-separator {
+        height: 1px;
+        margin: 6px 5px;
+        background: rgba(255, 255, 255, .06);
+    }
 
-            display: grid;
-            place-items: center;
+    /* =========================
+       HERO
+    ========================= */
 
-            border-radius: 12px;
+    .hero {
+        position: relative;
+        min-height: 650px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 120px 20px 70px;
+        text-align: center;
+    }
 
-            border: 1px solid rgba(255,255,255,.08);
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        width: min(900px, 100%);
+    }
 
-            background: rgba(255,255,255,.035);
+    .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 12px;
+        margin-bottom: 22px;
+        border-radius: 100px;
+        color: #ff7777;
+        background: rgba(224, 0, 0, .08);
+        border: 1px solid rgba(224, 0, 0, .18);
+        font-size: 9px;
+        font-weight: bold;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+    }
 
-            color: #aaa;
+    .hero-badge-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--red);
+        box-shadow: 0 0 12px var(--red);
+    }
 
-            font-size: 21px;
+    .hero h1 {
+        font-size: clamp(45px, 9vw, 105px);
+        line-height: .92;
+        font-weight: 900;
+        letter-spacing: -5px;
+        text-transform: uppercase;
+        text-shadow: 0 0 50px rgba(224, 0, 0, .12);
+    }
 
-            cursor: pointer;
+    .hero h1 span {
+        color: var(--red);
+    }
 
-            transition:
-                transform .5s ease,
-                color .25s ease,
-                border-color .25s ease,
-                background .25s ease;
-        }
+    .hero-text {
+        max-width: 650px;
+        margin: 25px auto 0;
+        color: #707070;
+        font-size: 13px;
+        line-height: 1.8;
+    }
 
-        .gear:hover {
-            transform: rotate(180deg);
-            color: white;
-            background: rgba(224,0,0,.10);
-            border-color: rgba(224,0,0,.28);
-        }
+    .hero-buttons {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 28px;
+    }
 
-        .settings-menu {
-            position: absolute;
+    .hero-button {
+        min-width: 140px;
+        padding: 12px 18px;
+        border-radius: 9px;
+        border: 1px solid rgba(255, 255, 255, .08);
+        background: rgba(255, 255, 255, .035);
+        color: #bbb;
+        font-size: 11px;
+        transition: .25s;
+    }
 
-            top: 54px;
-            right: 0;
+    .hero-button:hover {
+        color: white;
+        background: rgba(255, 255, 255, .07);
+        transform: translateY(-2px);
+    }
 
-            width: 210px;
+    .hero-button.primary {
+        color: white;
+        border-color: rgba(224, 0, 0, .35);
+        background:
+            linear-gradient(
+                135deg,
+                #250000,
+                #700000
+            );
+        box-shadow: 0 10px 35px rgba(224, 0, 0, .13);
+    }
 
-            padding: 8px;
+    .glow {
+        position: absolute;
+        width: 420px;
+        height: 420px;
+        border-radius: 50%;
+        background: var(--red);
+        filter: blur(150px);
+        opacity: .07;
+        pointer-events: none;
+    }
 
-            border-radius: 14px;
+    .glow.one {
+        top: 100px;
+        left: -180px;
+    }
 
-            background: rgba(9,9,9,.96);
+    .glow.two {
+        right: -180px;
+        bottom: 20px;
+        opacity: .05;
+    }
 
-            border:
-                1px solid rgba(255,255,255,.09);
+    /* =========================
+       MEMBER PANEL
+    ========================= */
 
-            box-shadow:
-                0 25px 70px rgba(0,0,0,.55);
+    .member-panel {
+        width: min(1050px, calc(100% - 30px));
+        margin: -25px auto 30px;
+        position: relative;
+        z-index: 5;
+        padding: 20px;
+        border-radius: 16px;
+        background:
+            linear-gradient(
+                145deg,
+                rgba(18, 18, 18, .92),
+                rgba(7, 7, 7, .92)
+            );
+        border: 1px solid rgba(224, 0, 0, .15);
+        box-shadow: 0 20px 70px rgba(0, 0, 0, .35);
+    }
 
-            backdrop-filter: blur(20px);
+    .member-panel-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+    }
 
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-8px) scale(.97);
+    .member-info {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+    }
 
-            transition: .22s ease;
-        }
+    .member-avatar {
+        width: 47px;
+        height: 47px;
+        display: grid;
+        place-items: center;
+        border-radius: 13px;
+        background:
+            linear-gradient(
+                145deg,
+                var(--red),
+                #4d0000
+            );
+        font-weight: 900;
+    }
 
-        .settings:hover .settings-menu {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0) scale(1);
-        }
+    .member-info strong {
+        display: block;
+        font-size: 13px;
+    }
 
-        .menu-title {
-            padding: 9px 11px 7px;
+    .member-info small {
+        display: block;
+        margin-top: 4px;
+        color: #666;
+        font-size: 9px;
+    }
 
-            color: #444;
+    .member-actions {
+        display: flex;
+        gap: 8px;
+    }
 
-            font-size: 8px;
-            letter-spacing: 1.7px;
-            text-transform: uppercase;
-        }
+    .member-button {
+        padding: 10px 13px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, .07);
+        background: rgba(255, 255, 255, .03);
+        color: #aaa;
+        font-size: 10px;
+        transition: .2s;
+    }
 
-        .settings-menu a {
-            display: flex;
-            align-items: center;
-            gap: 10px;
+    .member-button:hover {
+        color: white;
+        background: rgba(255, 255, 255, .06);
+    }
 
-            padding: 11px;
+    /* =========================
+       BANNER
+    ========================= */
 
-            border-radius: 9px;
+    .banner-section {
+        width: min(1100px, calc(100% - 30px));
+        margin: 25px auto 55px;
+        position: relative;
+        z-index: 4;
+    }
 
-            color: #999;
+    .banner {
+        position: relative;
+        min-height: 240px;
+        overflow: hidden;
+        display: flex;
+        align-items: flex-end;
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, .08);
+        background:
+            linear-gradient(
+                135deg,
+                #090909,
+                #151515
+            );
+        box-shadow: 0 25px 80px rgba(0, 0, 0, .35);
+    }
 
-            font-size: 11px;
+    .banner-image {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: .48;
+    }
 
-            transition: .2s;
-        }
+    .banner-overlay {
+        position: absolute;
+        inset: 0;
+        background:
+            linear-gradient(
+                90deg,
+                rgba(0, 0, 0, .95),
+                rgba(0, 0, 0, .55),
+                rgba(0, 0, 0, .35)
+            );
+    }
 
-        .settings-menu a:hover {
-            color: white;
-            background: rgba(255,255,255,.05);
-        }
+    .banner-content {
+        position: relative;
+        z-index: 2;
+        max-width: 700px;
+        padding: 35px;
+    }
 
-        .settings-menu .admin-link {
-            color: #ff6666;
-        }
+    .banner-label {
+        color: #ff6868;
+        font-size: 9px;
+        font-weight: bold;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+    }
 
-        .settings-menu .admin-link:hover {
-            background: rgba(224,0,0,.09);
-        }
+    .banner h2 {
+        font-size: clamp(24px, 4vw, 40px);
+        line-height: 1.05;
+        margin-bottom: 10px;
+    }
 
-        .menu-separator {
-            height: 1px;
-            margin: 6px 5px;
-            background: rgba(255,255,255,.06);
+    .banner p {
+        color: #aaa;
+        font-size: 12px;
+        line-height: 1.7;
+    }
+
+    .banner-button {
+        display: inline-flex;
+        margin-top: 18px;
+        padding: 10px 15px;
+        border-radius: 8px;
+        background: var(--red);
+        color: white;
+        font-size: 10px;
+        font-weight: bold;
+    }
+
+    /* =========================
+       SECTIONS
+    ========================= */
+
+    .section {
+        width: min(1100px, calc(100% - 30px));
+        margin: 0 auto 65px;
+    }
+
+    .section-header {
+        margin-bottom: 18px;
+    }
+
+    .section-label {
+        color: var(--red);
+        font-size: 9px;
+        font-weight: bold;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+
+    .section-title {
+        margin-top: 7px;
+        font-size: 25px;
+    }
+
+    .section-description {
+        margin-top: 5px;
+        color: #555;
+        font-size: 11px;
+    }
+
+    /* =========================
+       ANNOUNCEMENTS
+    ========================= */
+
+    .announcements {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .announcement {
+        overflow: hidden;
+        border-radius: 14px;
+        background: rgba(10, 10, 10, .82);
+        border: 1px solid var(--border);
+        transition: .25s;
+    }
+
+    .announcement:hover {
+        transform: translateY(-4px);
+        border-color: rgba(224, 0, 0, .23);
+        box-shadow: 0 20px 45px rgba(0, 0, 0, .3);
+    }
+
+    .announcement-image {
+        width: 100%;
+        height: 145px;
+        object-fit: cover;
+        background: #080808;
+    }
+
+    .announcement-content {
+        padding: 17px;
+    }
+
+    .announcement h3 {
+        font-size: 14px;
+    }
+
+    .announcement p {
+        margin-top: 8px;
+        color: #666;
+        font-size: 10px;
+        line-height: 1.7;
+    }
+
+    .announcement-link {
+        display: inline-block;
+        margin-top: 14px;
+        color: #ff6666;
+        font-size: 9px;
+        font-weight: bold;
+    }
+
+    .empty {
+        padding: 35px;
+        text-align: center;
+        border-radius: 13px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, .015);
+        color: #444;
+        font-size: 11px;
+    }
+
+    /* =========================
+       FEATURES
+    ========================= */
+
+    .features {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .feature {
+        padding: 22px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: rgba(10, 10, 10, .65);
+        transition: .25s;
+    }
+
+    .feature:hover {
+        transform: translateY(-3px);
+        border-color: rgba(224, 0, 0, .18);
+    }
+
+    .feature-icon {
+        width: 38px;
+        height: 38px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 15px;
+        border-radius: 10px;
+        background: rgba(224, 0, 0, .08);
+        border: 1px solid rgba(224, 0, 0, .14);
+    }
+
+    .feature h3 {
+        font-size: 13px;
+    }
+
+    .feature p {
+        margin-top: 7px;
+        color: #5e5e5e;
+        font-size: 10px;
+        line-height: 1.7;
+    }
+
+    /* =========================
+       FOOTER
+    ========================= */
+
+    footer {
+        padding: 35px 20px 45px;
+        text-align: center;
+        border-top: 1px solid rgba(255, 255, 255, .05);
+        color: #333;
+        font-size: 9px;
+        letter-spacing: 1px;
+    }
+
+    footer span {
+        color: var(--red);
+    }
+
+    /* =========================
+       RESPONSIVE
+    ========================= */
+
+    @media (max-width: 850px) {
+        .announcements,
+        .features {
+            grid-template-columns: 1fr 1fr;
         }
 
         .hero {
-            position: relative;
-
-            min-height: 650px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            padding: 120px 20px 70px;
-
-            text-align: center;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-
-            width: min(900px, 100%);
-        }
-
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-
-            padding: 7px 12px;
-
-            margin-bottom: 22px;
-
-            border-radius: 100px;
-
-            color: #ff7777;
-
-            background: rgba(224,0,0,.08);
-
-            border:
-                1px solid rgba(224,0,0,.18);
-
-            font-size: 9px;
-            font-weight: bold;
-            letter-spacing: 1.8px;
-            text-transform: uppercase;
-        }
-
-        .hero-badge-dot {
-            width: 6px;
-            height: 6px;
-
-            border-radius: 50%;
-
-            background: var(--red);
-
-            box-shadow:
-                0 0 12px var(--red);
+            min-height: 570px;
         }
 
         .hero h1 {
-            font-size: clamp(45px, 9vw, 105px);
+            letter-spacing: -3px;
+        }
+    }
 
-            line-height: .92;
-
-            font-weight: 900;
-
-            letter-spacing: -5px;
-
-            text-transform: uppercase;
-
-            text-shadow:
-                0 0 50px rgba(224,0,0,.12);
+    @media (max-width: 600px) {
+        .topbar {
+            padding: 0 15px;
         }
 
-        .hero h1 span {
-            color: var(--red);
-        }
-
-        .hero-text {
-            max-width: 650px;
-
-            margin: 25px auto 0;
-
-            color: #707070;
-
-            font-size: 13px;
-
-            line-height: 1.8;
-        }
-
-        .hero-buttons {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 10px;
-
-            margin-top: 28px;
-        }
-
-        .hero-button {
-            min-width: 140px;
-
-            padding: 12px 18px;
-
-            border-radius: 9px;
-
-            border: 1px solid rgba(255,255,255,.08);
-
-            background: rgba(255,255,255,.035);
-
-            color: #bbb;
-
-            font-size: 11px;
-
-            transition: .25s;
-        }
-
-        .hero-button:hover {
-            color: white;
-            background: rgba(255,255,255,.07);
-            transform: translateY(-2px);
-        }
-
-        .hero-button.primary {
-            color: white;
-
-            border-color:
-                rgba(224,0,0,.35);
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #250000,
-                    #700000
-                );
-
-            box-shadow:
-                0 10px 35px rgba(224,0,0,.13);
-        }
-
-        .glow {
-            position: absolute;
-
-            width: 420px;
-            height: 420px;
-
-            border-radius: 50%;
-
-            background: var(--red);
-
-            filter: blur(150px);
-
-            opacity: .07;
-
-            pointer-events: none;
-        }
-
-        .glow.one {
-            top: 100px;
-            left: -180px;
-        }
-
-        .glow.two {
-            right: -180px;
-            bottom: 20px;
-            opacity: .05;
-        }
-
-        .member-panel {
-            width: min(1050px, calc(100% - 30px));
-
-            margin: -25px auto 30px;
-
-            position: relative;
-            z-index: 5;
-
-            padding: 20px;
-
-            border-radius: 16px;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    rgba(18,18,18,.92),
-                    rgba(7,7,7,.92)
-                );
-
-            border:
-                1px solid rgba(224,0,0,.15);
-
-            box-shadow:
-                0 20px 70px rgba(0,0,0,.35);
-        }
-
-        .member-panel-inner {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
-            gap: 20px;
-        }
-
-        .member-info {
-            display: flex;
-            align-items: center;
-            gap: 13px;
-        }
-
-        .member-avatar {
-            width: 47px;
-            height: 47px;
-
-            display: grid;
-            place-items: center;
-
-            border-radius: 13px;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    var(--red),
-                    #4d0000
-                );
-
-            font-weight: 900;
-        }
-
-        .member-info strong {
-            display: block;
-            font-size: 13px;
-        }
-
-        .member-info small {
-            display: block;
-            margin-top: 4px;
-            color: #666;
-            font-size: 9px;
-        }
-
-        .member-actions {
-            display: flex;
-            gap: 8px;
-        }
-
-        .member-button {
-            padding: 10px 13px;
-
-            border-radius: 8px;
-
-            border: 1px solid rgba(255,255,255,.07);
-
-            background: rgba(255,255,255,.03);
-
-            color: #aaa;
-
-            font-size: 10px;
-
-            transition: .2s;
-        }
-
-        .member-button:hover {
-            color: white;
-            background: rgba(255,255,255,.06);
-        }
-
-        .banner-section {
-            width: min(1100px, calc(100% - 30px));
-
-            margin: 25px auto 55px;
-
-            position: relative;
-            z-index: 4;
-        }
-
-        .banner {
-            position: relative;
-
-            min-height: 240px;
-
-            overflow: hidden;
-
-            display: flex;
-            align-items: flex-end;
-
-            border-radius: 18px;
-
-            border:
-                1px solid rgba(255,255,255,.08);
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #090909,
-                    #151515
-                );
-
-            box-shadow:
-                0 25px 80px rgba(0,0,0,.35);
-        }
-
-        .banner-image {
-            position: absolute;
-            inset: 0;
-
-            width: 100%;
-            height: 100%;
-
-            object-fit: cover;
-
-            opacity: .48;
-        }
-
-        .banner-overlay {
-            position: absolute;
-            inset: 0;
-
-            background:
-                linear-gradient(
-                    90deg,
-                    rgba(0,0,0,.95),
-                    rgba(0,0,0,.55),
-                    rgba(0,0,0,.35)
-                );
-        }
-
-        .banner-content {
-            position: relative;
-            z-index: 2;
-
-            max-width: 700px;
-
-            padding: 35px;
-        }
-
-        .banner-label {
-            color: #ff6868;
-
-            font-size: 9px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-
-            margin-bottom: 10px;
-        }
-
-        .banner h2 {
-            font-size: clamp(24px, 4vw, 40px);
-
-            line-height: 1.05;
-
-            margin-bottom: 10px;
-        }
-
-        .banner p {
-            color: #aaa;
-
-            font-size: 12px;
-
-            line-height: 1.7;
-        }
-
-        .banner-button {
-            display: inline-flex;
-
-            margin-top: 18px;
-
-            padding: 10px 15px;
-
-            border-radius: 8px;
-
-            background: var(--red);
-
-            color: white;
-
-            font-size: 10px;
-            font-weight: bold;
-        }
-
-        .section {
-            width: min(1100px, calc(100% - 30px));
-
-            margin: 0 auto 65px;
-        }
-
-        .section-header {
-            margin-bottom: 18px;
-        }
-
-        .section-label {
-            color: var(--red);
-
-            font-size: 9px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .section-title {
-            margin-top: 7px;
-
-            font-size: 25px;
-        }
-
-        .section-description {
-            margin-top: 5px;
-
-            color: #555;
-
-            font-size: 11px;
-        }
-
-        .announcements {
-            display: grid;
-
-            grid-template-columns:
-                repeat(
-                    3,
-                    minmax(0,1fr)
-                );
-
-            gap: 14px;
-        }
-
-        .announcement {
-            overflow: hidden;
-
-            border-radius: 14px;
-
-            background:
-                rgba(10,10,10,.82);
-
-            border:
-                1px solid var(--border);
-
-            transition: .25s;
-        }
-
-        .announcement:hover {
-            transform: translateY(-4px);
-
-            border-color:
-                rgba(224,0,0,.23);
-
-            box-shadow:
-                0 20px 45px rgba(0,0,0,.3);
-        }
-
-        .announcement-image {
-            width: 100%;
-            height: 145px;
-
-            object-fit: cover;
-
-            background: #080808;
-        }
-
-        .announcement-content {
-            padding: 17px;
-        }
-
-        .announcement h3 {
+        .logo {
             font-size: 14px;
         }
 
-        .announcement p {
-            margin-top: 8px;
-
-            color: #666;
-
-            font-size: 10px;
-
-            line-height: 1.7;
+        .logo-icon {
+            width: 35px;
+            height: 35px;
         }
 
-        .announcement-link {
-            display: inline-block;
-
-            margin-top: 14px;
-
-            color: #ff6666;
-
-            font-size: 9px;
-            font-weight: bold;
+        .hero {
+            min-height: 540px;
+            padding-top: 110px;
         }
 
-        .empty {
-            padding: 35px;
+        .hero h1 {
+            font-size: 48px;
+            letter-spacing: -3px;
+        }
 
-            text-align: center;
-
-            border-radius: 13px;
-
-            border: 1px solid var(--border);
-
-            background: rgba(255,255,255,.015);
-
-            color: #444;
-
+        .hero-text {
             font-size: 11px;
         }
 
-        .features {
-            display: grid;
-
-            grid-template-columns:
-                repeat(
-                    3,
-                    minmax(0,1fr)
-                );
-
-            gap: 14px;
+        .member-panel-inner {
+            align-items: flex-start;
+            flex-direction: column;
         }
 
-        .feature {
-            padding: 22px;
-
-            border-radius: 14px;
-
-            border:
-                1px solid var(--border);
-
-            background:
-                rgba(10,10,10,.65);
+        .member-actions {
+            width: 100%;
         }
 
-        .feature-icon {
-            width: 38px;
-            height: 38px;
-
-            display: grid;
-            place-items: center;
-
-            margin-bottom: 15px;
-
-            border-radius: 10px;
-
-            background:
-                rgba(224,0,0,.08);
-
-            border:
-                1px solid rgba(224,0,0,.14);
-        }
-
-        .feature h3 {
-            font-size: 13px;
-        }
-
-        .feature p {
-            margin-top: 7px;
-
-            color: #5e5e5e;
-
-            font-size: 10px;
-
-            line-height: 1.7;
-        }
-
-        footer {
-            padding: 35px 20px 45px;
-
+        .member-button {
+            flex: 1;
             text-align: center;
-
-            border-top:
-                1px solid rgba(255,255,255,.05);
-
-            color: #333;
-
-            font-size: 9px;
-
-            letter-spacing: 1px;
         }
 
-        footer span {
-            color: var(--red);
+        .banner-content {
+            padding: 25px;
         }
 
-        @media (max-width: 850px) {
-
-            .announcements,
-            .features {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .hero {
-                min-height: 570px;
-            }
-
-            .hero h1 {
-                letter-spacing: -3px;
-            }
-
+        .announcements,
+        .features {
+            grid-template-columns: 1fr;
         }
 
-        @media (max-width: 600px) {
-
-            .topbar {
-                padding: 0 15px;
-            }
-
-            .logo {
-                font-size: 14px;
-            }
-
-            .logo-icon {
-                width: 35px;
-                height: 35px;
-            }
-
-            .hero {
-                min-height: 540px;
-                padding-top: 110px;
-            }
-
-            .hero h1 {
-                font-size: 48px;
-                letter-spacing: -3px;
-            }
-
-            .hero-text {
-                font-size: 11px;
-            }
-
-            .member-panel-inner {
-                align-items: flex-start;
-                flex-direction: column;
-            }
-
-            .member-actions {
-                width: 100%;
-            }
-
-            .member-button {
-                flex: 1;
-                text-align: center;
-            }
-
-            .banner-content {
-                padding: 25px;
-            }
-
-            .announcements,
-            .features {
-                grid-template-columns: 1fr;
-            }
-
+        .settings-menu {
+            right: -5px;
         }
-
-    </style>
+    }
+</style>
+```
 
 </head>
 
 <body>
+
+```
+<!-- =========================================================
+     SESSÃO
+========================================================== -->
+
+{% set logado = session.get("usuario") %}
+{% set sou_admin = session.get("admin", false) %}
+
+<!-- =========================================================
+     TOPO
+========================================================== -->
 
 <header class="topbar">
 
@@ -918,13 +797,11 @@
 
     </a>
 
-
     <div class="settings">
 
         <div class="gear">
             ⚙
         </div>
-
 
         <div class="settings-menu">
 
@@ -932,23 +809,17 @@
                 Menu
             </div>
 
+            {% if logado %}
 
-            {% if usuario_logado %}
-
-                {% if usuario %}
-
-                    <a href="/perfil">
-                        👤 Perfil
-                    </a>
-
-                {% endif %}
+                <a href="/perfil">
+                    👤 Perfil
+                </a>
 
                 <a href="/configuracoes">
                     ⚙ Configurações
                 </a>
 
-
-                {% if usuario_admin %}
+                {% if sou_admin %}
 
                     <div class="menu-separator"></div>
 
@@ -961,17 +832,40 @@
                         class="admin-link"
                     >
                         🛡 Painel Admin
+
+                        <span class="admin-badge">
+                            ADMIN
+                        </span>
+                    </a>
+
+                    <a
+                        href="/admin/config"
+                        class="admin-link"
+                    >
+                        ⚙ Configuração Admin
+                    </a>
+
+                    <a
+                        href="/admin/anuncios"
+                        class="admin-link"
+                    >
+                        📢 Anúncios
+                    </a>
+
+                    <a
+                        href="/admin/banner"
+                        class="admin-link"
+                    >
+                        🖼 Banner
                     </a>
 
                 {% endif %}
-
 
                 <div class="menu-separator"></div>
 
                 <a href="/logout">
                     ⏻ Sair
                 </a>
-
 
             {% else %}
 
@@ -991,13 +885,14 @@
 
 </header>
 
+<!-- =========================================================
+     HERO
+========================================================== -->
 
 <section class="hero">
 
     <div class="glow one"></div>
-
     <div class="glow two"></div>
-
 
     <div class="hero-content">
 
@@ -1009,24 +904,22 @@
 
         </div>
 
-
         <h1>
             {{ config.home_text or "THE WORLD IS YOURS" }}
         </h1>
 
-
         <p class="hero-text">
 
             Bem-vindo ao {{ config.site_name }}.
+
             Um espaço criado para reunir pessoas,
             conteúdo e uma comunidade em um só lugar.
 
         </p>
 
-
         <div class="hero-buttons">
 
-            {% if usuario_logado %}
+            {% if logado %}
 
                 {% if config.chat_enabled %}
 
@@ -1039,7 +932,6 @@
 
                 {% endif %}
 
-
                 <a
                     href="#anuncios"
                     class="hero-button"
@@ -1047,6 +939,16 @@
                     Ver novidades
                 </a>
 
+                {% if sou_admin %}
+
+                    <a
+                        href="/admin"
+                        class="hero-button"
+                    >
+                        🛡 Painel Admin
+                    </a>
+
+                {% endif %}
 
             {% else %}
 
@@ -1056,7 +958,6 @@
                 >
                     🔐 Entrar
                 </a>
-
 
                 <a
                     href="/cadastro"
@@ -1073,247 +974,254 @@
 
 </section>
 
+<!-- =========================================================
+     MEMBER PANEL
+========================================================== -->
 
-{% if usuario_logado and usuario %}
+{% if logado %}
 
-<section class="member-panel">
+    <section class="member-panel">
 
-    <div class="member-panel-inner">
+        <div class="member-panel-inner">
 
-        <div class="member-info">
+            <div class="member-info">
 
-            <div class="member-avatar">
+                <div class="member-avatar">
 
-                {{ usuario.username[0]|upper }}
+                    {{ logado[0]|upper }}
 
-            </div>
-
-
-            <div>
-
-                <strong>
-                    Bem-vindo, {{ usuario.username }}
-                </strong>
-
-                <small>
-                    Nível {{ usuario.level }}
-                    •
-                    {{ usuario.xp }} XP
-                </small>
-
-            </div>
-
-        </div>
-
-
-        <div class="member-actions">
-
-            <a
-                href="/perfil"
-                class="member-button"
-            >
-                👤 Meu perfil
-            </a>
-
-
-            {% if config.chat_enabled %}
-
-                <a
-                    href="/chat"
-                    class="member-button"
-                >
-                    💬 Chat
-                </a>
-
-            {% endif %}
-
-        </div>
-
-    </div>
-
-</section>
-
-{% endif %}
-
-
-{% if usuario_logado and config.banner_enabled %}
-
-<section class="banner-section">
-
-    {% if config.banner_link %}
-
-        <a
-            href="{{ config.banner_link }}"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="banner"
-        >
-
-    {% else %}
-
-        <div class="banner">
-
-    {% endif %}
-
-
-            {% if config.banner_image %}
-
-                <img
-                    src="{{ config.banner_image }}"
-                    class="banner-image"
-                    alt="Banner"
-                >
-
-            {% endif %}
-
-
-            <div class="banner-overlay"></div>
-
-
-            <div class="banner-content">
-
-                <div class="banner-label">
-                    Destaque
                 </div>
 
+                <div>
 
-                <h2>
-                    {{ config.banner_title or "THE WORLD IS YOURS" }}
-                </h2>
+                    <strong>
+                        Bem-vindo,
+                        {{ logado }}
+                    </strong>
 
+                    {% if sou_admin %}
 
-                {% if config.banner_text %}
+                        <small>
+                            Administrador • Acesso total
+                        </small>
 
-                    <p>
-                        {{ config.banner_text }}
-                    </p>
+                    {% else %}
 
-                {% endif %}
-
-
-                {% if config.banner_link %}
-
-                    <span class="banner-button">
-                        Acessar →
-                    </span>
-
-                {% endif %}
-
-            </div>
-
-
-    {% if config.banner_link %}
-
-        </a>
-
-    {% else %}
-
-        </div>
-
-    {% endif %}
-
-</section>
-
-{% endif %}
-
-
-{% if config.announcements_enabled %}
-
-<section
-    class="section"
-    id="anuncios"
->
-
-    <div class="section-header">
-
-        <div class="section-label">
-            Atualizações
-        </div>
-
-
-        <h2 class="section-title">
-            Novidades
-        </h2>
-
-
-        <p class="section-description">
-            Últimas publicações da comunidade.
-        </p>
-
-    </div>
-
-
-    {% if announcements %}
-
-        <div class="announcements">
-
-            {% for anuncio in announcements %}
-
-                <article class="announcement">
-
-                    {% if anuncio.image %}
-
-                        <img
-                            src="{{ anuncio.image }}"
-                            class="announcement-image"
-                            alt="{{ anuncio.title }}"
-                        >
+                        <small>
+                            Membro da comunidade
+                        </small>
 
                     {% endif %}
 
+                </div>
 
-                    <div class="announcement-content">
+            </div>
 
-                        <h3>
-                            {{ anuncio.title }}
-                        </h3>
+            <div class="member-actions">
 
+                <a
+                    href="/perfil"
+                    class="member-button"
+                >
+                    👤 Meu perfil
+                </a>
 
-                        {% if anuncio.content %}
+                {% if config.chat_enabled %}
 
-                            <p>
-                                {{ anuncio.content }}
-                            </p>
+                    <a
+                        href="/chat"
+                        class="member-button"
+                    >
+                        💬 Chat
+                    </a>
 
-                        {% endif %}
+                {% endif %}
 
+                {% if sou_admin %}
 
-                        {% if anuncio.link %}
+                    <a
+                        href="/admin"
+                        class="member-button"
+                    >
+                        🛡 Admin
+                    </a>
 
-                            <a
-                                href="{{ anuncio.link }}"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="announcement-link"
-                            >
-                                Ver mais →
-                            </a>
+                {% endif %}
 
-                        {% endif %}
-
-                    </div>
-
-                </article>
-
-            {% endfor %}
-
-        </div>
-
-
-    {% else %}
-
-        <div class="empty">
-
-            Nenhuma novidade publicada no momento.
+            </div>
 
         </div>
 
-    {% endif %}
-
-</section>
+    </section>
 
 {% endif %}
 
+<!-- =========================================================
+     BANNER
+========================================================== -->
+
+{% if logado and config.banner_enabled %}
+
+    <section class="banner-section">
+
+        {% if config.banner_link %}
+
+            <a
+                href="{{ config.banner_link }}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="banner"
+            >
+
+        {% else %}
+
+            <div class="banner">
+
+        {% endif %}
+
+                {% if config.banner_image %}
+
+                    <img
+                        src="{{ config.banner_image }}"
+                        class="banner-image"
+                        alt="Banner"
+                    >
+
+                {% endif %}
+
+                <div class="banner-overlay"></div>
+
+                <div class="banner-content">
+
+                    <div class="banner-label">
+                        Destaque
+                    </div>
+
+                    <h2>
+                        {{
+                            config.banner_title
+                            or
+                            "THE WORLD IS YOURS"
+                        }}
+                    </h2>
+
+                    {% if config.banner_text %}
+
+                        <p>
+                            {{ config.banner_text }}
+                        </p>
+
+                    {% endif %}
+
+                    {% if config.banner_link %}
+
+                        <span class="banner-button">
+                            Acessar →
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+        {% if config.banner_link %}
+
+            </a>
+
+        {% else %}
+
+            </div>
+
+        {% endif %}
+
+    </section>
+
+{% endif %}
+
+<!-- =========================================================
+     ANÚNCIOS
+========================================================== -->
+
+{% if config.announcements_enabled %}
+
+    <section
+        class="section"
+        id="anuncios"
+    >
+
+        <div class="section-header">
+
+            <div class="section-label">
+                Atualizações
+            </div>
+
+            <h2 class="section-title">
+                Novidades
+            </h2>
+
+            <p class="section-description">
+                Últimas publicações da comunidade.
+            </p>
+
+        </div>
+
+        {% if anuncios %}
+
+            <div class="announcements">
+
+                {% for anuncio in anuncios %}
+
+                    <article class="announcement">
+
+                        <div class="announcement-content">
+
+                            <h3>
+                                {{ anuncio.title }}
+                            </h3>
+
+                            {% if anuncio.content %}
+
+                                <p>
+                                    {{ anuncio.content }}
+                                </p>
+
+                            {% endif %}
+
+                            {% if anuncio.link %}
+
+                                <a
+                                    href="{{ anuncio.link }}"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="announcement-link"
+                                >
+                                    Acessar →
+                                </a>
+
+                            {% endif %}
+
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="empty">
+                Nenhuma novidade publicada no momento.
+            </div>
+
+        {% endif %}
+
+    </section>
+
+{% endif %}
+
+<!-- =========================================================
+     RECURSOS
+========================================================== -->
 
 <section class="section">
 
@@ -1323,18 +1231,15 @@
             {{ config.site_name }}
         </div>
 
-
         <h2 class="section-title">
             Tudo em um só lugar
         </h2>
-
 
         <p class="section-description">
             Recursos disponíveis para a comunidade.
         </p>
 
     </div>
-
 
     <div class="features">
 
@@ -1350,11 +1255,11 @@
 
             <p>
                 Crie sua conta e faça parte
-                da comunidade do {{ config.site_name }}.
+                da comunidade do
+                {{ config.site_name }}.
             </p>
 
         </div>
-
 
         <div class="feature">
 
@@ -1372,7 +1277,6 @@
             </p>
 
         </div>
-
 
         <div class="feature">
 
@@ -1395,6 +1299,9 @@
 
 </section>
 
+<!-- =========================================================
+     FOOTER
+========================================================== -->
 
 <footer>
 
@@ -1406,12 +1313,21 @@
 
     •
 
-    <span>EXPURG</span>
+    <span>
+        EXPURG
+    </span>
 
 </footer>
 
+<!-- =========================================================
+     JAVASCRIPT
+========================================================== -->
 
 <script>
+
+    /* =========================
+       BRILHO DO MOUSE
+    ========================= */
 
     const glow = document.createElement("div");
 
@@ -1423,56 +1339,80 @@
     glow.style.zIndex = "999";
     glow.style.background =
         "radial-gradient(circle, rgba(224,0,0,.10), transparent 70%)";
-    glow.style.transform = "translate(-50%, -50%)";
+
+    glow.style.transform =
+        "translate(-50%, -50%)";
+
     glow.style.opacity = "0";
-    glow.style.transition = "opacity .3s";
+
+    glow.style.transition =
+        "opacity .3s";
 
     document.body.appendChild(glow);
 
+    document.addEventListener(
+        "mousemove",
+        function(event) {
 
-    document.addEventListener("mousemove", function(event) {
+            glow.style.left =
+                event.clientX + "px";
 
-        glow.style.left = event.clientX + "px";
-        glow.style.top = event.clientY + "px";
-        glow.style.opacity = "1";
+            glow.style.top =
+                event.clientY + "px";
 
-    });
+            glow.style.opacity = "1";
+
+        }
+    );
+
+    document.addEventListener(
+        "mouseleave",
+        function() {
+
+            glow.style.opacity = "0";
+
+        }
+    );
 
 
-    document.addEventListener("mouseleave", function() {
-
-        glow.style.opacity = "0";
-
-    });
-
+    /* =========================
+       ANIMAÇÕES DOS CARDS
+    ========================= */
 
     document
         .querySelectorAll(
             ".announcement, .feature, .member-panel, .banner"
         )
-        .forEach(function(elemento) {
+        .forEach(
+            function(elemento) {
 
-            elemento.animate(
-                [
+                elemento.animate(
+                    [
+                        {
+                            opacity: 0,
+                            transform:
+                                "translateY(12px)"
+                        },
+                        {
+                            opacity: 1,
+                            transform:
+                                "translateY(0)"
+                        }
+                    ],
                     {
-                        opacity: 0,
-                        transform: "translateY(12px)"
-                    },
-                    {
-                        opacity: 1,
-                        transform: "translateY(0)"
+                        duration: 550,
+                        easing:
+                            "cubic-bezier(.2,.8,.2,1)",
+                        fill: "forwards"
                     }
-                ],
-                {
-                    duration: 550,
-                    easing: "cubic-bezier(.2,.8,.2,1)",
-                    fill: "forwards"
-                }
-            );
+                );
 
-        });
+            }
+        );
 
 </script>
+```
 
 </body>
+
 </html>
