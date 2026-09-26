@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Cadastro | {{ config.site_name }}</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+
+            min-height: 100vh;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-family: Arial, sans-serif;
+
+            color: white;
+
+            background:
+                radial-gradient(
+                    circle at 50% 20%,
+                    rgba(110, 0, 0, .18),
+                    transparent 45%
+                ),
+                #030303;
+        }
+
+        .box {
+
+            width: 400px;
+
+            max-width: calc(100% - 30px);
+
+            padding: 40px;
+
+            background: rgba(10, 10, 10, .94);
+
+            border: 1px solid #241010;
+
+            border-radius: 16px;
+
+            box-shadow:
+                0 25px 80px rgba(0, 0, 0, .7);
+        }
+
+        .blood {
+
+            text-align: center;
+
+            font-size: 30px;
+
+            margin-bottom: 10px;
+        }
+
+        h1 {
+
+            text-align: center;
+
+            font-size: 25px;
+
+            letter-spacing: 2px;
+
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+
+            text-align: center;
+
+            color: #666;
+
+            font-size: 13px;
+
+            margin-bottom: 30px;
+        }
+
+        .field {
+
+            margin-bottom: 18px;
+        }
+
+        label {
+
+            display: block;
+
+            color: #999;
+
+            font-size: 12px;
+
+            font-weight: bold;
+
+            text-transform: uppercase;
+
+            letter-spacing: 1px;
+
+            margin-bottom: 8px;
+        }
+
+        input {
+
+            width: 100%;
+
+            height: 48px;
+
+            padding: 0 14px;
+
+            border-radius: 8px;
+
+            border: 1px solid #292929;
+
+            background: #070707;
+
+            color: white;
+
+            outline: none;
+        }
+
+        input:focus {
+
+            border-color: #720000;
+        }
+
+        button {
+
+            width: 100%;
+
+            height: 50px;
+
+            border: 1px solid #720000;
+
+            border-radius: 8px;
+
+            color: white;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #390000,
+                    #720000,
+                    #390000
+                );
+
+            cursor: pointer;
+
+            font-weight: bold;
+        }
+
+        .error {
+
+            margin-bottom: 20px;
+
+            padding: 12px;
+
+            border-radius: 7px;
+
+            font-size: 12px;
+
+            text-align: center;
+
+            color: #ffaaaa;
+
+            background: rgba(100, 0, 0, .12);
+
+            border: 1px solid rgba(130, 0, 0, .3);
+        }
+
+        .bottom {
+
+            text-align: center;
+
+            margin-top: 25px;
+
+            color: #555;
+
+            font-size: 12px;
+        }
+
+        .bottom a {
+
+            color: #9b0000;
+
+            text-decoration: none;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <main class="box">
+
+        <div class="blood">
+            🩸
+        </div>
+
+        <h1>
+            CADASTRO
+        </h1>
+
+        <p class="subtitle">
+            Crie sua conta
+        </p>
+
+
+        {% if erro %}
+
+            <div class="error">
+                {{ erro }}
+            </div>
+
+        {% endif %}
+
+
+        <form
+            action="/cadastro"
+            method="POST"
+        >
+
+            <div class="field">
+
+                <label>
+                    Usuário
+                </label>
+
+                <input
+                    type="text"
+                    name="username"
+                    placeholder="Escolha um usuário"
+                    required
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label>
+                    Gmail
+                </label>
+
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="seuemail@gmail.com"
+                    required
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label>
+                    Senha
+                </label>
+
+                <input
+                    type="password"
+                    name="password"
+                    placeholder="Sua senha"
+                    required
+                >
+
+            </div>
+
+
+            <div class="field">
+
+                <label>
+                    Confirmar senha
+                </label>
+
+                <input
+                    type="password"
+                    name="password_confirm"
+                    placeholder="Digite novamente"
+                    required
+                >
+
+            </div>
+
+
+            <button type="submit">
+                CRIAR CONTA
+            </button>
+
+        </form>
+
+
+        <div class="bottom">
+
+            Já possui uma conta?
+
+            <a href="/login">
+                Entrar
+            </a>
+
+        </div>
+
+    </main>
+
+</body>
+
+</html>
